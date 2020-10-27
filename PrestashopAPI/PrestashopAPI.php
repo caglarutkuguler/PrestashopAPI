@@ -115,8 +115,8 @@ class PrestashopAPI extends Module
             $amount = 0;
             foreach ($orders['sales'] as $order) {
                 if ($product['id_product'] == $order['id_product']) {
-                    $sales = $sales + $order['product_quantity'] - 2 * $order['product_quantity_refunded'];
-                    $amount = $amount + $order['product_quantity'] * $order['amount'] - 2 * $order['product_quantity_refunded'] * $order['amount'];
+                    $sales = $sales + $order['product_quantity'] - $order['product_quantity_refunded'];
+                    $amount = $amount + $order['product_quantity'] * $order['amount'] - $order['product_quantity_refunded'] * $order['amount'];
                 }
             }
             $products['products'][$arraynumber]['numberofsalesaddons'] = $sales;
@@ -307,7 +307,7 @@ class PrestashopAPI extends Module
             $sales = 0;
             foreach ($orders['sales'] as $order) {
                 if ($product['product']['id_product'] == $order['id_product']) {
-                    $sales = $sales + $order['product_quantity'] - 2 * $order['product_quantity_refunded'];
+                    $sales = $sales + $order['product_quantity'] - $order['product_quantity_refunded'];
                 }
                 $product['product'][0]['numberofsalesaddons'] = $sales;
             }
