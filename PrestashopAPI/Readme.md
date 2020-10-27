@@ -1,0 +1,1 @@
+# Prestashop Addons Seller Store API Module
