@@ -47,3 +47,10 @@
 		</ul>
 	</p>
 </div>
+
+<div class="alert alert-info" role="alert">
+  {l s='To be able to calculate the Prestashop Addons Store Sales and the local sales total, your local website\'s product reference must be the same with Addons Store product id.' mod='PrestashopAPI'}</p>
+</div>
+<div class="alert alert-warning" role="alert">
+  <p class="alert-text">{l s='Total turnover and total sales values include both website\'s refunds into consideration. Curencies are assumed to be the same in both sites.' mod='PrestashopAPI'}</p>
+</div>

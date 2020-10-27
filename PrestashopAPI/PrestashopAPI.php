@@ -66,14 +66,16 @@ class PrestashopAPI extends Module
      */
     public function install()
     {
+        Configuration::updateValue('PRODUCT_PAGE_FRONT_ENABLE', true);
         return parent::install() &&
-        $this->registerHook('header') &&
+        $this->registerHook('footer') &&
         $this->registerHook('backOfficeHeader') &&
         $this->registerHook('displayBackOfficeHeader');
     }
 
     public function uninstall()
     {
+        Configuration::deleteByName('PRODUCT_PAGE_FRONT_ENABLE');
         Configuration::deleteByName('PRESTASHOPAPI_KEY');
         Configuration::deleteByName('API_DATE_FROM');
         Configuration::deleteByName('API_DATE_TO');
@@ -96,13 +98,55 @@ class PrestashopAPI extends Module
         $api = new SellerApi();
 
         $options = array(
-            'limit' => 500,
+            'limit' => 10000,
             'sort' => 'asc',
             'page' => 1,
         );
 
+        setlocale(LC_MONETARY, 'nl_NL.UTF-8');
+
         $orders = json_decode($api->getOrders($options), true);
         $products = json_decode($api->getProducts($options), true);
+
+        /* Find the number of Prestashop Addons Store Sales*/
+        $arraynumber = 0;
+        foreach ($products['products'] as $product) {
+            $sales = 0;
+            $amount = 0;
+            foreach ($orders['sales'] as $order) {
+                if ($product['id_product'] == $order['id_product']) {
+                    $sales = $sales + $order['product_quantity'] - 2 * $order['product_quantity_refunded'];
+                    $amount = $amount + $order['product_quantity'] * $order['amount'] - 2 * $order['product_quantity_refunded'] * $order['amount'];
+                }
+            }
+            $products['products'][$arraynumber]['numberofsalesaddons'] = $sales;
+            $products['products'][$arraynumber]['turnover_addons'] = $amount;
+            $arraynumber++;
+        }
+
+        /* Find the number of local sales per reference */
+        $sql = 'SELECT a.id_order, a.product_id, a.product_quantity, a.product_price, a.total_price_tax_incl, b.reference
+                FROM ' . _DB_PREFIX_ . 'order_detail a, ' . _DB_PREFIX_ . 'product b
+                WHERE a.product_id = b.id_product';
+        $local_sales = Db::getInstance()->executes($sql);
+        $arraynumber = 0;
+        foreach ($products['products'] as $product) {
+            $sales = 0;
+            $amount = 0;
+            foreach ($local_sales as $order) {
+                if ($product['id_product'] == $order['reference']) {
+                    $sales = $sales + $order['product_quantity'] - $order['product_quantity_refunded'];
+                    $amount = $amount + $order['product_quantity'] * $order['total_price_tax_incl'] - $order['product_quantity_refunded'] * $order['total_price_tax_incl'];
+                }
+            }
+            $products['products'][$arraynumber]['numberofsaleslocal'] = $sales;
+            $products['products'][$arraynumber]['turnover_local'] = $amount;
+            $products['products'][$arraynumber]['totalsales'] = $products['products'][$arraynumber]['numberofsalesaddons'] + $products['products'][$arraynumber]['numberofsaleslocal'];
+            $products['products'][$arraynumber]['turnover'] = $products['products'][$arraynumber]['turnover_addons'] + $products['products'][$arraynumber]['turnover_local'];
+
+            $products['products'][$arraynumber]['turnover'] = money_format('%(#1n', $products['products'][$arraynumber]['turnover']);
+            $arraynumber++;
+        }
 
         $this->context->smarty->assign(array(
             'module_dir' => $this->_path,
@@ -177,6 +221,25 @@ class PrestashopAPI extends Module
                         'name' => 'API_DATE_TO',
                         'label' => $this->l('Date To'),
                     ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Enable product page number of sales notification'),
+                        'name' => 'PRODUCT_PAGE_FRONT_ENABLE',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => true,
+                                'label' => $this->l('Yes'),
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => false,
+                                'label' => $this->l('No'),
+                            ),
+                        ),
+                        'desc' => $this->l('displays the total number of sales (Addons Store + local store) of a product with a notification.'),
+                    ),
                 ),
                 'submit' => array(
                     'title' => $this->l('Save'),
@@ -191,6 +254,7 @@ class PrestashopAPI extends Module
     protected function getConfigFormValues()
     {
         return array(
+            'PRODUCT_PAGE_FRONT_ENABLE' => Configuration::get('PRODUCT_PAGE_FRONT_ENABLE', true),
             'PRESTASHOPAPI_KEY' => Configuration::get('PRESTASHOPAPI_KEY', ''),
             'API_DATE_FROM' => Configuration::get('API_DATE_FROM', ''),
             'API_DATE_TO' => Configuration::get('API_DATE_TO', ''),
@@ -223,10 +287,55 @@ class PrestashopAPI extends Module
     /**
      * Add the CSS & JavaScript files you want to be added on the FO.
      */
-    public function hookHeader()
+    public function hookDisplayFooter()
     {
-        $this->context->controller->addJS($this->_path . '/views/js/front.js');
-        $this->context->controller->addCSS($this->_path . '/views/css/front.css');
+        if (($this->context->controller instanceof ProductController) && (Configuration::get('PRODUCT_PAGE_FRONT_ENABLE'))) {
+            $api = new SellerApi();
+            $id_product = Tools::getValue('id_product');
+            $sql = 'SELECT reference FROM ' . _DB_PREFIX_ . 'product WHERE id_product = ' . (int) $id_product;
+            $reference = Db::getInstance()->getValue($sql);
+            $options = array(
+                'limit' => 10000,
+                'sort' => 'asc',
+                'page' => 1,
+            );
+
+            $orders = json_decode($api->getOrders($options), true);
+            $product = json_decode($api->getProduct($reference), true);
+
+            /* Find the number of Prestashop Addons Store Sales*/
+            $sales = 0;
+            foreach ($orders['sales'] as $order) {
+                if ($product['product']['id_product'] == $order['id_product']) {
+                    $sales = $sales + $order['product_quantity'] - 2 * $order['product_quantity_refunded'];
+                }
+                $product['product'][0]['numberofsalesaddons'] = $sales;
+            }
+            /* Find the number of local sales per reference */
+            $sql = 'SELECT a.id_order, a.product_id, a.product_quantity, a.product_price, a.total_price_tax_incl, b.reference
+                FROM ' . _DB_PREFIX_ . 'order_detail a, ' . _DB_PREFIX_ . 'product b
+                WHERE a.product_id = ' . $id_product;
+            $local_sales = Db::getInstance()->executes($sql);
+
+            $sales = 0;
+            foreach ($local_sales as $order) {
+                if ($product['product']['id_product'] == $order['reference']) {
+                    $sales = $sales + $order['product_quantity'] - $order['product_quantity_refunded'];
+                }
+            }
+            $product['product'][0]['numberofsaleslocal'] = $sales;
+            $product['product'][0]['totalsales'] = $product['product'][0]['numberofsalesaddons'] + $product['product'][0]['numberofsaleslocal'];
+
+            $numberofsales = $product['product'][0]['totalsales'];
+
+            $this->context->controller->addJS($this->_path . 'views/js/jquery.growl.js');
+            $this->context->controller->addCSS($this->_path . '/views/css/jquery.growl.css');
+
+            $this->smarty->assign('numberofsales', $numberofsales);
+            if ($numberofsales > 0) {
+                return $this->display(__FILE__, 'views/templates/front/header.tpl');
+            }
+        }
     }
 
     public function hookDisplayBackOfficeHeader()

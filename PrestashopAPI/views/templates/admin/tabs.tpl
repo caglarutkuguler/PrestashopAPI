@@ -43,9 +43,13 @@
           <th>{l s='Pic' mod='PrestashopAPI'}</th>
           <th>{l s='Product ID' mod='PrestashopAPI'}</th>
           <th>{l s='Product Name' mod='PrestashopAPI'}</th>
-          <th>{l s='Price' mod='PrestashopAPI'}</th>
+          <th>{l s='Addons Price' mod='PrestashopAPI'}</th>
           {* <th>{l s='Lang ID' mod='PrestashopAPI'}</th> *}
           <th>{l s='Status' mod='PrestashopAPI'}</th>
+          <th>{l s='Addons Sales' mod='PrestashopAPI'}</th>
+          <th>{l s='Local Sales' mod='PrestashopAPI'}</th>
+          <th>{l s='Total Sales' mod='PrestashopAPI'}</th>
+          <th>{l s='Total Turnover' mod='PrestashopAPI'}</th>
         </tr>
       </thead>
       <tbody>
@@ -57,7 +61,11 @@
           <td>{$product.name}</td>
           <td>{$product.price}</td>
           {* <td>{$order.id_lang}</td> *}
-          <td>{$order.statut}</td>
+          <td>{$product.statut}</td>
+          <td>{$product.numberofsalesaddons}</td>
+          <td>{$product.numberofsaleslocal}</td>
+          <td>{$product.totalsales}</td>
+          <td>{$product.turnover}</td>
         </tr>
         {$productrow = $productrow + 1}
         {/foreach}
