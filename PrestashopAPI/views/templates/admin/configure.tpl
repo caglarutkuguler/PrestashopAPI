@@ -24,7 +24,7 @@
 *}
 
 <div class="panel">
-	<h3><i class="icon icon-credit-card"></i> {l s='Prestashop Addons Seller Store API Module' mod='PrestashopAPI'}</h3>
+	<h3><i class="icon icon-credit-card"></i> {l s='Prestashop Addons Seller Store API Module by ' mod='PrestashopAPI'}<a href="https://www.megventure.com" target="_blank">MEG Venture</a></h3>
 	<p>
 		<strong>{l s='This module is created for Prestashop Addons Sellers!' mod='PrestashopAPI'}</strong><br />
 		{l s='Start with entering your API key. Then you will be able to use the module and get data from your Seller account.' mod='PrestashopAPI'}<br />
