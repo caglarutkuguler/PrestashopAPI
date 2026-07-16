@@ -356,6 +356,30 @@
     background: var(--psapi-sunken);
 }
 
+/* Shown only when there is no image, or when the one we were given failed to load. The image
+   is present in the DOM until then, so the placeholder never flashes over a working thumbnail. */
+.psapi-thumb-empty {
+    display: none;
+    width: 38px;
+    height: 38px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    background: var(--psapi-sunken);
+    color: var(--psapi-line);
+}
+
+/* :first-child means no <img> was rendered at all, i.e. the API supplied no picture. */
+.psapi-thumb-empty:first-child,
+.psapi-thumb--failed .psapi-thumb-empty {
+    display: inline-flex;
+}
+
+/* Set by admin.js on the img's error event. */
+.psapi-thumb--failed img {
+    display: none;
+}
+
 .psapi-row-refunded {
     background: #fff8f0;
 }

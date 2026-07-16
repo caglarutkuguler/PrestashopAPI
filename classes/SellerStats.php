@@ -30,6 +30,9 @@ class SellerStats
     /** @var string Marketplace payouts are denominated in euros unless told otherwise. */
     const DEFAULT_MARKETPLACE_CURRENCY = 'EUR';
 
+    /** @var string Base used to resolve any relative thumbnail path the API returns. */
+    const MARKETPLACE_URL = 'https://addons.prestashop.com';
+
     /** @var array Raw sales rows from seller/orders. */
     private $sales;
 
@@ -345,7 +348,7 @@ class SellerStats
             $rows[] = array(
                 'id_product' => $id,
                 'name' => isset($product['name']) ? $product['name'] : '',
-                'pico' => isset($product['pico']) ? $product['pico'] : '',
+                'pico' => self::normalizePicture(isset($product['pico']) ? $product['pico'] : ''),
                 'price' => isset($product['price']) ? (float) $product['price'] : 0.0,
                 'status' => isset($product['statut']) ? $product['statut'] : '',
                 'addons_units' => $marketplace['units'],
@@ -547,6 +550,38 @@ class SellerStats
         }
 
         return null;
+    }
+
+    /**
+     * Resolves the thumbnail the API returns in `pico` into a URL a browser will actually load.
+     *
+     * The field has no documented contract, and v1 dropped it into src="" untouched. Three
+     * things break that:
+     *  - a plain-http URL is blocked as mixed content before it is ever requested, because the
+     *    back office is normally served over https;
+     *  - a protocol-relative or root-relative path resolves against the shop's own domain,
+     *    where the image does not exist;
+     *  - anything that is not a URL at all still renders a broken-image icon.
+     *
+     * @return string Absolute https URL, or '' when the value cannot be one.
+     */
+    public static function normalizePicture($url)
+    {
+        $url = trim((string) $url);
+
+        if ($url === '') {
+            return '';
+        }
+
+        if (Tools::substr($url, 0, 2) === '//') {
+            $url = 'https:' . $url;
+        } elseif (Tools::strtolower(Tools::substr($url, 0, 7)) === 'http://') {
+            $url = 'https://' . Tools::substr($url, 7);
+        } elseif (Tools::strtolower(Tools::substr($url, 0, 8)) !== 'https://') {
+            $url = self::MARKETPLACE_URL . '/' . ltrim($url, '/');
+        }
+
+        return filter_var($url, FILTER_VALIDATE_URL) ? $url : '';
     }
 
     /**

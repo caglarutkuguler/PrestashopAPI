@@ -300,8 +300,17 @@
 							<tbody>
 								{foreach from=$psapi_products item=product}
 									<tr data-psapi-search="{$product.name|escape:'html':'UTF-8'} {$product.id_product|escape:'html':'UTF-8'}">
+										{* referrerpolicy: the marketplace CDN can reject hotlinked requests that carry a
+										   foreign Referer. The fallback replaces the browser's broken-image icon, and its
+										   title carries the URL that failed so it can be diagnosed without the console. *}
 										<td class="psapi-thumb">
-											{if $product.pico}<img src="{$product.pico|escape:'html':'UTF-8'}" alt="" loading="lazy" />{/if}
+											{if $product.pico}
+												<img src="{$product.pico|escape:'html':'UTF-8'}" alt="" loading="lazy"
+													referrerpolicy="no-referrer" data-psapi-thumb />
+											{/if}
+											<span class="psapi-thumb-empty" title="{if $product.pico}{$product.pico|escape:'html':'UTF-8'}{else}{l s='No image supplied by the marketplace' mod='PrestashopAPI'}{/if}">
+												<i class="icon icon-picture-o"></i>
+											</span>
 										</td>
 										<td>{$product.id_product}</td>
 										<td class="psapi-name">{$product.name}</td>

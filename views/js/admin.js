@@ -97,6 +97,28 @@
     });
 
     /* ---------------------------------------------------------------- *
+     * Thumbnails
+     *
+     * The marketplace supplies the image URL and we do not control it, so a dead one must
+     * degrade to a placeholder rather than a torn-page icon. The error event does not bubble,
+     * hence a listener per image rather than one delegated listener.
+     * ---------------------------------------------------------------- */
+    Array.prototype.forEach.call(app.querySelectorAll('img[data-psapi-thumb]'), function (img) {
+        img.addEventListener('error', function () {
+            var cell = img.parentNode;
+
+            if (cell) {
+                cell.classList.add('psapi-thumb--failed');
+            }
+        });
+
+        // An image that failed before this script ran fires no event we can catch.
+        if (img.complete && img.naturalWidth === 0 && img.parentNode) {
+            img.parentNode.classList.add('psapi-thumb--failed');
+        }
+    });
+
+    /* ---------------------------------------------------------------- *
      * Copy to clipboard
      * ---------------------------------------------------------------- */
     Array.prototype.forEach.call(app.querySelectorAll('[data-psapi-copy]'), function (button) {
