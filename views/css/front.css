@@ -1,0 +1,46 @@
+/**
+* 2019-2026 MEG Venture
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Academic Free License (AFL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/afl-3.0.php
+*
+*  @author    MEG Venture
+*  @copyright 2019-2026 MEG Venture
+*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*/
+
+/* Styled with currentColor and inherited type so the badge takes on whatever theme it lands
+   in, rather than imposing a palette the theme then has to fight. */
+.psapi-proof {
+    display: inline-flex;
+    align-items: center;
+    gap: .5em;
+    padding: .5em .85em;
+    margin: .75rem 0;
+    border: 1px solid rgba(0, 0, 0, .1);
+    border-radius: 4px;
+    background: rgba(0, 0, 0, .025);
+    font-size: .875em;
+    line-height: 1.3;
+}
+
+.psapi-proof-icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    opacity: .65;
+}
+
+.psapi-proof-text strong {
+    font-weight: 700;
+}
+
+@media (prefers-color-scheme: dark) {
+    .psapi-proof {
+        border-color: rgba(255, 255, 255, .16);
+        background: rgba(255, 255, 255, .05);
+    }
+}

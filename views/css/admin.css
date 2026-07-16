@@ -1,0 +1,553 @@
+/**
+* 2019-2026 MEG Venture
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Academic Free License (AFL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/afl-3.0.php
+*
+*  @author    MEG Venture
+*  @copyright 2019-2026 MEG Venture
+*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*/
+
+/* Custom properties live on :root, not on .psapi-app: the back office moves elements around
+   and a var() that resolves to nothing silently unsets whole shorthand declarations. */
+:root {
+    --psapi-accent: #25b9d7;
+    --psapi-accent-dark: #1b8fa7;
+    --psapi-ink: #363a41;
+    --psapi-muted: #7c8087;
+    --psapi-line: #e0e6ed;
+    --psapi-surface: #ffffff;
+    --psapi-sunken: #f6f8fa;
+    --psapi-ok: #4caf50;
+    --psapi-warn: #ff9a52;
+    --psapi-bad: #e2574c;
+    --psapi-radius: 6px;
+}
+
+.psapi-app {
+    color: var(--psapi-ink);
+}
+
+/* ---------------------------------------------------------------- *
+ * Header
+ * ---------------------------------------------------------------- */
+.psapi-hero {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, var(--psapi-accent) 0%, var(--psapi-accent-dark) 100%);
+    border-radius: var(--psapi-radius);
+    color: #fff;
+}
+
+.psapi-hero-text h2 {
+    margin: 0 0 4px;
+    font-size: 21px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.psapi-hero-text p {
+    margin: 0;
+    opacity: .9;
+    font-size: 13px;
+}
+
+.psapi-hero-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.psapi-sync {
+    font-size: 12px;
+    opacity: .9;
+}
+
+/* ---------------------------------------------------------------- *
+ * Tabs
+ * ---------------------------------------------------------------- */
+.psapi-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--psapi-line);
+}
+
+.psapi-tab {
+    padding: 10px 16px;
+    border: 1px solid transparent;
+    border-bottom: none;
+    border-radius: var(--psapi-radius) var(--psapi-radius) 0 0;
+    background: none;
+    color: var(--psapi-muted);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    /* start/end rather than left/right, so the module reads correctly in RTL back offices */
+    text-align: start;
+}
+
+.psapi-tab:hover {
+    color: var(--psapi-ink);
+    background: var(--psapi-sunken);
+}
+
+.psapi-tab--active {
+    background: var(--psapi-surface);
+    border-color: var(--psapi-line);
+    color: var(--psapi-accent-dark);
+    margin-bottom: -1px;
+    border-bottom: 1px solid var(--psapi-surface);
+}
+
+.psapi-pill {
+    display: inline-block;
+    min-width: 18px;
+    padding: 1px 6px;
+    margin-inline-start: 4px;
+    border-radius: 10px;
+    background: var(--psapi-line);
+    color: var(--psapi-muted);
+    font-size: 11px;
+    text-align: center;
+}
+
+.psapi-tab--active .psapi-pill {
+    background: var(--psapi-accent);
+    color: #fff;
+}
+
+/* ---------------------------------------------------------------- *
+ * Panes
+ * ---------------------------------------------------------------- */
+.psapi-pane {
+    display: none;
+}
+
+.psapi-pane--active {
+    display: block;
+}
+
+/* ---------------------------------------------------------------- *
+ * KPI cards
+ * ---------------------------------------------------------------- */
+.psapi-kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.psapi-kpi {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px;
+    background: var(--psapi-surface);
+    border: 1px solid var(--psapi-line);
+    border-radius: var(--psapi-radius);
+    border-top: 3px solid var(--psapi-line);
+}
+
+.psapi-kpi--primary {
+    border-top-color: var(--psapi-accent);
+}
+
+.psapi-kpi--accent {
+    border-top-color: var(--psapi-ok);
+}
+
+.psapi-kpi--warn {
+    border-top-color: var(--psapi-warn);
+}
+
+.psapi-kpi-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--psapi-muted);
+}
+
+.psapi-kpi-value {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.psapi-kpi-value--muted {
+    color: var(--psapi-muted);
+}
+
+.psapi-kpi-hint {
+    font-size: 11px;
+    color: var(--psapi-muted);
+}
+
+/* ---------------------------------------------------------------- *
+ * Status checks
+ * ---------------------------------------------------------------- */
+.psapi-checks {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.psapi-checks li {
+    padding: 9px 0 9px 26px;
+    border-bottom: 1px solid var(--psapi-sunken);
+    font-size: 13px;
+    position: relative;
+}
+
+.psapi-checks li:last-child {
+    border-bottom: none;
+}
+
+.psapi-checks .icon {
+    position: absolute;
+    inset-inline-start: 0;
+    top: 11px;
+}
+
+.psapi-ok .icon {
+    color: var(--psapi-ok);
+}
+
+.psapi-warn .icon {
+    color: var(--psapi-warn);
+}
+
+.psapi-bad {
+    color: var(--psapi-bad);
+    font-weight: 600;
+}
+
+.psapi-bad .icon {
+    color: var(--psapi-bad);
+}
+
+.psapi-inline-link {
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--psapi-accent-dark);
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+/* ---------------------------------------------------------------- *
+ * Chart
+ * ---------------------------------------------------------------- */
+.psapi-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 190px;
+    padding: 10px 0 0;
+}
+
+.psapi-bar-wrap {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    min-width: 0;
+}
+
+.psapi-bar {
+    width: 100%;
+    max-width: 46px;
+    min-height: 2px;
+    border-radius: 3px 3px 0 0;
+    background: linear-gradient(180deg, var(--psapi-accent) 0%, var(--psapi-accent-dark) 100%);
+    transition: opacity .15s;
+}
+
+.psapi-bar-wrap:hover .psapi-bar {
+    opacity: .75;
+}
+
+.psapi-bar-value {
+    margin-bottom: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--psapi-muted);
+}
+
+.psapi-bar-label {
+    margin-top: 6px;
+    font-size: 10px;
+    color: var(--psapi-muted);
+    white-space: nowrap;
+}
+
+.psapi-chart-note {
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--psapi-muted);
+}
+
+/* ---------------------------------------------------------------- *
+ * Meter
+ * ---------------------------------------------------------------- */
+.psapi-meter {
+    height: 8px;
+    border-radius: 4px;
+    background: var(--psapi-sunken);
+    overflow: hidden;
+}
+
+.psapi-meter span {
+    display: block;
+    height: 100%;
+    background: var(--psapi-accent);
+}
+
+/* ---------------------------------------------------------------- *
+ * Tables
+ * ---------------------------------------------------------------- */
+.psapi-table {
+    font-size: 13px;
+}
+
+.psapi-table th {
+    font-size: 11px;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    color: var(--psapi-muted);
+    white-space: nowrap;
+}
+
+.psapi-table td {
+    vertical-align: middle !important;
+}
+
+.psapi-table td small {
+    display: block;
+    color: var(--psapi-muted);
+    font-size: 11px;
+}
+
+.psapi-name {
+    font-weight: 600;
+    max-width: 280px;
+}
+
+.psapi-thumb img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    border-radius: 4px;
+    background: var(--psapi-sunken);
+}
+
+.psapi-row-refunded {
+    background: #fff8f0;
+}
+
+.psapi-danger {
+    color: var(--psapi-bad);
+    font-weight: 600;
+}
+
+.psapi-muted {
+    color: var(--psapi-muted);
+}
+
+.psapi-badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 3px;
+    background: var(--psapi-sunken);
+    border: 1px solid var(--psapi-line);
+    font-size: 11px;
+    color: var(--psapi-muted);
+}
+
+.psapi-select {
+    max-width: 220px;
+    font-size: 12px;
+}
+
+.psapi-filter {
+    max-width: 320px;
+    margin-bottom: 12px;
+}
+
+.psapi-empty {
+    padding: 28px;
+    text-align: center;
+    color: var(--psapi-muted);
+    background: var(--psapi-sunken);
+    border-radius: var(--psapi-radius);
+}
+
+.psapi-lead {
+    color: var(--psapi-muted);
+    font-size: 13px;
+    margin-bottom: 14px;
+}
+
+/* ---------------------------------------------------------------- *
+ * Onboarding
+ * ---------------------------------------------------------------- */
+.psapi-steps {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.psapi-steps li {
+    display: flex;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--psapi-sunken);
+}
+
+.psapi-steps li:last-child {
+    border-bottom: none;
+}
+
+.psapi-step-n {
+    flex: 0 0 26px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--psapi-accent);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 26px;
+    text-align: center;
+}
+
+.psapi-steps p {
+    margin: 3px 0 8px;
+    color: var(--psapi-muted);
+    font-size: 13px;
+}
+
+/* ---------------------------------------------------------------- *
+ * Messages
+ * ---------------------------------------------------------------- */
+.psapi-thread {
+    max-height: 460px;
+    overflow-y: auto;
+    padding-inline-end: 6px;
+}
+
+.psapi-message {
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    background: var(--psapi-sunken);
+    border-radius: var(--psapi-radius);
+    border-inline-start: 3px solid var(--psapi-line);
+}
+
+.psapi-message-meta {
+    margin-bottom: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--psapi-muted);
+}
+
+.psapi-message-body {
+    font-size: 13px;
+    /* pre-wrap keeps the buyer's line breaks without turning the text into markup */
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.psapi-reply {
+    margin-top: 16px;
+}
+
+.psapi-reply label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    /* The back office sets `label { text-align: right }` globally; assert our own. */
+    text-align: start;
+}
+
+.psapi-reply textarea {
+    margin-bottom: 10px;
+}
+
+/* ---------------------------------------------------------------- *
+ * Help
+ * ---------------------------------------------------------------- */
+.psapi-help-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+}
+
+.psapi-help-grid h4 {
+    margin: 0 0 6px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.psapi-help-grid p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--psapi-muted);
+}
+
+.psapi-faq dt {
+    margin-top: 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.psapi-faq dd {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: var(--psapi-muted);
+}
+
+/* ---------------------------------------------------------------- *
+ * Copy field
+ * ---------------------------------------------------------------- */
+.psapi-copy {
+    display: flex;
+    gap: 8px;
+    max-width: 640px;
+}
+
+.psapi-copy input {
+    flex: 1 1 auto;
+    font-family: monospace;
+    font-size: 12px;
+}
+
+@media (max-width: 767px) {
+    .psapi-hero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .psapi-chart {
+        height: 140px;
+    }
+
+    .psapi-bar-value {
+        display: none;
+    }
+}
