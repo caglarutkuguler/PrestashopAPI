@@ -48,6 +48,20 @@ class SellerApiClient
     /** @var int Rows requested per collection call. v1 asked for 10000 on every page view. */
     const PAGE_LIMIT = 5000;
 
+    /** @var int Safety stop when walking a paginated endpoint. 10 x PAGE_LIMIT rows. */
+    const MAX_PAGES = 10;
+
+    /**
+     * @var array Wrapper keys a collection can arrive under, tried in order.
+     *
+     * The endpoints are not consistent with each other: seller/products answers
+     * {"products":[...]}, seller/orders answers {"sales":[...]}, but seller/threads answers a
+     * Laravel paginator, {"total":1843,"per_page":5000,"last_page":1,"data":[...]}. Rather
+     * than pin each endpoint to one key and break the moment another is migrated to the
+     * paginator, every endpoint accepts its own key or "data".
+     */
+    const LIST_KEYS = array('data');
+
     /** @var int Bytes of the response body kept in an error message for diagnostics. */
     const ERROR_SNIPPET = 300;
 
@@ -319,7 +333,7 @@ class SellerApiClient
             return false;
         }
 
-        $response = $this->call($path, $params);
+        $response = $this->callPaged($path, $params);
 
         if ($response === false) {
             if ($entry !== false) {
@@ -338,11 +352,72 @@ class SellerApiClient
     }
 
     /**
+     * Walks a paginated endpoint and returns one response with every page's rows merged in.
+     *
+     * seller/threads answers a Laravel paginator. Reading only page 1 silently truncates the
+     * result at PAGE_LIMIT rows, which would quietly understate revenue on a busy account
+     * rather than fail in any visible way.
+     *
+     * @return array|false
+     */
+    private function callPaged($path, array $params)
+    {
+        $first = $this->call($path, $params, false, 1);
+
+        if ($first === false) {
+            return false;
+        }
+
+        $last = isset($first['last_page']) ? (int) $first['last_page'] : 1;
+
+        if ($last <= 1) {
+            return $first;
+        }
+
+        $key = $this->listKey($first);
+
+        if ($key === null) {
+            return $first;
+        }
+
+        $last = min($last, self::MAX_PAGES);
+
+        for ($page = 2; $page <= $last; ++$page) {
+            $next = $this->call($path, $params, false, $page);
+
+            // A partial result beats no result: keep whatever pages did arrive.
+            if ($next === false || !isset($next[$key]) || !is_array($next[$key])) {
+                break;
+            }
+
+            $first[$key] = array_merge($first[$key], $next[$key]);
+        }
+
+        return $first;
+    }
+
+    /**
+     * Name of the key holding the rows, for a paginated response.
+     *
+     * @return string|null
+     */
+    private function listKey(array $response)
+    {
+        foreach ($response as $key => $value) {
+            if (is_array($value) && (isset($value[0]) || $value === array())) {
+                return $key;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Performs one API call.
      *
      * @return array|false Decoded JSON, or false with last_error set.
      */
-    private function call($path, array $params, $multipart = false)
+    private function call($path, array $params, $multipart = false, $page = 1)
     {
         $this->last_error = '';
 
@@ -371,7 +446,7 @@ class SellerApiClient
         curl_setopt($ch, CURLOPT_URL, self::API_URL . $path . '?' . http_build_query(array(
             'limit' => self::PAGE_LIMIT,
             'sort' => 'desc',
-            'page' => 1,
+            'page' => max(1, (int) $page),
         )));
         curl_setopt($ch, CURLOPT_POST, true);
         // A multipart body must stay an array; anything else is urlencoded so that cURL does
@@ -441,7 +516,8 @@ class SellerApiClient
      */
     private function extract(array $response, $keys)
     {
-        foreach ((array) $keys as $key) {
+        // "data" last, so an endpoint with a named wrapper keeps using it.
+        foreach (array_merge((array) $keys, self::LIST_KEYS) as $key) {
             if (!isset($response[$key])) {
                 continue;
             }

@@ -410,6 +410,18 @@
     color: var(--psapi-muted);
 }
 
+.psapi-badge--expired {
+    border-color: #f3c6c2;
+    background: #fdf0ef;
+    color: var(--psapi-bad);
+}
+
+.psapi-badge--active {
+    border-color: #c5e8c7;
+    background: #f1faf1;
+    color: #3a8c3f;
+}
+
 .psapi-select {
     max-width: 220px;
     font-size: 12px;

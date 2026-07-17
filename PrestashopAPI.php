@@ -650,14 +650,28 @@ class PrestashopAPI extends Module
     {
         $seen = json_decode((string) Configuration::get('PRESTASHOPAPI_SEEN'), true);
         $seen = is_array($seen) ? $seen : array();
+
+        // First run on an established account: a real seller has well over a thousand
+        // conversations, and flagging every one of them as new would be noise, not a
+        // notification. Start from "all read" and report only what moves from here.
+        if (!$seen && $threads) {
+            $this->markSeen($threads);
+
+            return array();
+        }
+
         $unread = array();
 
         foreach ($threads as $thread) {
-            if (!is_array($thread) || !isset($thread['id_thread'])) {
+            if (!is_array($thread)) {
                 continue;
             }
 
-            $id = (int) $thread['id_thread'];
+            $id = self::threadId($thread);
+
+            if (!$id) {
+                continue;
+            }
 
             if (!isset($seen[$id]) || $seen[$id] !== self::fingerprint($thread)) {
                 $unread[] = $id;
@@ -665,6 +679,26 @@ class PrestashopAPI extends Module
         }
 
         return $unread;
+    }
+
+    /**
+     * A conversation's id.
+     *
+     * The threads endpoint calls it id_community_thread, not id_thread. Reading the wrong name
+     * meant every row was skipped: no conversation could be opened and none could be flagged.
+     * Both names are accepted because seller/threads/{id}/messages may well use the shorter one.
+     *
+     * @return int 0 when the row carries no id.
+     */
+    private static function threadId(array $thread)
+    {
+        foreach (array('id_community_thread', 'id_thread') as $field) {
+            if (isset($thread[$field]) && (int) $thread[$field] > 0) {
+                return (int) $thread[$field];
+            }
+        }
+
+        return 0;
     }
 
     /**
@@ -696,11 +730,16 @@ class PrestashopAPI extends Module
         $current = array();
 
         foreach ($threads as $thread) {
-            if (!is_array($thread) || !isset($thread['id_thread'])) {
+            if (!is_array($thread)) {
                 continue;
             }
 
-            $id = (int) $thread['id_thread'];
+            $id = self::threadId($thread);
+
+            if (!$id) {
+                continue;
+            }
+
             $current[$id] = true;
 
             if ($id_thread === null || $id === (int) $id_thread) {
@@ -832,7 +871,10 @@ class PrestashopAPI extends Module
             'psapi_months' => $this->prepareChart($stats->getMonthlySeries(12)),
             'psapi_countries' => $stats->getCountryBreakdown(8),
 
-            'psapi_threads' => $this->normalizeTable($threads, $unread),
+            // Capped: this account has 1843 conversations, and every rendered row is markup the
+            // browser has to parse. The filter box searches what is rendered.
+            'psapi_threads' => array_slice($this->buildThreads($threads, $unread), 0, 300),
+            'psapi_threads_total' => count($threads),
             'psapi_unread' => count($unread),
             'psapi_invoices' => $this->normalizeTable($has_key ? $this->safeList($client->getInvoices()) : array()),
             'psapi_thread' => $this->currentThread($client, $threads),
@@ -954,6 +996,57 @@ class PrestashopAPI extends Module
         }
 
         return array('id' => $id_thread, 'messages' => $messages);
+    }
+
+    /**
+     * Builds the conversation list from the real thread fields.
+     *
+     * Purpose-built rather than run through normalizeTable(), now that the shape is known: the
+     * generic renderer would print raw customer_hash and token columns and drop `zen` and
+     * `quantity` entirely for being nested.
+     *
+     * @return array
+     */
+    private function buildThreads(array $threads, array $unread)
+    {
+        $rows = array();
+
+        foreach ($threads as $thread) {
+            if (!is_array($thread)) {
+                continue;
+            }
+
+            $id = self::threadId($thread);
+
+            if (!$id) {
+                continue;
+            }
+
+            $zen = isset($thread['zen']) && is_array($thread['zen']) ? $thread['zen'] : array();
+            $version = isset($thread['versionps']) ? trim((string) $thread['versionps']) : '';
+
+            $rows[] = array(
+                'id' => $id,
+                'topic' => isset($thread['topic']) ? (string) $thread['topic'] : '',
+                'product' => isset($thread['name']) ? (string) $thread['name'] : '',
+                'id_product' => isset($thread['id_product']) ? (int) $thread['id_product'] : 0,
+                'messages' => isset($thread['nb_messages']) ? (int) $thread['nb_messages'] : 0,
+                'date' => isset($thread['date_add']) ? (string) $thread['date_add'] : '',
+                // "" | presale | aftersale.
+                'qualification' => isset($thread['qualification']) ? (string) $thread['qualification'] : '',
+                // The API writes "none" when the buyer did not say.
+                'version' => $version === 'none' ? '' : $version,
+                'website' => isset($thread['website']) ? (string) $thread['website'] : '',
+                // id_order 0 means the person has not bought: a pre-sales question.
+                'is_buyer' => !empty($thread['id_order']),
+                // zen is the Business Care entitlement. Negative days left means their free
+                // support window has closed, which is worth knowing before you spend an hour.
+                'support_days' => isset($zen['nb_days_left']) ? (int) $zen['nb_days_left'] : null,
+                'unread' => in_array($id, $unread, true),
+            );
+        }
+
+        return $rows;
     }
 
     /**

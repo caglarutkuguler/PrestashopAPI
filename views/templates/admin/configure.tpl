@@ -515,29 +515,71 @@
 						<i class="icon icon-send"></i> {l s='Send reply' mod='PrestashopAPI'}
 					</button>
 				</form>
-			{elseif $psapi_threads.rows}
+			{elseif $psapi_threads}
+				{if $psapi_threads_total > 300}
+					<div class="alert alert-info">
+						{l s='Showing the 300 most recent of' mod='PrestashopAPI'} {$psapi_threads_total}
+						{l s='conversations.' mod='PrestashopAPI'}
+					</div>
+				{/if}
+
+				<input type="text" class="psapi-filter form-control" data-psapi-filter="psapi-threads-table"
+					placeholder="{l s='Filter by subject, product or shop...' mod='PrestashopAPI'}" />
+
 				<div class="table-responsive">
-					<table class="table psapi-table">
+					<table class="table psapi-table" id="psapi-threads-table">
 						<thead>
 							<tr>
-								{foreach from=$psapi_threads.columns item=label}<th>{$label}</th>{/foreach}
+								<th>{l s='Subject' mod='PrestashopAPI'}</th>
+								<th>{l s='Product' mod='PrestashopAPI'}</th>
+								<th>{l s='Customer' mod='PrestashopAPI'}</th>
+								<th class="text-right">{l s='Messages' mod='PrestashopAPI'}</th>
+								<th>{l s='Opened' mod='PrestashopAPI'}</th>
+								<th>{l s='Support' mod='PrestashopAPI'}</th>
 								<th></th>
 							</tr>
 						</thead>
 						<tbody>
-							{foreach from=$psapi_threads.rows item=thread}
-								<tr{if $thread.unread} class="psapi-row-unread"{/if}>
-									{foreach from=$thread.cells item=cell}<td>{$cell.text}</td>{/foreach}
+							{foreach from=$psapi_threads item=thread}
+								<tr data-psapi-search="{$thread.topic|escape:'html':'UTF-8'} {$thread.product|escape:'html':'UTF-8'} {$thread.website|escape:'html':'UTF-8'}"
+									{if $thread.unread}class="psapi-row-unread"{/if}>
+									<td class="psapi-name">
+										{if $thread.unread}<span class="psapi-new">{l s='New' mod='PrestashopAPI'}</span>{/if}
+										{$thread.topic}
+									</td>
+									<td>{$thread.product}</td>
+									<td>
+										{if $thread.is_buyer}
+											<span class="psapi-badge">{l s='Bought' mod='PrestashopAPI'}</span>
+										{else}
+											<span class="psapi-badge">{l s='Pre-sales' mod='PrestashopAPI'}</span>
+										{/if}
+										{if $thread.website}
+											<small>{$thread.website}</small>
+										{/if}
+										{if $thread.version}
+											<small>{l s='PrestaShop' mod='PrestashopAPI'} {$thread.version}</small>
+										{/if}
+									</td>
+									<td class="text-right">{$thread.messages}</td>
+									<td>{$thread.date|truncate:10:''}</td>
+									<td>
+										{* Business Care entitlement: negative days means it has run out. *}
+										{if $thread.support_days === null}
+											<span class="psapi-muted">&mdash;</span>
+										{elseif $thread.support_days < 0}
+											<span class="psapi-badge psapi-badge--expired">{l s='Expired' mod='PrestashopAPI'}</span>
+										{else}
+											<span class="psapi-badge psapi-badge--active">
+												{$thread.support_days} {l s='days left' mod='PrestashopAPI'}
+											</span>
+										{/if}
+									</td>
 									<td class="text-right">
-										{if $thread.unread}
-											<span class="psapi-new">{l s='New' mod='PrestashopAPI'}</span>
-										{/if}
-										{if $thread.id_thread}
-											<a class="btn btn-default btn-xs"
-												href="{$psapi_config_url|escape:'html':'UTF-8'}&psapi_id_thread={$thread.id_thread}#psapi-messages">
-												{l s='Open' mod='PrestashopAPI'}
-											</a>
-										{/if}
+										<a class="btn btn-default btn-xs"
+											href="{$psapi_config_url|escape:'html':'UTF-8'}&psapi_id_thread={$thread.id}#psapi-messages">
+											{l s='Open' mod='PrestashopAPI'}
+										</a>
 									</td>
 								</tr>
 							{/foreach}
