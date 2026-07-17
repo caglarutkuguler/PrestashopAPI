@@ -593,11 +593,17 @@
 					{l s='item(s), none of which look like a conversation. Nothing is wrong with your account or your API key: your products and sales are loading normally.' mod='PrestashopAPI'}
 				</div>
 				<p class="psapi-lead">
-					{l s='The Help tab shows exactly what came back, which is what is needed to fix this.' mod='PrestashopAPI'}
-					<button type="button" class="psapi-inline-link" data-psapi-goto="help">
-						{l s='Open the Help tab' mod='PrestashopAPI'}
-					</button>
+					{l s='This is exactly what the marketplace sent back. Copying it into a bug report is enough to get this fixed.' mod='PrestashopAPI'}
 				</p>
+				<div class="psapi-diag">
+					<div class="psapi-diag-head">
+						<code>seller/threads</code>
+						<button type="button" class="btn btn-default btn-xs" data-psapi-copy="psapi-threads-debug">
+							<i class="icon icon-copy"></i> {l s='Copy' mod='PrestashopAPI'}
+						</button>
+					</div>
+					<textarea id="psapi-threads-debug" class="psapi-diag-body form-control" rows="14" readonly="readonly">{$psapi_threads_debug}</textarea>
+				</div>
 			{elseif $psapi_threads_error}
 				{* An empty list and a failed request are different things and must not look alike. *}
 				<div class="alert alert-danger">

@@ -126,6 +126,7 @@ $_MODULE['<{prestashopapi}prestashop>configure_cce5ffc741270470dec823a4fff75552'
 $_MODULE['<{prestashopapi}prestashop>configure_cd310f329b7e97fd8d3f89709a0f0a34'] = 'Konusmalariniz indirilemedi.';
 $_MODULE['<{prestashopapi}prestashop>configure_ce26601dac0dea138b7295f02b7620a7'] = 'Musteri';
 $_MODULE['<{prestashopapi}prestashop>configure_ce479c09b1ac91e597244330f7799fa5'] = 'Pazar yerine ulasilamadi.';
+$_MODULE['<{prestashopapi}prestashop>configure_ced8dfb71e1fef4e66506b748517a1b4'] = 'Pazar yerinin gonderdigi yanit aynen asagidadir. Bunu bir hata bildirimine kopyalamak sorunu duzeltmek icin yeterlidir.';
 $_MODULE['<{prestashopapi}prestashop>configure_d300cdd8058e8c768b8af1c4dcc37441'] = 'Toplam adet';
 $_MODULE['<{prestashopapi}prestashop>configure_d421fc3948ceb443dcd0e65bd4901a58'] = 'Mesajlari oku';
 $_MODULE['<{prestashopapi}prestashop>configure_d4eb463703a7e5de947f59c53ef36bfa'] = 'Pazar yeri bu aralik icin fatura dondurmedi.';
@@ -156,7 +157,6 @@ $_MODULE['<{prestashopapi}prestashop>configure_f53d1cd25e03173ba9eaa4e493636769'
 $_MODULE['<{prestashopapi}prestashop>configure_f64dc4589dc99c8b6633332d2cd64673'] = 'Satici hesabinizda Ayarlar ardindan API bolumunden yeni bir anahtar uretin ve tekrar yapistirin. Yalnizca anahtari kopyalayin, cevresindeki metni degil.';
 $_MODULE['<{prestashopapi}prestashop>configure_f7886f70cab9f5a7a0d40a33c6f15046'] = 'Cubuk yuksekligi pazar yeri cirosudur; her cubugun ustundeki sayi satilan adettir.';
 $_MODULE['<{prestashopapi}prestashop>configure_f90fee5298d77ffd738740166d89de5a'] = 'Urunleriniz';
-$_MODULE['<{prestashopapi}prestashop>configure_fb646bd93d6ed2b11ff2cc58ba589aa2'] = 'Yardim sekmesi tam olarak neyin dondugunu gosterir; bunu duzeltmek icin gereken de budur.';
 $_MODULE['<{prestashopapi}prestashop>configure_fbc2b36e3017338a98de94503405093e'] = 'Bekleyen konusma yok, bu nedenle Panoda bildirim gosterilmiyor. Bildirim yalnizca bir alici beklerken cikar.';
 $_MODULE['<{prestashopapi}prestashop>configure_fc3834f47cae70c79001aebcc1590cb6'] = 'Urunleriniz ve satislariniz normal yukleniyor, yani API anahtariniz calisiyor. Konusma uc noktasinin tam olarak ne dondurdugunu gormek icin Yardim sekmesini kullanin.';
 $_MODULE['<{prestashopapi}prestashop>configure_fe5a7fc9d9c907efdf6a384a71cd53fc'] = 'Satin aldi';

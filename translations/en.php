@@ -126,6 +126,7 @@ $_MODULE['<{prestashopapi}prestashop>configure_cce5ffc741270470dec823a4fff75552'
 $_MODULE['<{prestashopapi}prestashop>configure_cd310f329b7e97fd8d3f89709a0f0a34'] = 'Your conversations could not be downloaded.';
 $_MODULE['<{prestashopapi}prestashop>configure_ce26601dac0dea138b7295f02b7620a7'] = 'Customer';
 $_MODULE['<{prestashopapi}prestashop>configure_ce479c09b1ac91e597244330f7799fa5'] = 'The marketplace could not be reached.';
+$_MODULE['<{prestashopapi}prestashop>configure_ced8dfb71e1fef4e66506b748517a1b4'] = 'This is exactly what the marketplace sent back. Copying it into a bug report is enough to get this fixed.';
 $_MODULE['<{prestashopapi}prestashop>configure_d300cdd8058e8c768b8af1c4dcc37441'] = 'Total units';
 $_MODULE['<{prestashopapi}prestashop>configure_d421fc3948ceb443dcd0e65bd4901a58'] = 'Read them';
 $_MODULE['<{prestashopapi}prestashop>configure_d4eb463703a7e5de947f59c53ef36bfa'] = 'No invoices returned by the marketplace for this period.';
@@ -156,7 +157,6 @@ $_MODULE['<{prestashopapi}prestashop>configure_f53d1cd25e03173ba9eaa4e493636769'
 $_MODULE['<{prestashopapi}prestashop>configure_f64dc4589dc99c8b6633332d2cd64673'] = 'Generate a fresh key in your seller account, under Settings then API, and paste it again. Copy only the key, not the surrounding text.';
 $_MODULE['<{prestashopapi}prestashop>configure_f7886f70cab9f5a7a0d40a33c6f15046'] = 'Bar height is marketplace revenue; the number above each bar is the number of units sold.';
 $_MODULE['<{prestashopapi}prestashop>configure_f90fee5298d77ffd738740166d89de5a'] = 'Your products';
-$_MODULE['<{prestashopapi}prestashop>configure_fb646bd93d6ed2b11ff2cc58ba589aa2'] = 'The Help tab shows exactly what came back, which is what is needed to fix this.';
 $_MODULE['<{prestashopapi}prestashop>configure_fbc2b36e3017338a98de94503405093e'] = 'No conversations are waiting, so the Dashboard shows no notice. It appears there only when a buyer is waiting.';
 $_MODULE['<{prestashopapi}prestashop>configure_fc3834f47cae70c79001aebcc1590cb6'] = 'Your products and sales are loading normally, so your API key works. Use the Help tab to see exactly what the conversations endpoint returned.';
 $_MODULE['<{prestashopapi}prestashop>configure_fe5a7fc9d9c907efdf6a384a71cd53fc'] = 'Bought';

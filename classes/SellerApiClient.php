@@ -415,9 +415,12 @@ class SellerApiClient
     /**
      * Performs one API call.
      *
+     * Protected rather than private so a test double can stand in for the network and the
+     * whole fetch/paginate/extract path can be exercised against a recorded response.
+     *
      * @return array|false Decoded JSON, or false with last_error set.
      */
-    private function call($path, array $params, $multipart = false, $page = 1)
+    protected function call($path, array $params, $multipart = false, $page = 1)
     {
         $this->last_error = '';
 

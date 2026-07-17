@@ -895,6 +895,9 @@ class PrestashopAPI extends Module
             // understand. That is a third state, and reporting it as "you have no
             // conversations" is how the wrong wrapper key stayed hidden for three rounds.
             'psapi_threads_unrecognised' => $threads && !$built,
+            // Printed inline with that warning rather than behind the Help tab. A diagnostic
+            // one click away from the failure is a diagnostic nobody reads.
+            'psapi_threads_debug' => $threads && !$built ? $this->threadsDebug($client, $threads) : '',
             'psapi_unread' => count($unread),
             'psapi_invoices' => $this->normalizeTable($has_key ? $this->safeList($client->getInvoices()) : array()),
             'psapi_thread' => $this->currentThread($client, $threads),
@@ -1017,6 +1020,34 @@ class PrestashopAPI extends Module
         }
 
         return array('id' => $id_thread, 'messages' => $messages);
+    }
+
+    /**
+     * The envelope, plus the first thing extracted from it, as JSON.
+     *
+     * Shown inline when conversations arrive in an unusable shape. Testing established that
+     * only one thing produces "N items, none usable": a wrapper holding a map of scalars
+     * rather than a list of rows. This prints that map, which names the cause outright.
+     *
+     * @return string
+     */
+    private function threadsDebug(SellerApiClient $client, array $threads)
+    {
+        $flags = 128; // JSON_PRETTY_PRINT
+
+        if (defined('JSON_UNESCAPED_SLASHES')) {
+            $flags |= JSON_UNESCAPED_SLASHES;
+        }
+
+        if (defined('JSON_UNESCAPED_UNICODE')) {
+            $flags |= JSON_UNESCAPED_UNICODE;
+        }
+
+        return json_encode(array(
+            'envelope' => $client->getLastRaw('threads'),
+            'first_item_extracted' => isset($threads[0]) ? $threads[0] : null,
+            'items_extracted' => count($threads),
+        ), $flags);
     }
 
     /**
