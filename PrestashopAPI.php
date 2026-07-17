@@ -682,6 +682,45 @@ class PrestashopAPI extends Module
     }
 
     /**
+     * Turns a marketplace message body into readable plain text.
+     *
+     * Bodies arrive as HTML ("<p>Dear customer,</p><p><br /></p>...") and are sometimes
+     * entity-encoded on top of that, so a buyer's apostrophe reaches us as "d&#039;acheter".
+     * Escaping that for display, which is what the first version did, printed the markup at
+     * the merchant instead of the message.
+     *
+     * The bodies are NOT rendered as HTML. This is buyer-supplied content shown inside an
+     * authenticated back office; one <script> or one <img onerror> in a support message would
+     * run with the merchant's session. Formatting worth keeping in a support thread is
+     * paragraphs and line breaks, and those survive as newlines, so nothing of value is lost
+     * by reducing to text.
+     *
+     * @return string
+     */
+    private static function messageToText($raw)
+    {
+        $text = (string) $raw;
+
+        // Decode first: the entities are part of the payload, not of our escaping. Doing this
+        // before strip_tags also means an entity-encoded tag cannot survive as markup.
+        $text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
+
+        // Block boundaries become newlines, or every paragraph runs into the next.
+        $text = preg_replace('#<br\s*/?>#i', "\n", $text);
+        $text = preg_replace('#</(p|div|li|tr|h[1-6])>#i', "\n", $text);
+        $text = preg_replace('#<li[^>]*>#i', "- ", $text);
+
+        $text = strip_tags($text);
+
+        // Normalise the blank-line runs that "<p><br /></p>" leaves behind.
+        $text = str_replace("\r\n", "\n", $text);
+        $text = preg_replace("/[ \t]+\n/", "\n", $text);
+        $text = preg_replace("/\n{3,}/", "\n\n", $text);
+
+        return trim($text);
+    }
+
+    /**
      * A conversation's id.
      *
      * The threads endpoint calls it id_community_thread, not id_thread. Reading the wrong name
@@ -1011,7 +1050,7 @@ class PrestashopAPI extends Module
 
             foreach (array('message', 'content', 'text') as $field) {
                 if (isset($message[$field]) && is_scalar($message[$field])) {
-                    $body = (string) $message[$field];
+                    $body = self::messageToText($message[$field]);
                     break;
                 }
             }
@@ -1149,6 +1188,18 @@ class PrestashopAPI extends Module
                 $samples['seller/threads/{id}/messages'] = isset($messages[0]) ? $messages[0] : null;
                 $samples['seller/threads/{id}/messages (envelope)'] = $client->getLastRaw('messages_' . $id_thread);
             }
+        }
+
+        // Deciding "awaiting a reply" needs to know who wrote last. Per-conversation that is
+        // 1843 requests; this endpoint is one. Its shape decides whether the feature is
+        // possible at all, so it is sampled here rather than guessed at.
+        $all = $client->getAllMessages();
+
+        if ($all === false) {
+            $samples['seller/messages (error)'] = $client->getLastError();
+        } else {
+            $samples['seller/messages'] = isset($all[0]) ? $all[0] : null;
+            $samples['seller/messages (envelope)'] = $client->getLastRaw('allmessages');
         }
 
         $invoices = $this->safeList($client->getInvoices());
@@ -1516,14 +1567,12 @@ class PrestashopAPI extends Module
                 return '';
             }
 
-            $unread = $this->unreadThreads($threads);
-
-            if (!$unread) {
-                return '';
-            }
-
+            // Rendered even at zero. The block previously hid itself whenever nothing was
+            // waiting, which is indistinguishable from the module being broken — and since
+            // the first sync marks everything read, that was its normal state.
             $this->context->smarty->assign(array(
-                'psapi_unread' => count($unread),
+                'psapi_unread' => count($this->unreadThreads($threads)),
+                'psapi_total' => count($threads),
                 'psapi_messages_url' => $this->configUrl() . '#psapi-messages',
             ));
 

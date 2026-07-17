@@ -176,6 +176,21 @@ class SellerApiClient
     }
 
     /**
+     * Every message across every conversation, in one call.
+     *
+     * This is what makes "awaiting a reply" affordable. Deciding it per conversation means
+     * knowing who wrote last, and asking seller/threads/{id}/messages for each would be 1843
+     * requests on this account. One call for the lot is the difference between a feature and
+     * a denial-of-service against your own API key.
+     *
+     * @return array|false
+     */
+    public function getAllMessages($force = false)
+    {
+        return $this->fetchList('seller/messages', array(), 'allmessages', array('messages', 'message'), $force);
+    }
+
+    /**
      * @return array|false Invoices, or false on failure.
      */
     public function getInvoices($force = false)

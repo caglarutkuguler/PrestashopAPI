@@ -481,7 +481,10 @@
 								{if $message.meta}
 									<div class="psapi-message-meta">{$message.meta nofilter}</div>
 								{/if}
-								<div class="psapi-message-body">{$message.body|escape:'html':'UTF-8'|nl2br nofilter}</div>
+								{* Escaped, never rendered as HTML: this is buyer-supplied text in an
+								   authenticated back office. Line breaks come from CSS white-space:pre-wrap,
+								   so no nl2br is needed and no markup is reintroduced. *}
+								<div class="psapi-message-body">{$message.body|escape:'html':'UTF-8'}</div>
 							</div>
 						{/foreach}
 					{else}
