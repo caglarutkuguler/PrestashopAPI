@@ -206,6 +206,17 @@
 						</button>
 					{/if}
 				</li>
+				<li class="psapi-ok">
+					<i class="icon icon-bell"></i>
+					{if $psapi_unread > 0}
+						{$psapi_unread} {l s='conversation(s) have new activity. The back-office Dashboard is showing a notice.' mod='PrestashopAPI'}
+						<button type="button" class="psapi-inline-link" data-psapi-goto="messages">
+							{l s='Read them' mod='PrestashopAPI'}
+						</button>
+					{else}
+						{l s='No conversations are waiting, so the Dashboard shows no notice. It appears there only when a buyer is waiting.' mod='PrestashopAPI'}
+					{/if}
+				</li>
 				<li class="{if $psapi_currency_mismatch}psapi-warn{else}psapi-ok{/if}">
 					<i class="icon icon-money"></i>
 					{if $psapi_currency_mismatch}
@@ -675,6 +686,35 @@
 				<dt>{l s='Shop sales are zero for every product' mod='PrestashopAPI'}</dt>
 				<dd>{l s='None of your marketplace products matched a product in your catalogue. Check the Status list on the Dashboard tab, and pin the products by hand on the Products tab.' mod='PrestashopAPI'}</dd>
 			</dl>
+		</div>
+
+		<div class="panel">
+			<h3><i class="icon icon-code"></i> {l s='What the API returns' mod='PrestashopAPI'}</h3>
+			<p class="psapi-lead">
+				{l s='The marketplace only documents its products and sales data. Everything else, including conversations, invoices and payouts, is read from fields whose names we have had to infer. This shows one real row from each endpoint of your own account, so the module can be matched to what your account actually sends.' mod='PrestashopAPI'}
+			</p>
+
+			{if $psapi_diag}
+				<div class="alert alert-warning">
+					{l s='This is live data from your seller account and may contain buyer names or e-mail addresses. Remove anything personal before sharing it.' mod='PrestashopAPI'}
+				</div>
+
+				{foreach from=$psapi_diag key=endpoint item=json}
+					<div class="psapi-diag">
+						<div class="psapi-diag-head">
+							<code>{$endpoint}</code>
+							<button type="button" class="btn btn-default btn-xs" data-psapi-copy="psapi-diag-{$endpoint|md5}">
+								<i class="icon icon-copy"></i> {l s='Copy' mod='PrestashopAPI'}
+							</button>
+						</div>
+						<textarea id="psapi-diag-{$endpoint|md5}" class="psapi-diag-body form-control" rows="10" readonly="readonly">{$json}</textarea>
+					</div>
+				{/foreach}
+			{else}
+				<a class="btn btn-default" href="{$psapi_config_url|escape:'html':'UTF-8'}&psapi_diag=1#psapi-help">
+					<i class="icon icon-search"></i> {l s='Show one sample row from each endpoint' mod='PrestashopAPI'}
+				</a>
+			{/if}
 		</div>
 
 		<div class="panel">

@@ -59,6 +59,13 @@ class PrestashopAPI extends Module
         'pdf', 'txt', 'log', 'csv', 'zip', 'doc', 'docx', 'xls', 'xlsx',
     );
 
+    /** @var array Every hook the module needs. Checked on each visit to the config page. */
+    const HOOKS = array(
+        'actionFrontControllerSetMedia',
+        'displayProductAdditionalInfo',
+        'displayDashboardTop',
+    );
+
     /** @var string */
     private $html = '';
 
@@ -122,9 +129,13 @@ class PrestashopAPI extends Module
 
         // The configuration page loads its own assets with tags in the template, so no
         // back-office media hook is needed.
-        return $this->registerHook('actionFrontControllerSetMedia')
-            && $this->registerHook('displayProductAdditionalInfo')
-            && $this->registerHook('displayDashboardTop');
+        foreach (self::HOOKS as $hook) {
+            if (!$this->registerHook($hook)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function uninstall()
@@ -207,6 +218,7 @@ class PrestashopAPI extends Module
     public function getContent()
     {
         $this->html = '';
+        $this->ensureHooks();
 
         if (Tools::isSubmit('submitPrestashopAPISettings')) {
             $this->saveSettings();
@@ -225,6 +237,31 @@ class PrestashopAPI extends Module
         }
 
         return $this->html . $this->renderPage();
+    }
+
+    /**
+     * Registers any hook the installed copy is missing.
+     *
+     * install() runs exactly once, so a hook introduced in a later revision than the one a
+     * merchant installed stays unregistered for ever, and whatever it powered silently does
+     * nothing. That is what happened to the Dashboard notice. Reconciling here costs one
+     * cached query per visit to this page and removes a whole class of "why is nothing
+     * showing" reports, without asking anyone to reset the module and lose their settings.
+     *
+     * @return string[] Hooks that had to be repaired.
+     */
+    private function ensureHooks()
+    {
+        $repaired = array();
+
+        foreach (self::HOOKS as $hook) {
+            if (!$this->isRegisteredInHook($hook)) {
+                $this->registerHook($hook);
+                $repaired[] = $hook;
+            }
+        }
+
+        return $repaired;
     }
 
     /**
@@ -808,6 +845,7 @@ class PrestashopAPI extends Module
             'psapi_shop_iso' => $stats->getShopIso(),
             'psapi_local_products' => $this->localProductChoices(),
 
+            'psapi_diag' => $this->diagnostics($client, $threads, $sales, $products),
             'psapi_config_url' => $this->configUrl(),
             'psapi_action_param' => self::ACTION_PARAM,
             'psapi_cron_url' => $this->cronUrl(),
@@ -916,6 +954,62 @@ class PrestashopAPI extends Module
         }
 
         return array('id' => $id_thread, 'messages' => $messages);
+    }
+
+    /**
+     * One sample row from each endpoint, pretty-printed.
+     *
+     * The Seller API is undocumented beyond products and orders, so several features here are
+     * built against field names that are inferred rather than known. This panel shows exactly
+     * what the account actually returns, which is the difference between implementing
+     * "unanswered" properly and guessing at a status field.
+     *
+     * One row per endpoint, not the whole payload: enough to read the shape, without spilling
+     * every buyer's details across the page.
+     *
+     * @return array|null endpoint => JSON, or null when not requested.
+     */
+    private function diagnostics(SellerApiClient $client, array $threads, array $sales, array $products)
+    {
+        if (!Tools::getValue('psapi_diag')) {
+            return null;
+        }
+
+        $samples = array(
+            'seller/products' => isset($products[0]) ? $products[0] : null,
+            'seller/orders' => isset($sales[0]) ? $sales[0] : null,
+            'seller/threads' => isset($threads[0]) ? $threads[0] : null,
+        );
+
+        if (isset($threads[0]['id_thread'])) {
+            $messages = $this->safeList($client->getMessages((int) $threads[0]['id_thread']));
+            $samples['seller/threads/{id}/messages'] = isset($messages[0]) ? $messages[0] : null;
+        }
+
+        $invoices = $this->safeList($client->getInvoices());
+        $samples['seller/invoices'] = isset($invoices[0]) ? $invoices[0] : null;
+
+        $bank = $this->safeList($client->getBank());
+        $samples['seller/bank'] = isset($bank[0]) ? $bank[0] : null;
+
+        $out = array();
+        $flags = 128; // JSON_PRETTY_PRINT, named numerically for PHP 5.3 parsers.
+
+        if (defined('JSON_UNESCAPED_SLASHES')) {
+            $flags |= JSON_UNESCAPED_SLASHES;
+        }
+
+        if (defined('JSON_UNESCAPED_UNICODE')) {
+            $flags |= JSON_UNESCAPED_UNICODE;
+        }
+
+        foreach ($samples as $endpoint => $row) {
+            $out[$endpoint] = $row === null
+                ? '// no rows returned for this account'
+                : json_encode($row, $flags);
+        }
+
+        return $out;
     }
 
     /**

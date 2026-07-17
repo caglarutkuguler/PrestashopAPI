@@ -17,6 +17,7 @@ $_MODULE['<{prestashopapi}prestashop>configure_1438971d29f373379a0ca6b9e82f04b0'
 $_MODULE['<{prestashopapi}prestashop>configure_159f404a63b6f3b28bfda77307324731'] = 'Attach a file';
 $_MODULE['<{prestashopapi}prestashop>configure_16360a2d4a190428439b0ce69b794d67'] = '"The marketplace could not be reached"';
 $_MODULE['<{prestashopapi}prestashop>configure_19c4d60ad5ac061124c671d40b9609bb'] = 'No API key yet. Add one in the Settings tab.';
+$_MODULE['<{prestashopapi}prestashop>configure_1ad29d73a1351f6885ba5f406942f35c'] = 'Show one sample row from each endpoint';
 $_MODULE['<{prestashopapi}prestashop>configure_1c1325208aa668df5ebd5590d78559b1'] = 'Add your API key to see your payouts.';
 $_MODULE['<{prestashopapi}prestashop>configure_1e06be11fb5fd2dc5d6515dfcbed7f55'] = 'Matched to';
 $_MODULE['<{prestashopapi}prestashop>configure_22d87a31c5e26023929199b558579ea7'] = 'Find your API key';
@@ -49,6 +50,7 @@ $_MODULE['<{prestashopapi}prestashop>configure_53beb26d8bca00f56fbd295fdee83459'
 $_MODULE['<{prestashopapi}prestashop>configure_56103ac9fe649f0f10b538d6ee4d6490'] = 'Marketplace only';
 $_MODULE['<{prestashopapi}prestashop>configure_59716c97497eb9694541f7c3d37b1a4d'] = 'Country';
 $_MODULE['<{prestashopapi}prestashop>configure_5a95a425f74314a96f13a2f136992178'] = 'Share';
+$_MODULE['<{prestashopapi}prestashop>configure_5f588f8b6393eb57d3cb0408bf1c8e81'] = 'conversation(s) have new activity. The back-office Dashboard is showing a notice.';
 $_MODULE['<{prestashopapi}prestashop>configure_5f7d06ec87f9fb8535cd5fb3baf4a984'] = 'Go to the marketplace';
 $_MODULE['<{prestashopapi}prestashop>configure_5fb63579fc981698f97d55bfecb213ea'] = 'Copy';
 $_MODULE['<{prestashopapi}prestashop>configure_6272ffa96ae67e69bc6aa665b7bb0cdc'] = 'sales. Export to CSV for the full list.';
@@ -78,6 +80,7 @@ $_MODULE['<{prestashopapi}prestashop>configure_86184d9499984dde8e5a8aba9f58c721'
 $_MODULE['<{prestashopapi}prestashop>configure_894c2ad9e36d4c367339b72dad6807db'] = 'Your marketplace sales and your own shop sales, side by side.';
 $_MODULE['<{prestashopapi}prestashop>configure_8b9c1abd043bde61211bc6d58be58370'] = 'If something does not work';
 $_MODULE['<{prestashopapi}prestashop>configure_8c52770d57749900ab4280e92a05681c'] = 'This shop';
+$_MODULE['<{prestashopapi}prestashop>configure_8c97b6869b7a8ca6c4d6ec89ea13cbe0'] = 'This is live data from your seller account and may contain buyer names or e-mail addresses. Remove anything personal before sharing it.';
 $_MODULE['<{prestashopapi}prestashop>configure_8f6aaeec557a82fef22390c59dd98bb1'] = 'Marketplace amounts are converted into your shop currency.';
 $_MODULE['<{prestashopapi}prestashop>configure_8f7f4c1ce7a4f933663d10543562b096'] = 'About';
 $_MODULE['<{prestashopapi}prestashop>configure_90272099a375c547c040ef614bfa2d3a'] = 'Currencies cannot be combined';
@@ -91,6 +94,7 @@ $_MODULE['<{prestashopapi}prestashop>configure_9adb3ec85d19cd77a38752c64b6eba1f'
 $_MODULE['<{prestashopapi}prestashop>configure_9b4fe89ace5fbb71472cf7a6c3c0ffe9'] = 'Keep this URL private: anyone who has it can trigger a refresh. It changes if you reinstall the module.';
 $_MODULE['<{prestashopapi}prestashop>configure_9bd1ea4499517071a96ee0340edeccf5'] = 'Marketplace payouts are usually in euros while your shop may sell in another currency. Combined totals use your shop exchange rate. If your shop has no rate for the marketplace currency, combined totals are hidden rather than guessed.';
 $_MODULE['<{prestashopapi}prestashop>configure_9cf3cea9fc2559bc3932a1034a8c77bd'] = 'Keep the data fresh automatically';
+$_MODULE['<{prestashopapi}prestashop>configure_9d0b331fa4855d2fc2b8ffca416cc545'] = 'The marketplace only documents its products and sales data. Everything else, including conversations, invoices and payouts, is read from fields whose names we have had to infer. This shows one real row from each endpoint of your own account, so the module can be matched to what your account actually sends.';
 $_MODULE['<{prestashopapi}prestashop>configure_9d2ee662b0a15d1d3df9ac28bd8616d7'] = 'Marketplace revenue';
 $_MODULE['<{prestashopapi}prestashop>configure_a1fa27779242b4902f7ae3bdd5c6d508'] = 'Type';
 $_MODULE['<{prestashopapi}prestashop>configure_a240fa27925a635b08dc28c9e4f9216d'] = 'Order';
@@ -109,6 +113,7 @@ $_MODULE['<{prestashopapi}prestashop>configure_cc61945cbbf46721a053467c395c666f'
 $_MODULE['<{prestashopapi}prestashop>configure_cce5ffc741270470dec823a4fff75552'] = 'Shop sales are zero for every product';
 $_MODULE['<{prestashopapi}prestashop>configure_ce479c09b1ac91e597244330f7799fa5'] = 'The marketplace could not be reached.';
 $_MODULE['<{prestashopapi}prestashop>configure_d300cdd8058e8c768b8af1c4dcc37441'] = 'Total units';
+$_MODULE['<{prestashopapi}prestashop>configure_d421fc3948ceb443dcd0e65bd4901a58'] = 'Read them';
 $_MODULE['<{prestashopapi}prestashop>configure_d4eb463703a7e5de947f59c53ef36bfa'] = 'No invoices returned by the marketplace for this period.';
 $_MODULE['<{prestashopapi}prestashop>configure_d754a9e8cb640da12849a040f3ca8176'] = 'Your reply';
 $_MODULE['<{prestashopapi}prestashop>configure_dc034e19f7696e490bc7229a3f70142c'] = 'Clear cached data';
@@ -119,6 +124,7 @@ $_MODULE['<{prestashopapi}prestashop>configure_dfcfc43722eef1eab1e4a12e50a068b1'
 $_MODULE['<{prestashopapi}prestashop>configure_e3b21a23cde5333c6eb4ae77e4910371'] = 'Add your API key to see your buyer messages.';
 $_MODULE['<{prestashopapi}prestashop>configure_e42e9d958504c5158fe91c5d56ee6214'] = 'The figures are older than they should be';
 $_MODULE['<{prestashopapi}prestashop>configure_e5771a362d88a71a657bfcd21ca54b3f'] = 'Units';
+$_MODULE['<{prestashopapi}prestashop>configure_e67411c887a32a48389e48e21d409fca'] = 'What the API returns';
 $_MODULE['<{prestashopapi}prestashop>configure_e9ac528d46587d227713f545b102975e'] = 'Why some products show no shop sales';
 $_MODULE['<{prestashopapi}prestashop>configure_ea97c403c6c439c1cd8bff25e5a0d19b'] = 'Your marketplace currency and your shop currency are different, and your shop has no exchange rate for the marketplace currency, so combined totals are hidden.';
 $_MODULE['<{prestashopapi}prestashop>configure_eaaab9447a9e1b5bb8c03d50b258c81c'] = 'Allowed:';
@@ -134,6 +140,7 @@ $_MODULE['<{prestashopapi}prestashop>configure_f53d1cd25e03173ba9eaa4e493636769'
 $_MODULE['<{prestashopapi}prestashop>configure_f64dc4589dc99c8b6633332d2cd64673'] = 'Generate a fresh key in your seller account, under Settings then API, and paste it again. Copy only the key, not the surrounding text.';
 $_MODULE['<{prestashopapi}prestashop>configure_f7886f70cab9f5a7a0d40a33c6f15046'] = 'Bar height is marketplace revenue; the number above each bar is the number of units sold.';
 $_MODULE['<{prestashopapi}prestashop>configure_f90fee5298d77ffd738740166d89de5a'] = 'Your products';
+$_MODULE['<{prestashopapi}prestashop>configure_fbc2b36e3017338a98de94503405093e'] = 'No conversations are waiting, so the Dashboard shows no notice. It appears there only when a buyer is waiting.';
 $_MODULE['<{prestashopapi}prestashop>configure_ffbb3331182cbfda3ccea5bb0c3eea46'] = 'Last updated';
 $_MODULE['<{prestashopapi}prestashop>dashboard_0ac3018a5819cf492da33b663399ee0d'] = 'marketplace conversations have new activity.';
 $_MODULE['<{prestashopapi}prestashop>dashboard_5470c8ac080e60f2c2ec2e009e2e32aa'] = 'buyers are waiting for a reply';

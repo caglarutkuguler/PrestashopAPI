@@ -17,6 +17,7 @@ $_MODULE['<{prestashopapi}prestashop>configure_1438971d29f373379a0ca6b9e82f04b0'
 $_MODULE['<{prestashopapi}prestashop>configure_159f404a63b6f3b28bfda77307324731'] = 'Dosya ekle';
 $_MODULE['<{prestashopapi}prestashop>configure_16360a2d4a190428439b0ce69b794d67'] = '"Pazar yerine ulasilamadi"';
 $_MODULE['<{prestashopapi}prestashop>configure_19c4d60ad5ac061124c671d40b9609bb'] = 'Henuz API anahtari yok. Ayarlar sekmesinden ekleyin.';
+$_MODULE['<{prestashopapi}prestashop>configure_1ad29d73a1351f6885ba5f406942f35c'] = 'Her uc noktadan birer ornek satir goster';
 $_MODULE['<{prestashopapi}prestashop>configure_1c1325208aa668df5ebd5590d78559b1'] = 'Odemelerinizi gormek icin API anahtarinizi ekleyin.';
 $_MODULE['<{prestashopapi}prestashop>configure_1e06be11fb5fd2dc5d6515dfcbed7f55'] = 'Eslestigi urun';
 $_MODULE['<{prestashopapi}prestashop>configure_22d87a31c5e26023929199b558579ea7'] = 'API anahtarinizi bulun';
@@ -49,6 +50,7 @@ $_MODULE['<{prestashopapi}prestashop>configure_53beb26d8bca00f56fbd295fdee83459'
 $_MODULE['<{prestashopapi}prestashop>configure_56103ac9fe649f0f10b538d6ee4d6490'] = 'Yalnizca pazar yeri';
 $_MODULE['<{prestashopapi}prestashop>configure_59716c97497eb9694541f7c3d37b1a4d'] = 'Ulke';
 $_MODULE['<{prestashopapi}prestashop>configure_5a95a425f74314a96f13a2f136992178'] = 'Pay';
+$_MODULE['<{prestashopapi}prestashop>configure_5f588f8b6393eb57d3cb0408bf1c8e81'] = 'konusmada yeni hareket var. Yonetim panosunda bir bildirim gosteriliyor.';
 $_MODULE['<{prestashopapi}prestashop>configure_5f7d06ec87f9fb8535cd5fb3baf4a984'] = 'Pazar yerine git';
 $_MODULE['<{prestashopapi}prestashop>configure_5fb63579fc981698f97d55bfecb213ea'] = 'Kopyala';
 $_MODULE['<{prestashopapi}prestashop>configure_6272ffa96ae67e69bc6aa665b7bb0cdc'] = 'Tam liste icin CSV olarak disa aktarin.';
@@ -78,6 +80,7 @@ $_MODULE['<{prestashopapi}prestashop>configure_86184d9499984dde8e5a8aba9f58c721'
 $_MODULE['<{prestashopapi}prestashop>configure_894c2ad9e36d4c367339b72dad6807db'] = 'Pazar yeri satislariniz ve kendi magaza satislariniz yan yana.';
 $_MODULE['<{prestashopapi}prestashop>configure_8b9c1abd043bde61211bc6d58be58370'] = 'Bir sey calismiyorsa';
 $_MODULE['<{prestashopapi}prestashop>configure_8c52770d57749900ab4280e92a05681c'] = 'Bu magaza';
+$_MODULE['<{prestashopapi}prestashop>configure_8c97b6869b7a8ca6c4d6ec89ea13cbe0'] = 'Bu, satici hesabinizdan gelen canli veridir ve alici adlari veya e-posta adresleri icerebilir. Paylasmadan once kisisel bilgileri kaldirin.';
 $_MODULE['<{prestashopapi}prestashop>configure_8f6aaeec557a82fef22390c59dd98bb1'] = 'Pazar yeri tutarlari magaza para biriminize cevriliyor.';
 $_MODULE['<{prestashopapi}prestashop>configure_8f7f4c1ce7a4f933663d10543562b096'] = 'Hakkinda';
 $_MODULE['<{prestashopapi}prestashop>configure_90272099a375c547c040ef614bfa2d3a'] = 'Para birimleri birlestirilemiyor';
@@ -91,6 +94,7 @@ $_MODULE['<{prestashopapi}prestashop>configure_9adb3ec85d19cd77a38752c64b6eba1f'
 $_MODULE['<{prestashopapi}prestashop>configure_9b4fe89ace5fbb71472cf7a6c3c0ffe9'] = 'Bu adresi gizli tutun: adrese sahip olan herkes yenileme tetikleyebilir. Modulu yeniden kurarsaniz adres degisir.';
 $_MODULE['<{prestashopapi}prestashop>configure_9bd1ea4499517071a96ee0340edeccf5'] = 'Pazar yeri odemeleri genellikle euro cinsindendir, magazaniz ise baska bir para biriminde satis yapiyor olabilir. Birlesik toplamlar magaza kurunuzu kullanir. Magazanizda pazar yeri para birimi icin kur yoksa birlesik toplamlar tahmin edilmek yerine gizlenir.';
 $_MODULE['<{prestashopapi}prestashop>configure_9cf3cea9fc2559bc3932a1034a8c77bd'] = 'Verileri otomatik guncel tutun';
+$_MODULE['<{prestashopapi}prestashop>configure_9d0b331fa4855d2fc2b8ffca416cc545'] = 'Pazar yeri yalnizca urun ve satis verilerini belgeliyor. Konusmalar, faturalar ve odemeler dahil diger her sey, adlarini tahmin etmek zorunda kaldigimiz alanlardan okunuyor. Burada kendi hesabinizin her uc noktasindan gercek bir satir gosterilir; boylece modul, hesabinizin gercekte gonderdigi verilere gore uyarlanabilir.';
 $_MODULE['<{prestashopapi}prestashop>configure_9d2ee662b0a15d1d3df9ac28bd8616d7'] = 'Pazar yeri cirosu';
 $_MODULE['<{prestashopapi}prestashop>configure_a1fa27779242b4902f7ae3bdd5c6d508'] = 'Tur';
 $_MODULE['<{prestashopapi}prestashop>configure_a240fa27925a635b08dc28c9e4f9216d'] = 'Siparis';
@@ -109,6 +113,7 @@ $_MODULE['<{prestashopapi}prestashop>configure_cc61945cbbf46721a053467c395c666f'
 $_MODULE['<{prestashopapi}prestashop>configure_cce5ffc741270470dec823a4fff75552'] = 'Her urunde magaza satisi sifir';
 $_MODULE['<{prestashopapi}prestashop>configure_ce479c09b1ac91e597244330f7799fa5'] = 'Pazar yerine ulasilamadi.';
 $_MODULE['<{prestashopapi}prestashop>configure_d300cdd8058e8c768b8af1c4dcc37441'] = 'Toplam adet';
+$_MODULE['<{prestashopapi}prestashop>configure_d421fc3948ceb443dcd0e65bd4901a58'] = 'Mesajlari oku';
 $_MODULE['<{prestashopapi}prestashop>configure_d4eb463703a7e5de947f59c53ef36bfa'] = 'Pazar yeri bu aralik icin fatura dondurmedi.';
 $_MODULE['<{prestashopapi}prestashop>configure_d754a9e8cb640da12849a040f3ca8176'] = 'Yanitiniz';
 $_MODULE['<{prestashopapi}prestashop>configure_dc034e19f7696e490bc7229a3f70142c'] = 'Onbellegi temizle';
@@ -119,6 +124,7 @@ $_MODULE['<{prestashopapi}prestashop>configure_dfcfc43722eef1eab1e4a12e50a068b1'
 $_MODULE['<{prestashopapi}prestashop>configure_e3b21a23cde5333c6eb4ae77e4910371'] = 'Alici mesajlarinizi gormek icin API anahtarinizi ekleyin.';
 $_MODULE['<{prestashopapi}prestashop>configure_e42e9d958504c5158fe91c5d56ee6214'] = 'Rakamlar olmasi gerekenden eski';
 $_MODULE['<{prestashopapi}prestashop>configure_e5771a362d88a71a657bfcd21ca54b3f'] = 'Adet';
+$_MODULE['<{prestashopapi}prestashop>configure_e67411c887a32a48389e48e21d409fca'] = 'API ne donduruyor';
 $_MODULE['<{prestashopapi}prestashop>configure_e9ac528d46587d227713f545b102975e'] = 'Neden bazi urunlerde magaza satisi gorunmuyor';
 $_MODULE['<{prestashopapi}prestashop>configure_ea97c403c6c439c1cd8bff25e5a0d19b'] = 'Pazar yeri para biriminiz ile magaza para biriminiz farkli ve magazanizda pazar yeri para birimi icin kur tanimli degil, bu nedenle birlesik toplamlar gizlendi.';
 $_MODULE['<{prestashopapi}prestashop>configure_eaaab9447a9e1b5bb8c03d50b258c81c'] = 'Izin verilenler:';
@@ -134,6 +140,7 @@ $_MODULE['<{prestashopapi}prestashop>configure_f53d1cd25e03173ba9eaa4e493636769'
 $_MODULE['<{prestashopapi}prestashop>configure_f64dc4589dc99c8b6633332d2cd64673'] = 'Satici hesabinizda Ayarlar ardindan API bolumunden yeni bir anahtar uretin ve tekrar yapistirin. Yalnizca anahtari kopyalayin, cevresindeki metni degil.';
 $_MODULE['<{prestashopapi}prestashop>configure_f7886f70cab9f5a7a0d40a33c6f15046'] = 'Cubuk yuksekligi pazar yeri cirosudur; her cubugun ustundeki sayi satilan adettir.';
 $_MODULE['<{prestashopapi}prestashop>configure_f90fee5298d77ffd738740166d89de5a'] = 'Urunleriniz';
+$_MODULE['<{prestashopapi}prestashop>configure_fbc2b36e3017338a98de94503405093e'] = 'Bekleyen konusma yok, bu nedenle Panoda bildirim gosterilmiyor. Bildirim yalnizca bir alici beklerken cikar.';
 $_MODULE['<{prestashopapi}prestashop>configure_ffbb3331182cbfda3ccea5bb0c3eea46'] = 'Son guncelleme';
 $_MODULE['<{prestashopapi}prestashop>dashboard_0ac3018a5819cf492da33b663399ee0d'] = 'pazar yeri konusmasinda yeni hareket var.';
 $_MODULE['<{prestashopapi}prestashop>dashboard_5470c8ac080e60f2c2ec2e009e2e32aa'] = 'alici yanit bekliyor';

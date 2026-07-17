@@ -590,6 +590,34 @@
 }
 
 /* ---------------------------------------------------------------- *
+ * Diagnostics
+ * ---------------------------------------------------------------- */
+.psapi-diag {
+    margin-bottom: 14px;
+}
+
+.psapi-diag-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.psapi-diag-head code {
+    font-size: 12px;
+}
+
+.psapi-diag-body {
+    font-family: monospace;
+    font-size: 12px;
+    /* nowrap + scroll keeps the JSON readable; the page itself must never scroll sideways */
+    white-space: pre;
+    overflow-x: auto;
+    background: var(--psapi-sunken);
+}
+
+/* ---------------------------------------------------------------- *
  * Copy field
  * ---------------------------------------------------------------- */
 .psapi-copy {
