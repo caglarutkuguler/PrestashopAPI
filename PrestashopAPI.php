@@ -1555,6 +1555,14 @@ class PrestashopAPI extends Module
     public function hookDisplayDashboardTop()
     {
         try {
+            // displayDashboardTop fires on more admin pages than the Dashboard, and on this
+            // shop it fires twice on the module's own configuration page. Without this guard
+            // the widget printed itself twice, above the page it was meant to link to. The
+            // same guard is in wecallyouback for the same reason.
+            if (!($this->context->controller instanceof AdminDashboardControllerCore)) {
+                return '';
+            }
+
             $client = $this->client(false);
 
             if (!$client->hasKey()) {
