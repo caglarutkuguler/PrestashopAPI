@@ -50,6 +50,15 @@ class PrestashopAPI extends Module
     /** @var string Date the marketplace opened. Used as the lower bound for the "all time" window. */
     const EPOCH = '2008-01-01';
 
+    /** @var int Largest reply attachment accepted, in bytes. */
+    const ATTACHMENT_MAX = 8388608;
+
+    /** @var array Extensions a buyer support reply may carry. */
+    const ATTACHMENT_TYPES = array(
+        'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp',
+        'pdf', 'txt', 'log', 'csv', 'zip', 'doc', 'docx', 'xls', 'xlsx',
+    );
+
     /** @var string */
     private $html = '';
 
@@ -99,6 +108,7 @@ class PrestashopAPI extends Module
             'PRESTASHOPAPI_BADGE_SCOPE' => 'total',
             'PRESTASHOPAPI_LINKS' => '{}',
             'PRESTASHOPAPI_BADGE_MAP' => '{}',
+            'PRESTASHOPAPI_SEEN' => '{}',
         );
 
         foreach ($defaults as $key => $value) {
@@ -113,7 +123,8 @@ class PrestashopAPI extends Module
         // The configuration page loads its own assets with tags in the template, so no
         // back-office media hook is needed.
         return $this->registerHook('actionFrontControllerSetMedia')
-            && $this->registerHook('displayProductAdditionalInfo');
+            && $this->registerHook('displayProductAdditionalInfo')
+            && $this->registerHook('displayDashboardTop');
     }
 
     public function uninstall()
@@ -122,8 +133,8 @@ class PrestashopAPI extends Module
             'PRESTASHOPAPI_KEY', 'PRESTASHOPAPI_PERIOD', 'PRESTASHOPAPI_DATE_FROM',
             'PRESTASHOPAPI_DATE_TO', 'PRESTASHOPAPI_CURRENCY', 'PRESTASHOPAPI_CACHE_TTL',
             'PRESTASHOPAPI_BADGE_ENABLED', 'PRESTASHOPAPI_BADGE_MIN', 'PRESTASHOPAPI_BADGE_SCOPE',
-            'PRESTASHOPAPI_LINKS', 'PRESTASHOPAPI_BADGE_MAP', 'PRESTASHOPAPI_CRON_TOKEN',
-            'PRESTASHOPAPI_LAST_SYNC', 'PRESTASHOPAPI_LAST_ERROR',
+            'PRESTASHOPAPI_LINKS', 'PRESTASHOPAPI_BADGE_MAP', 'PRESTASHOPAPI_SEEN',
+            'PRESTASHOPAPI_CRON_TOKEN', 'PRESTASHOPAPI_LAST_SYNC', 'PRESTASHOPAPI_LAST_ERROR',
             // v1 keys, unprefixed and liable to collide with other modules.
             'PRODUCT_PAGE_FRONT_ENABLE', 'API_DATE_FROM', 'API_DATE_TO',
         );
@@ -241,6 +252,12 @@ class PrestashopAPI extends Module
             case 'export':
                 $this->exportCsv();
                 break;
+
+            case 'readall':
+                $threads = $this->client()->getThreads();
+                $this->markSeen(is_array($threads) ? $threads : array());
+                $this->redirectBack(7, '', 'messages');
+                break;
         }
     }
 
@@ -286,6 +303,7 @@ class PrestashopAPI extends Module
             4 => $this->l('Your reply has been sent to the buyer.'),
             5 => $this->l('Cached marketplace data cleared.'),
             6 => $this->l('Connection to the marketplace works.'),
+            7 => $this->l('All conversations marked as read.'),
         );
 
         $conf = (int) Tools::getValue('psapi_conf');
@@ -486,9 +504,23 @@ class PrestashopAPI extends Module
             return false;
         }
 
+        $path = null;
+        $name = null;
+
+        if (isset($_FILES['psapi_attachment']) && (int) $_FILES['psapi_attachment']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $attachment = $this->validateAttachment($_FILES['psapi_attachment']);
+
+            if ($attachment === false) {
+                return false;
+            }
+
+            $path = $attachment['path'];
+            $name = $attachment['name'];
+        }
+
         $client = $this->client();
 
-        if (!$client->sendMessage($id_thread, $message)) {
+        if (!$client->sendMessage($id_thread, $message, $path, $name)) {
             $this->redirectBack(0, $client->getLastError(), 'messages');
 
             return false;
@@ -497,6 +529,156 @@ class PrestashopAPI extends Module
         $this->redirectBack(4, '', 'messages');
 
         return true;
+    }
+
+    /**
+     * Checks one uploaded reply attachment.
+     *
+     * @return array{path: string, name: string}|false False with errors_list populated.
+     */
+    private function validateAttachment(array $file)
+    {
+        $error = (int) $file['error'];
+
+        if ($error !== UPLOAD_ERR_OK) {
+            // A file larger than PHP accepts never reaches the size test below, so the upload
+            // error codes have to be reported in their own right or the form fails silently.
+            if ($error === UPLOAD_ERR_INI_SIZE || $error === UPLOAD_ERR_FORM_SIZE) {
+                $this->errors_list[] = sprintf(
+                    $this->l('That file is larger than this server accepts (%s).'),
+                    ini_get('upload_max_filesize')
+                );
+            } else {
+                $this->errors_list[] = $this->l('The file could not be uploaded. Please try again.');
+            }
+
+            return false;
+        }
+
+        // Guards against a crafted path being passed off as an upload.
+        if (!is_uploaded_file($file['tmp_name'])) {
+            $this->errors_list[] = $this->l('The file could not be uploaded. Please try again.');
+
+            return false;
+        }
+
+        if ((int) $file['size'] <= 0) {
+            $this->errors_list[] = $this->l('That file is empty.');
+
+            return false;
+        }
+
+        if ((int) $file['size'] > self::ATTACHMENT_MAX) {
+            $this->errors_list[] = sprintf(
+                $this->l('That file is too large. The limit is %d MB.'),
+                self::ATTACHMENT_MAX / 1048576
+            );
+
+            return false;
+        }
+
+        // basename() strips any directory component the client put in the name.
+        $name = basename(str_replace('\\', '/', (string) $file['name']));
+        $extension = Tools::strtolower(pathinfo($name, PATHINFO_EXTENSION));
+
+        if (!in_array($extension, self::ATTACHMENT_TYPES, true)) {
+            $this->errors_list[] = sprintf(
+                $this->l('Files of type "%s" cannot be attached. Allowed: %s.'),
+                $extension === '' ? '?' : $extension,
+                implode(', ', self::ATTACHMENT_TYPES)
+            );
+
+            return false;
+        }
+
+        return array('path' => $file['tmp_name'], 'name' => $name);
+    }
+
+    /* ================================================================ *
+     * Unread conversations
+     * ================================================================ */
+
+    /**
+     * Conversations that have changed since the merchant last looked at them.
+     *
+     * The threads endpoint is undocumented, so rather than reading a "status" or "answered"
+     * field that may not exist, each row is fingerprinted whole. A new buyer message has to
+     * change something in the row it belongs to (a date, a counter), so the fingerprint moves
+     * and the conversation resurfaces. This is why the feature says "new" and not
+     * "unanswered": the latter is not knowable from what the API documents.
+     *
+     * @return int[] Thread ids.
+     */
+    private function unreadThreads(array $threads)
+    {
+        $seen = json_decode((string) Configuration::get('PRESTASHOPAPI_SEEN'), true);
+        $seen = is_array($seen) ? $seen : array();
+        $unread = array();
+
+        foreach ($threads as $thread) {
+            if (!is_array($thread) || !isset($thread['id_thread'])) {
+                continue;
+            }
+
+            $id = (int) $thread['id_thread'];
+
+            if (!isset($seen[$id]) || $seen[$id] !== self::fingerprint($thread)) {
+                $unread[] = $id;
+            }
+        }
+
+        return $unread;
+    }
+
+    /**
+     * Stable hash of a thread row's scalar fields.
+     */
+    private static function fingerprint(array $thread)
+    {
+        $flat = array();
+
+        foreach ($thread as $field => $value) {
+            if (is_scalar($value) || $value === null) {
+                $flat[$field] = (string) $value;
+            }
+        }
+
+        // Sorted so that a reordered response is not mistaken for a changed one.
+        ksort($flat);
+
+        return md5(json_encode($flat));
+    }
+
+    /**
+     * @param int|null $id_thread Thread to mark, or null for every thread.
+     */
+    private function markSeen(array $threads, $id_thread = null)
+    {
+        $seen = json_decode((string) Configuration::get('PRESTASHOPAPI_SEEN'), true);
+        $seen = is_array($seen) ? $seen : array();
+        $current = array();
+
+        foreach ($threads as $thread) {
+            if (!is_array($thread) || !isset($thread['id_thread'])) {
+                continue;
+            }
+
+            $id = (int) $thread['id_thread'];
+            $current[$id] = true;
+
+            if ($id_thread === null || $id === (int) $id_thread) {
+                $seen[$id] = self::fingerprint($thread);
+            }
+        }
+
+        // Drop threads the marketplace no longer returns, so the value cannot grow forever.
+        foreach (array_keys($seen) as $id) {
+            if (!isset($current[$id])) {
+                unset($seen[$id]);
+            }
+        }
+
+        Configuration::updateValue('PRESTASHOPAPI_SEEN', json_encode($seen));
     }
 
     /**
@@ -593,6 +775,9 @@ class PrestashopAPI extends Module
         $dates = self::resolvePeriod();
         $summary = $stats->getSummary();
 
+        $threads = $has_key ? $this->safeList($client->getThreads()) : array();
+        $unread = $this->unreadThreads($threads);
+
         $this->context->smarty->assign(array(
             'psapi_has_key' => $has_key,
             'psapi_api_error' => $api_error,
@@ -610,9 +795,12 @@ class PrestashopAPI extends Module
             'psapi_months' => $this->prepareChart($stats->getMonthlySeries(12)),
             'psapi_countries' => $stats->getCountryBreakdown(8),
 
-            'psapi_threads' => $this->normalizeTable($has_key ? $this->safeList($client->getThreads()) : array()),
+            'psapi_threads' => $this->normalizeTable($threads, $unread),
+            'psapi_unread' => count($unread),
             'psapi_invoices' => $this->normalizeTable($has_key ? $this->safeList($client->getInvoices()) : array()),
-            'psapi_thread' => $this->currentThread($client),
+            'psapi_thread' => $this->currentThread($client, $threads),
+            'psapi_attachment_types' => implode(', ', self::ATTACHMENT_TYPES),
+            'psapi_attachment_max' => (int) (self::ATTACHMENT_MAX / 1048576),
 
             'psapi_link_health' => $link_health,
             'psapi_currency_mismatch' => $stats->hasCurrencyMismatch(),
@@ -687,13 +875,16 @@ class PrestashopAPI extends Module
     /**
      * Loads the messages of the thread the merchant opened, if any.
      */
-    private function currentThread(SellerApiClient $client)
+    private function currentThread(SellerApiClient $client, array $threads)
     {
         $id_thread = (int) Tools::getValue('psapi_id_thread');
 
         if ($id_thread <= 0) {
             return null;
         }
+
+        // Opening the conversation is what marks it read.
+        $this->markSeen($threads, $id_thread);
 
         $messages = array();
 
@@ -735,9 +926,11 @@ class PrestashopAPI extends Module
      * scalar fields come back are displayed with humanised labels. A field that disappears
      * simply stops being a column instead of fataling a template.
      *
+     * @param int[] $unread Thread ids to flag, when the rows are conversations.
+     *
      * @return array{columns: array, rows: array}
      */
-    private function normalizeTable(array $rows)
+    private function normalizeTable(array $rows, array $unread = array())
     {
         $columns = array();
 
@@ -771,9 +964,12 @@ class PrestashopAPI extends Module
                 );
             }
 
+            $id_thread = isset($row['id_thread']) ? (int) $row['id_thread'] : 0;
+
             $out[] = array(
                 'cells' => $cells,
-                'id_thread' => isset($row['id_thread']) ? (int) $row['id_thread'] : 0,
+                'id_thread' => $id_thread,
+                'unread' => $id_thread > 0 && in_array($id_thread, $unread, true),
             );
         }
 
@@ -1008,6 +1204,50 @@ class PrestashopAPI extends Module
     /* ================================================================ *
      * Hooks
      * ================================================================ */
+
+    /**
+     * Tells the merchant on the back-office Dashboard that buyers are waiting.
+     *
+     * Reads the cache only: this hook fires on every Dashboard page load, and an admin page
+     * must never block on the marketplace. If nothing has been downloaded yet, it says nothing.
+     */
+    public function hookDisplayDashboardTop()
+    {
+        try {
+            $client = $this->client(false);
+
+            if (!$client->hasKey()) {
+                return '';
+            }
+
+            $threads = $client->getThreads();
+
+            if (!is_array($threads) || !$threads) {
+                return '';
+            }
+
+            $unread = $this->unreadThreads($threads);
+
+            if (!$unread) {
+                return '';
+            }
+
+            $this->context->smarty->assign(array(
+                'psapi_unread' => count($unread),
+                'psapi_messages_url' => $this->configUrl() . '#psapi-messages',
+            ));
+
+            return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/dashboard.tpl');
+        } catch (Throwable $e) {
+            PrestaShopLogger::addLog('PrestashopAPI dashboard: ' . $e->getMessage(), 2);
+
+            return '';
+        } catch (Exception $e) {
+            PrestaShopLogger::addLog('PrestashopAPI dashboard: ' . $e->getMessage(), 2);
+
+            return '';
+        }
+    }
 
     public function hookActionFrontControllerSetMedia()
     {

@@ -14,7 +14,7 @@ Built for PrestaShop Addons contributors, by a contributor. Free and open source
 | **Dashboard** | Revenue, units, refunds, average per order, last 30 days, and a 12-month revenue chart. |
 | **Products** | Every marketplace product with its marketplace sales *and* your own shop's sales for the same product, side by side. |
 | **Sales** | Every sale line, filterable, exportable to CSV for your accountant. |
-| **Messages** | Your buyer conversations, with replies sent straight from your back office. |
+| **Messages** | Your buyer conversations, with replies — and file attachments — sent straight from your back office. New conversations are flagged, and the back-office Dashboard tells you when buyers are waiting. |
 | **Payouts** | Your marketplace invoices. |
 | **Storefront badge** | Optional social-proof badge on your own product pages: "Downloaded 1 234 times". |
 
@@ -63,6 +63,27 @@ By default it matches **your product's reference** to the **marketplace product 
 references are different, you do not have to rename anything: open the **Products** tab and pick
 the right product from the dropdown next to each row. The Dashboard tells you how many matched
 (`4 / 6 marketplace products are matched…`), so you always know whether the totals are complete.
+
+## Buyer messages
+
+The **Messages** tab lists your marketplace conversations and lets you reply without leaving
+your shop. Replies can carry one attachment (up to 8 MB — jpg, png, gif, webp, bmp, pdf, txt,
+log, csv, zip, doc, docx, xls, xlsx). Size and type are checked on the server, not just in the
+browser.
+
+**"New" flags and the Dashboard notice.** When a conversation has activity you have not looked
+at, it is flagged *New*, the Messages tab shows a red count, and the back-office Dashboard shows
+a notice. Opening a conversation clears its flag; **Mark all as read** clears the lot.
+
+One honest limitation: the module reports conversations that are **new to you**, not ones that
+are *unanswered*. The Seller API does not document a field for "awaiting seller reply", so
+rather than reading a field that might not exist, the module fingerprints each conversation and
+re-flags it whenever anything in it changes — which a new buyer message necessarily does. The
+practical difference: on first install everything is flagged, because you have not reviewed any
+of it here yet. Hit **Mark all as read** once and it settles.
+
+The Dashboard notice reads only the local copy of your data — it never calls the marketplace, so
+it cannot slow your back office down. It refreshes with everything else.
 
 ## Keeping data fresh automatically
 

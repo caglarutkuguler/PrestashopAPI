@@ -199,9 +199,13 @@ class SellerApiClient
 
         if ($file_path !== null && is_file($file_path)) {
             if (class_exists('CURLFile')) {
-                $params['attachment'] = new CURLFile($file_path, null, (string) $file_name);
+                // The third argument is the filename the API sees. Without it the upload is
+                // named after the PHP temp file, so the buyer would receive "phpA1B2.tmp".
+                $params['attachment'] = new CURLFile($file_path, self::detectMime($file_path), (string) $file_name);
             } else {
-                $params['attachment'] = '@' . $file_path;
+                // PHP 5.4 and below. CURLOPT_SAFE_UPLOAD defaults to true from 5.6 on, so this
+                // branch only ever runs where the @ syntax is still honoured.
+                $params['attachment'] = '@' . $file_path . ';filename=' . $file_name;
             }
         }
 
@@ -216,6 +220,38 @@ class SellerApiClient
         self::purgeCache('threads');
 
         return true;
+    }
+
+    /**
+     * Reads the real MIME type from the file's bytes rather than trusting whatever the
+     * browser declared in the upload.
+     *
+     * @return string
+     */
+    private static function detectMime($path)
+    {
+        if (function_exists('finfo_open')) {
+            $finfo = @finfo_open(FILEINFO_MIME_TYPE);
+
+            if ($finfo) {
+                $mime = @finfo_file($finfo, $path);
+                @finfo_close($finfo);
+
+                if ($mime) {
+                    return $mime;
+                }
+            }
+        }
+
+        if (function_exists('mime_content_type')) {
+            $mime = @mime_content_type($path);
+
+            if ($mime) {
+                return $mime;
+            }
+        }
+
+        return 'application/octet-stream';
     }
 
     /**

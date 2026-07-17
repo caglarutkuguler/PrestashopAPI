@@ -115,7 +115,11 @@
 		</button>
 		<button type="button" class="psapi-tab" data-psapi-tab="messages" role="tab">
 			<i class="icon icon-comments"></i> {l s='Messages' mod='PrestashopAPI'}
-			{if $psapi_threads.rows}<span class="psapi-pill">{$psapi_threads.rows|count}</span>{/if}
+			{if $psapi_unread > 0}
+				<span class="psapi-pill psapi-pill--alert">{$psapi_unread}</span>
+			{elseif $psapi_threads.rows}
+				<span class="psapi-pill">{$psapi_threads.rows|count}</span>
+			{/if}
 		</button>
 		<button type="button" class="psapi-tab" data-psapi-tab="payouts" role="tab">
 			<i class="icon icon-money"></i> {l s='Payouts' mod='PrestashopAPI'}
@@ -441,7 +445,16 @@
 	{* ============================================================ *}
 	<section class="psapi-pane" data-psapi-pane="messages">
 		<div class="panel">
-			<h3><i class="icon icon-comments"></i> {l s='Buyer messages' mod='PrestashopAPI'}</h3>
+			<h3>
+				<i class="icon icon-comments"></i> {l s='Buyer messages' mod='PrestashopAPI'}
+				{if $psapi_unread > 0 && !$psapi_thread}
+					<span class="panel-heading-action">
+						<a class="btn btn-default btn-sm" href="{$psapi_base|escape:'html':'UTF-8'}readall">
+							<i class="icon icon-check"></i> {l s='Mark all as read' mod='PrestashopAPI'}
+						</a>
+					</span>
+				{/if}
+			</h3>
 
 			{if $psapi_thread}
 				<p>
@@ -465,11 +478,28 @@
 					{/if}
 				</div>
 
-				<form method="post" action="{$psapi_config_url|escape:'html':'UTF-8'}" class="psapi-reply">
+				{* enctype is required or the browser posts the filename only and $_FILES stays empty. *}
+				<form method="post" action="{$psapi_config_url|escape:'html':'UTF-8'}" class="psapi-reply"
+					enctype="multipart/form-data">
 					<input type="hidden" name="psapi_id_thread" value="{$psapi_thread.id|escape:'html':'UTF-8'}" />
+
 					<label for="psapi-message">{l s='Your reply' mod='PrestashopAPI'}</label>
 					<textarea id="psapi-message" name="psapi_message" rows="5" class="form-control"
 						placeholder="{l s='Write your answer to the buyer...' mod='PrestashopAPI'}"></textarea>
+
+					<label for="psapi-attachment">{l s='Attach a file' mod='PrestashopAPI'}
+						<span class="psapi-optional">{l s='(optional)' mod='PrestashopAPI'}</span>
+					</label>
+					<div class="psapi-file">
+						<input type="file" id="psapi-attachment" name="psapi_attachment"
+							accept=".{$psapi_attachment_types|replace:', ':',.'}" />
+						<span class="psapi-file-name" data-psapi-file-name></span>
+					</div>
+					<p class="help-block">
+						{l s='Up to' mod='PrestashopAPI'} {$psapi_attachment_max} {l s='MB.' mod='PrestashopAPI'}
+						{l s='Allowed:' mod='PrestashopAPI'} {$psapi_attachment_types}
+					</p>
+
 					<button type="submit" name="submitPrestashopAPIReply" class="btn btn-primary">
 						<i class="icon icon-send"></i> {l s='Send reply' mod='PrestashopAPI'}
 					</button>
@@ -485,9 +515,12 @@
 						</thead>
 						<tbody>
 							{foreach from=$psapi_threads.rows item=thread}
-								<tr>
+								<tr{if $thread.unread} class="psapi-row-unread"{/if}>
 									{foreach from=$thread.cells item=cell}<td>{$cell.text}</td>{/foreach}
 									<td class="text-right">
+										{if $thread.unread}
+											<span class="psapi-new">{l s='New' mod='PrestashopAPI'}</span>
+										{/if}
 										{if $thread.id_thread}
 											<a class="btn btn-default btn-xs"
 												href="{$psapi_config_url|escape:'html':'UTF-8'}&psapi_id_thread={$thread.id_thread}#psapi-messages">

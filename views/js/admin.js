@@ -158,6 +158,30 @@
     });
 
     /* ---------------------------------------------------------------- *
+     * Reply attachment
+     *
+     * Purely a convenience. The server re-checks size and extension, because a client-side
+     * check is a hint, not a control.
+     * ---------------------------------------------------------------- */
+    var attachment = document.getElementById('psapi-attachment');
+    var attachmentName = app.querySelector('[data-psapi-file-name]');
+
+    if (attachment && attachmentName) {
+        attachment.addEventListener('change', function () {
+            if (!attachment.files || !attachment.files.length) {
+                attachmentName.textContent = '';
+
+                return;
+            }
+
+            var file = attachment.files[0];
+            var mb = file.size / 1048576;
+
+            attachmentName.textContent = file.name + ' (' + mb.toFixed(1) + ' MB)';
+        });
+    }
+
+    /* ---------------------------------------------------------------- *
      * Settings: the custom date fields only matter for the custom period
      * ---------------------------------------------------------------- */
     var period = document.getElementById('PRESTASHOPAPI_PERIOD');

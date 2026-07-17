@@ -51,7 +51,14 @@ Complete rewrite. Renamed **Seller Dashboard — Marketplace Sales, Messages & P
 
 - Dashboard with KPI cards, a 12-month revenue chart (server-rendered, no JS chart library)
   and a buyer-country breakdown.
-- **Messages** tab: buyer conversations with replies sent from the back office.
+- **Messages** tab: buyer conversations with replies sent from the back office, carrying an
+  optional attachment (8 MB, extension allow-list, `is_uploaded_file` + server-side size and
+  type checks, real MIME read from the file's bytes rather than the browser's declaration).
+- **New-conversation flags and a back-office Dashboard notice** telling you when buyers are
+  waiting, with per-conversation and "mark all as read" clearing. Conversations are fingerprinted
+  whole rather than read through a "status"/"unanswered" field, because the threads endpoint
+  documents none — so the feature reports *new to you*, not *unanswered*. The Dashboard widget
+  is cache-only and can never make an admin page wait on the marketplace.
 - **Payouts** tab: marketplace invoices.
 - **Products** tab: manual product matching, replacing the 1.x instruction to rename your
   references to match marketplace IDs.

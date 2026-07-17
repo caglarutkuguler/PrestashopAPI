@@ -67,6 +67,7 @@ function upgrade_module_2_0_0($module)
         'PRESTASHOPAPI_BADGE_MIN' => 10,
         'PRESTASHOPAPI_LINKS' => '{}',
         'PRESTASHOPAPI_BADGE_MAP' => '{}',
+        'PRESTASHOPAPI_SEEN' => '{}',
     );
 
     foreach ($defaults as $key => $value) {
@@ -114,6 +115,7 @@ function upgrade_module_2_0_0($module)
 
     $module->registerHook('actionFrontControllerSetMedia');
     $module->registerHook('displayProductAdditionalInfo');
+    $module->registerHook('displayDashboardTop');
 
     /* ---------------------------------------------------------------- *
      * Stale 1.x files
