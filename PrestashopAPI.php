@@ -867,6 +867,7 @@ class PrestashopAPI extends Module
         }
 
         $unread = $this->unreadThreads($threads);
+        $built = $this->buildThreads($threads, $unread);
 
         $this->context->smarty->assign(array(
             'psapi_has_key' => $has_key,
@@ -887,9 +888,13 @@ class PrestashopAPI extends Module
 
             // Capped: this account has 1843 conversations, and every rendered row is markup the
             // browser has to parse. The filter box searches what is rendered.
-            'psapi_threads' => array_slice($this->buildThreads($threads, $unread), 0, 300),
+            'psapi_threads' => array_slice($built, 0, 300),
             'psapi_threads_total' => count($threads),
             'psapi_threads_error' => $threads_error,
+            // Rows arrived but none were usable: the response is a shape this module does not
+            // understand. That is a third state, and reporting it as "you have no
+            // conversations" is how the wrong wrapper key stayed hidden for three rounds.
+            'psapi_threads_unrecognised' => $threads && !$built,
             'psapi_unread' => count($unread),
             'psapi_invoices' => $this->normalizeTable($has_key ? $this->safeList($client->getInvoices()) : array()),
             'psapi_thread' => $this->currentThread($client, $threads),
@@ -908,6 +913,7 @@ class PrestashopAPI extends Module
             'psapi_cron_url' => $this->cronUrl(),
             'psapi_module_dir' => $this->_path,
             'psapi_version' => self::MODULE_VERSION,
+            'psapi_asset_v' => $this->assetVersion(),
             'psapi_settings_form' => $this->renderSettingsForm(),
         ));
 
@@ -1089,13 +1095,16 @@ class PrestashopAPI extends Module
             'seller/threads' => isset($threads[0]) ? $threads[0] : null,
         );
 
-        // When an endpoint yields nothing, the sample row is null and tells us nothing about
-        // why. The envelope and the transport error are what actually diagnose it.
-        if (!isset($threads[0])) {
-            $samples['seller/threads (envelope)'] = $client->getLastRaw('threads');
+        // Always shown, not only when the list came back empty: a sample row cannot explain a
+        // row that is the wrong shape, and the envelope is what identifies the wrapper key and
+        // the true row count. Not having this from the start cost several rounds of guessing.
+        $samples['seller/threads (envelope)'] = $client->getLastRaw('threads');
+        $samples['seller/threads (rows the module built)'] = count($threads) . ' row(s) extracted from the envelope';
+
+        if ($threads_error !== '') {
             // The captured error, not getLastError(): every later call resets that, and several
             // have run since the conversations one failed.
-            $samples['seller/threads (error)'] = $threads_error === '' ? '// no error reported' : $threads_error;
+            $samples['seller/threads (error)'] = $threads_error;
         }
 
         $id_thread = isset($threads[0]) ? self::threadId($threads[0]) : 0;
@@ -1257,6 +1266,31 @@ class PrestashopAPI extends Module
         }
 
         return $choices;
+    }
+
+    /**
+     * Cache-busting stamp for the configuration page's own CSS and JS.
+     *
+     * Keying these on the module version was a mistake: the version only changes on release,
+     * so every stylesheet fix between releases kept being served from the browser cache under
+     * the same ?v=. The file's own mtime changes exactly when the file does, which is the
+     * question the browser is actually asking.
+     *
+     * @return string
+     */
+    private function assetVersion()
+    {
+        $stamp = 0;
+
+        foreach (array('views/css/admin.css', 'views/js/admin.js') as $file) {
+            $path = $this->local_path . $file;
+
+            if (is_file($path)) {
+                $stamp = max($stamp, (int) @filemtime($path));
+            }
+        }
+
+        return $stamp ? (string) $stamp : self::MODULE_VERSION;
     }
 
     private function cronUrl()

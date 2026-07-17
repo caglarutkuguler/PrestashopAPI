@@ -17,7 +17,7 @@
 
 {* Loaded here rather than through actionAdminControllerSetMedia: the styles only ever apply
    inside getContent(), and a tag cannot silently fail to fire. *}
-<link href="{$psapi_module_dir|escape:'html':'UTF-8'}views/css/admin.css?v={$psapi_version|escape:'html':'UTF-8'}" rel="stylesheet" type="text/css" media="all" />
+<link href="{$psapi_module_dir|escape:'html':'UTF-8'}views/css/admin.css?v={$psapi_asset_v|escape:'html':'UTF-8'}" rel="stylesheet" type="text/css" media="all" />
 
 <div class="psapi-app">
 
@@ -586,6 +586,18 @@
 						</tbody>
 					</table>
 				</div>
+			{elseif $psapi_threads_unrecognised}
+				<div class="alert alert-warning">
+					<strong>{l s='The marketplace answered, but in a shape this module does not recognise.' mod='PrestashopAPI'}</strong><br />
+					{l s='It returned' mod='PrestashopAPI'} {$psapi_threads_total}
+					{l s='item(s), none of which look like a conversation. Nothing is wrong with your account or your API key: your products and sales are loading normally.' mod='PrestashopAPI'}
+				</div>
+				<p class="psapi-lead">
+					{l s='The Help tab shows exactly what came back, which is what is needed to fix this.' mod='PrestashopAPI'}
+					<button type="button" class="psapi-inline-link" data-psapi-goto="help">
+						{l s='Open the Help tab' mod='PrestashopAPI'}
+					</button>
+				</p>
 			{elseif $psapi_threads_error}
 				{* An empty list and a failed request are different things and must not look alike. *}
 				<div class="alert alert-danger">
@@ -787,4 +799,4 @@
 </div>
 
 {* At the end of the markup so the script finds the tabs and panes already in the DOM. *}
-<script src="{$psapi_module_dir|escape:'html':'UTF-8'}views/js/admin.js?v={$psapi_version|escape:'html':'UTF-8'}"></script>
+<script src="{$psapi_module_dir|escape:'html':'UTF-8'}views/js/admin.js?v={$psapi_asset_v|escape:'html':'UTF-8'}"></script>
