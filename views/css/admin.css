@@ -567,24 +567,33 @@
     width: 1%;
 }
 
-.psapi-pin {
+/* Every colour rule on an <a> below is written as `.psapi-app a.foo` (0,2,1) rather than
+   `.psapi-foo` (0,1,0). The back office styles its links with an element-qualified selector
+   (`.bootstrap a`, 0,1,1), which outranks a bare single class — so a plain `.psapi-segment--on
+   { color: #fff }` lost and the label was painted the theme's link colour on top of our own
+   background, i.e. invisible. The count inside the same anchor stayed white only because
+   `.psapi-segment--on span` happens to be 0,2,0. Namespacing stops us leaking out; it does
+   nothing to stop the theme leaking in. */
+.psapi-app a.psapi-pin {
     display: inline-block;
     padding: 2px 4px;
     color: var(--psapi-line);
     transition: color .12s;
+    text-decoration: none;
 }
 
-.psapi-pin:hover {
+.psapi-app a.psapi-pin:hover {
     color: var(--psapi-muted);
 }
 
-.psapi-pin--on,
-.psapi-pin--on:hover {
+.psapi-app a.psapi-pin--on,
+.psapi-app a.psapi-pin--on:hover {
     color: var(--psapi-warn);
 }
 
-/* A dot rather than a label: one click, and its meaning is carried by the row styling. */
-.psapi-dot {
+/* A dot rather than a label: one click, and its meaning is carried by the row styling.
+   Also an <a>, so also written at 0,2,1 — see the note above. */
+.psapi-app a.psapi-dot {
     display: inline-block;
     width: 10px;
     height: 10px;
@@ -593,13 +602,14 @@
     border-radius: 50%;
     background: transparent;
     vertical-align: middle;
+    text-decoration: none;
 }
 
-.psapi-dot:hover {
+.psapi-app a.psapi-dot:hover {
     border-color: var(--psapi-accent);
 }
 
-.psapi-dot--unread {
+.psapi-app a.psapi-dot--unread {
     border-color: var(--psapi-accent-dark);
     background: var(--psapi-accent);
 }
@@ -615,7 +625,7 @@
     overflow: hidden;
 }
 
-.psapi-segment {
+.psapi-app a.psapi-segment {
     padding: 6px 14px;
     border-inline-end: 1px solid var(--psapi-line);
     background: var(--psapi-surface);
@@ -625,22 +635,23 @@
     text-decoration: none;
 }
 
-.psapi-segment:last-child {
+.psapi-app a.psapi-segment:last-child {
     border-inline-end: none;
 }
 
-.psapi-segment:hover {
+.psapi-app a.psapi-segment:hover {
     background: var(--psapi-sunken);
+    color: var(--psapi-ink);
     text-decoration: none;
 }
 
-.psapi-segment--on,
-.psapi-segment--on:hover {
+.psapi-app a.psapi-segment--on,
+.psapi-app a.psapi-segment--on:hover {
     background: var(--psapi-accent);
     color: #fff;
 }
 
-.psapi-segment span {
+.psapi-app a.psapi-segment span {
     display: inline-block;
     min-width: 16px;
     padding: 0 5px;
@@ -652,7 +663,7 @@
     text-align: center;
 }
 
-.psapi-segment--on span {
+.psapi-app a.psapi-segment--on span {
     background: rgba(255, 255, 255, .25);
     color: #fff;
 }
