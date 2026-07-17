@@ -554,6 +554,109 @@
     font-weight: 600;
 }
 
+.psapi-row-pinned {
+    /* start, not left: the marker must sit on the leading edge in RTL back offices too */
+    box-shadow: inset 3px 0 0 var(--psapi-warn);
+}
+
+/* ---------------------------------------------------------------- *
+ * Read / pinned controls
+ * ---------------------------------------------------------------- */
+.psapi-flags {
+    white-space: nowrap;
+    width: 1%;
+}
+
+.psapi-pin {
+    display: inline-block;
+    padding: 2px 4px;
+    color: var(--psapi-line);
+    transition: color .12s;
+}
+
+.psapi-pin:hover {
+    color: var(--psapi-muted);
+}
+
+.psapi-pin--on,
+.psapi-pin--on:hover {
+    color: var(--psapi-warn);
+}
+
+/* A dot rather than a label: one click, and its meaning is carried by the row styling. */
+.psapi-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-inline-start: 4px;
+    border: 1px solid var(--psapi-line);
+    border-radius: 50%;
+    background: transparent;
+    vertical-align: middle;
+}
+
+.psapi-dot:hover {
+    border-color: var(--psapi-accent);
+}
+
+.psapi-dot--unread {
+    border-color: var(--psapi-accent-dark);
+    background: var(--psapi-accent);
+}
+
+/* ---------------------------------------------------------------- *
+ * Filter segments
+ * ---------------------------------------------------------------- */
+.psapi-segments {
+    display: inline-flex;
+    margin-bottom: 12px;
+    border: 1px solid var(--psapi-line);
+    border-radius: var(--psapi-radius);
+    overflow: hidden;
+}
+
+.psapi-segment {
+    padding: 6px 14px;
+    border-inline-end: 1px solid var(--psapi-line);
+    background: var(--psapi-surface);
+    color: var(--psapi-muted);
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.psapi-segment:last-child {
+    border-inline-end: none;
+}
+
+.psapi-segment:hover {
+    background: var(--psapi-sunken);
+    text-decoration: none;
+}
+
+.psapi-segment--on,
+.psapi-segment--on:hover {
+    background: var(--psapi-accent);
+    color: #fff;
+}
+
+.psapi-segment span {
+    display: inline-block;
+    min-width: 16px;
+    padding: 0 5px;
+    margin-inline-start: 4px;
+    border-radius: 9px;
+    background: var(--psapi-sunken);
+    color: var(--psapi-muted);
+    font-size: 11px;
+    text-align: center;
+}
+
+.psapi-segment--on span {
+    background: rgba(255, 255, 255, .25);
+    color: #fff;
+}
+
 .psapi-new {
     display: inline-block;
     padding: 1px 7px;

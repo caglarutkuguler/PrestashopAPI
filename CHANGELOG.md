@@ -69,11 +69,20 @@ Complete rewrite. Renamed **Seller Dashboard — Marketplace Sales, Messages & P
 - **Messages** tab: buyer conversations with replies sent from the back office, carrying an
   optional attachment (8 MB, extension allow-list, `is_uploaded_file` + server-side size and
   type checks, real MIME read from the file's bytes rather than the browser's declaration).
-- **New-conversation flags and a back-office Dashboard notice** telling you when buyers are
-  waiting, with per-conversation and "mark all as read" clearing. Conversations are fingerprinted
-  whole rather than read through a "status"/"unanswered" field, because the threads endpoint
-  documents none — so the feature reports *new to you*, not *unanswered*. The Dashboard widget
-  is cache-only and can never make an admin page wait on the marketplace.
+- **Merchant-owned unread / pinned state** in its own table (`prestashopapi_thread`), with
+  All / Unread / Pinned filters, pinned-then-unread-then-newest ordering, and a back-office
+  Dashboard notice. Everything starts unread; the merchant sets the baseline once. A buyer reply
+  moves the conversation's fingerprint, which returns it to unread automatically while keeping
+  its pin. The marketplace exposes no read/status/answered field and no message author, so this
+  tracks the merchant's decisions plus genuine change rather than pretending to mirror the
+  Addons "unread" badge. Not a Configuration value: 1843 conversations need ~83KB and
+  `ps_configuration.value` is TEXT, capped at 64KB.
+- The Dashboard widget is cache-only and can never make an admin page wait on the marketplace.
+  It is guarded to `AdminDashboardController` — `displayDashboardTop` fires on other admin pages
+  too, and rendered the block twice on the module's own configuration page.
+- Message bodies are decoded and reduced to plain text. They arrive as HTML, sometimes
+  entity-encoded on top, so escaping them printed the markup and rendering them raw would run
+  buyer-supplied script with the merchant's back-office session.
 - **Payouts** tab: marketplace invoices.
 - **Products** tab: manual product matching, replacing the 1.x instruction to rename your
   references to match marketplace IDs.

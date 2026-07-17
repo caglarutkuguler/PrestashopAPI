@@ -20,6 +20,7 @@ if (!defined('_PS_VERSION_')) {
 
 require_once dirname(__FILE__) . '/classes/SellerApiClient.php';
 require_once dirname(__FILE__) . '/classes/SellerStats.php';
+require_once dirname(__FILE__) . '/classes/SellerThreadState.php';
 
 /**
  * Seller Dashboard: brings PrestaShop Addons marketplace sales into the shop's own back office.
@@ -99,7 +100,7 @@ class PrestashopAPI extends Module
             return false;
         }
 
-        if (!SellerApiClient::installCache()) {
+        if (!SellerApiClient::installCache() || !SellerThreadState::install()) {
             return false;
         }
 
@@ -115,7 +116,6 @@ class PrestashopAPI extends Module
             'PRESTASHOPAPI_BADGE_SCOPE' => 'total',
             'PRESTASHOPAPI_LINKS' => '{}',
             'PRESTASHOPAPI_BADGE_MAP' => '{}',
-            'PRESTASHOPAPI_SEEN' => '{}',
         );
 
         foreach ($defaults as $key => $value) {
@@ -155,6 +155,7 @@ class PrestashopAPI extends Module
         }
 
         SellerApiClient::uninstallCache();
+        SellerThreadState::uninstall();
 
         return parent::uninstall();
     }
@@ -219,6 +220,7 @@ class PrestashopAPI extends Module
     {
         $this->html = '';
         $this->ensureHooks();
+        $this->ensureSchema();
 
         if (Tools::isSubmit('submitPrestashopAPISettings')) {
             $this->saveSettings();
@@ -265,6 +267,29 @@ class PrestashopAPI extends Module
     }
 
     /**
+     * Creates tables introduced after the merchant installed the module.
+     *
+     * Same reasoning as ensureHooks(): install() runs once, so a table added in a later
+     * revision never appears on an existing install, and everything built on it silently does
+     * nothing. Seeds the conversation state on first creation so the merchant does not have to
+     * hit Refresh before the inbox works.
+     */
+    private function ensureSchema()
+    {
+        if (SellerThreadState::tableExists()) {
+            return;
+        }
+
+        SellerThreadState::install();
+
+        $threads = $this->client(false)->getThreads();
+
+        if (is_array($threads) && $threads) {
+            SellerThreadState::sync($threads);
+        }
+    }
+
+    /**
      * Handles link-style actions. Everything redirects back so a refresh cannot replay them.
      */
     private function handleAction()
@@ -291,9 +316,28 @@ class PrestashopAPI extends Module
                 break;
 
             case 'readall':
-                $threads = $this->client()->getThreads();
-                $this->markSeen(is_array($threads) ? $threads : array());
+                SellerThreadState::setRead(null, true);
                 $this->redirectBack(7, '', 'messages');
+                break;
+
+            case 'read':
+                SellerThreadState::setRead((int) Tools::getValue('psapi_id'), true);
+                $this->redirectBack(8, '', 'messages');
+                break;
+
+            case 'unread':
+                SellerThreadState::setRead((int) Tools::getValue('psapi_id'), false);
+                $this->redirectBack(9, '', 'messages');
+                break;
+
+            case 'pin':
+                SellerThreadState::setPinned((int) Tools::getValue('psapi_id'), true);
+                $this->redirectBack(10, '', 'messages');
+                break;
+
+            case 'unpin':
+                SellerThreadState::setPinned((int) Tools::getValue('psapi_id'), false);
+                $this->redirectBack(11, '', 'messages');
                 break;
         }
     }
@@ -341,6 +385,10 @@ class PrestashopAPI extends Module
             5 => $this->l('Cached marketplace data cleared.'),
             6 => $this->l('Connection to the marketplace works.'),
             7 => $this->l('All conversations marked as read.'),
+            8 => $this->l('Conversation marked as read.'),
+            9 => $this->l('Conversation marked as unread.'),
+            10 => $this->l('Conversation pinned.'),
+            11 => $this->l('Conversation unpinned.'),
         );
 
         $conf = (int) Tools::getValue('psapi_conf');
@@ -382,8 +430,14 @@ class PrestashopAPI extends Module
 
         $client->getProducts(true);
         $sales = $client->getOrders(true);
-        $client->getThreads(true);
+        $threads = $client->getThreads(true);
         $client->getInvoices(true);
+
+        // Reconcile read/pinned state against what just arrived: new conversations appear
+        // unread, and anything whose fingerprint moved goes back to unread.
+        if (is_array($threads)) {
+            SellerThreadState::sync($threads);
+        }
 
         if ($sales === false) {
             $this->errors_list[] = $client->getLastError();
@@ -632,54 +686,8 @@ class PrestashopAPI extends Module
     }
 
     /* ================================================================ *
-     * Unread conversations
+     * Conversations
      * ================================================================ */
-
-    /**
-     * Conversations that have changed since the merchant last looked at them.
-     *
-     * The threads endpoint is undocumented, so rather than reading a "status" or "answered"
-     * field that may not exist, each row is fingerprinted whole. A new buyer message has to
-     * change something in the row it belongs to (a date, a counter), so the fingerprint moves
-     * and the conversation resurfaces. This is why the feature says "new" and not
-     * "unanswered": the latter is not knowable from what the API documents.
-     *
-     * @return int[] Thread ids.
-     */
-    private function unreadThreads(array $threads)
-    {
-        $seen = json_decode((string) Configuration::get('PRESTASHOPAPI_SEEN'), true);
-        $seen = is_array($seen) ? $seen : array();
-
-        // First run on an established account: a real seller has well over a thousand
-        // conversations, and flagging every one of them as new would be noise, not a
-        // notification. Start from "all read" and report only what moves from here.
-        if (!$seen && $threads) {
-            $this->markSeen($threads);
-
-            return array();
-        }
-
-        $unread = array();
-
-        foreach ($threads as $thread) {
-            if (!is_array($thread)) {
-                continue;
-            }
-
-            $id = self::threadId($thread);
-
-            if (!$id) {
-                continue;
-            }
-
-            if (!isset($seen[$id]) || $seen[$id] !== self::fingerprint($thread)) {
-                $unread[] = $id;
-            }
-        }
-
-        return $unread;
-    }
 
     /**
      * Turns a marketplace message body into readable plain text.
@@ -721,79 +729,11 @@ class PrestashopAPI extends Module
     }
 
     /**
-     * A conversation's id.
-     *
-     * The threads endpoint calls it id_community_thread, not id_thread. Reading the wrong name
-     * meant every row was skipped: no conversation could be opened and none could be flagged.
-     * Both names are accepted because seller/threads/{id}/messages may well use the shorter one.
-     *
      * @return int 0 when the row carries no id.
      */
     private static function threadId(array $thread)
     {
-        foreach (array('id_community_thread', 'id_thread') as $field) {
-            if (isset($thread[$field]) && (int) $thread[$field] > 0) {
-                return (int) $thread[$field];
-            }
-        }
-
-        return 0;
-    }
-
-    /**
-     * Stable hash of a thread row's scalar fields.
-     */
-    private static function fingerprint(array $thread)
-    {
-        $flat = array();
-
-        foreach ($thread as $field => $value) {
-            if (is_scalar($value) || $value === null) {
-                $flat[$field] = (string) $value;
-            }
-        }
-
-        // Sorted so that a reordered response is not mistaken for a changed one.
-        ksort($flat);
-
-        return md5(json_encode($flat));
-    }
-
-    /**
-     * @param int|null $id_thread Thread to mark, or null for every thread.
-     */
-    private function markSeen(array $threads, $id_thread = null)
-    {
-        $seen = json_decode((string) Configuration::get('PRESTASHOPAPI_SEEN'), true);
-        $seen = is_array($seen) ? $seen : array();
-        $current = array();
-
-        foreach ($threads as $thread) {
-            if (!is_array($thread)) {
-                continue;
-            }
-
-            $id = self::threadId($thread);
-
-            if (!$id) {
-                continue;
-            }
-
-            $current[$id] = true;
-
-            if ($id_thread === null || $id === (int) $id_thread) {
-                $seen[$id] = self::fingerprint($thread);
-            }
-        }
-
-        // Drop threads the marketplace no longer returns, so the value cannot grow forever.
-        foreach (array_keys($seen) as $id) {
-            if (!isset($current[$id])) {
-                unset($seen[$id]);
-            }
-        }
-
-        Configuration::updateValue('PRESTASHOPAPI_SEEN', json_encode($seen));
+        return SellerThreadState::threadId($thread);
     }
 
     /**
@@ -905,8 +845,9 @@ class PrestashopAPI extends Module
             }
         }
 
-        $unread = $this->unreadThreads($threads);
-        $built = $this->buildThreads($threads, $unread);
+        $built = $this->buildThreads($threads);
+        $filtered = $this->filterThreads($built);
+        $counts = SellerThreadState::counts();
 
         $this->context->smarty->assign(array(
             'psapi_has_key' => $has_key,
@@ -925,9 +866,12 @@ class PrestashopAPI extends Module
             'psapi_months' => $this->prepareChart($stats->getMonthlySeries(12)),
             'psapi_countries' => $stats->getCountryBreakdown(8),
 
-            // Capped: this account has 1843 conversations, and every rendered row is markup the
-            // browser has to parse. The filter box searches what is rendered.
-            'psapi_threads' => array_slice($built, 0, 300),
+            // Filtered before the cap, so "unread" reaches every unread conversation rather
+            // than only those inside the first 300 rendered rows.
+            'psapi_threads' => array_slice($filtered, 0, 300),
+            'psapi_threads_shown' => count($filtered),
+            'psapi_threads_filter' => $this->threadFilter(),
+            'psapi_threads_counts' => $counts,
             'psapi_threads_total' => count($threads),
             'psapi_threads_error' => $threads_error,
             // Rows arrived but none were usable: the response is a shape this module does not
@@ -937,7 +881,7 @@ class PrestashopAPI extends Module
             // Printed inline with that warning rather than behind the Help tab. A diagnostic
             // one click away from the failure is a diagnostic nobody reads.
             'psapi_threads_debug' => $threads && !$built ? $this->threadsDebug($client, $threads) : '',
-            'psapi_unread' => count($unread),
+            'psapi_unread' => $counts['unread'],
             'psapi_invoices' => $this->normalizeTable($has_key ? $this->safeList($client->getInvoices()) : array()),
             'psapi_thread' => $this->currentThread($client, $threads),
             'psapi_attachment_types' => implode(', ', self::ATTACHMENT_TYPES),
@@ -1026,8 +970,9 @@ class PrestashopAPI extends Module
             return null;
         }
 
-        // Opening the conversation is what marks it read.
-        $this->markSeen($threads, $id_thread);
+        // Opening a conversation marks it read, as any inbox does. "Mark as unread" puts it
+        // back, which is how the merchant flags the ones they still owe an answer.
+        SellerThreadState::setRead($id_thread, true);
 
         $messages = array();
 
@@ -1098,8 +1043,9 @@ class PrestashopAPI extends Module
      *
      * @return array
      */
-    private function buildThreads(array $threads, array $unread)
+    private function buildThreads(array $threads)
     {
+        $state = SellerThreadState::all();
         $rows = array();
 
         foreach ($threads as $thread) {
@@ -1112,6 +1058,9 @@ class PrestashopAPI extends Module
             if (!$id) {
                 continue;
             }
+
+            $is_read = isset($state[$id]) ? $state[$id]['read'] : false;
+            $is_pinned = isset($state[$id]) && $state[$id]['pinned'];
 
             $zen = isset($thread['zen']) && is_array($thread['zen']) ? $thread['zen'] : array();
             $version = isset($thread['versionps']) ? trim((string) $thread['versionps']) : '';
@@ -1133,11 +1082,59 @@ class PrestashopAPI extends Module
                 // zen is the Business Care entitlement. Negative days left means their free
                 // support window has closed, which is worth knowing before you spend an hour.
                 'support_days' => isset($zen['nb_days_left']) ? (int) $zen['nb_days_left'] : null,
-                'unread' => in_array($id, $unread, true),
+                'unread' => !$is_read,
+                'pinned' => $is_pinned,
+                // Sort key: pinned first, then unread, then newest. Computed here because
+                // Smarty cannot sort on three keys without a plugin.
+                'rank' => ($is_pinned ? 0 : 1) . ($is_read ? '1' : '0') . str_pad(
+                    (string) (99999999999 - strtotime(isset($thread['date_add']) ? $thread['date_add'] : '1970-01-01')),
+                    11,
+                    '0',
+                    STR_PAD_LEFT
+                ),
             );
         }
 
+        usort($rows, array('PrestashopAPI', 'sortThreads'));
+
         return $rows;
+    }
+
+    public static function sortThreads($a, $b)
+    {
+        return strcmp($a['rank'], $b['rank']);
+    }
+
+    /**
+     * @return string One of: all, unread, pinned.
+     */
+    private function threadFilter()
+    {
+        $filter = (string) Tools::getValue('psapi_filter');
+
+        return in_array($filter, array('all', 'unread', 'pinned'), true) ? $filter : 'all';
+    }
+
+    /**
+     * @return array
+     */
+    private function filterThreads(array $rows)
+    {
+        $filter = $this->threadFilter();
+
+        if ($filter === 'all') {
+            return $rows;
+        }
+
+        $out = array();
+
+        foreach ($rows as $row) {
+            if (($filter === 'unread' && $row['unread']) || ($filter === 'pinned' && $row['pinned'])) {
+                $out[] = $row;
+            }
+        }
+
+        return $out;
     }
 
     /**
@@ -1576,12 +1573,14 @@ class PrestashopAPI extends Module
             }
 
             // Rendered even at zero. The block previously hid itself whenever nothing was
-            // waiting, which is indistinguishable from the module being broken — and since
-            // the first sync marks everything read, that was its normal state.
+            // waiting, which is indistinguishable from the module being broken.
+            $counts = SellerThreadState::counts();
+
             $this->context->smarty->assign(array(
-                'psapi_unread' => count($this->unreadThreads($threads)),
-                'psapi_total' => count($threads),
-                'psapi_messages_url' => $this->configUrl() . '#psapi-messages',
+                'psapi_unread' => $counts['unread'],
+                'psapi_pinned' => $counts['pinned'],
+                'psapi_total' => $counts['total'] ? $counts['total'] : count($threads),
+                'psapi_messages_url' => $this->configUrl() . '&psapi_filter=unread#psapi-messages',
             ));
 
             return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/dashboard.tpl');

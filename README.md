@@ -71,16 +71,23 @@ your shop. Replies can carry one attachment (up to 8 MB — jpg, png, gif, webp,
 log, csv, zip, doc, docx, xls, xlsx). Size and type are checked on the server, not just in the
 browser.
 
-**"New" flags and the Dashboard notice.** When a conversation has activity you have not looked
-at, it is flagged *New*, the Messages tab shows a red count, and the back-office Dashboard shows
-a notice. Opening a conversation clears its flag; **Mark all as read** clears the lot.
+**Unread and pinned.** You decide what is read. Every conversation starts **unread**; mark them
+read one at a time, or all at once with **Mark all as read**. Opening a conversation marks it
+read, and **Mark as unread** puts it back — that is how you flag the ones you still owe an
+answer. **Pin** any conversation to keep it at the top of the list; pinning is filing, and is
+independent of read state.
 
-One honest limitation: the module reports conversations that are **new to you**, not ones that
-are *unanswered*. The Seller API does not document a field for "awaiting seller reply", so
-rather than reading a field that might not exist, the module fingerprints each conversation and
-re-flags it whenever anything in it changes — which a new buyer message necessarily does. The
-practical difference: on first install everything is flagged, because you have not reviewed any
-of it here yet. Hit **Mark all as read** once and it settles.
+From then on the module only tells you what **changed**: when a buyer replies, that conversation
+goes back to unread by itself and rises to the top. It keeps its pin.
+
+Filter the list by **All / Unread / Pinned**, and the Messages tab and the back-office Dashboard
+both show the unread count.
+
+One honest limitation, worth knowing: the marketplace's own "N unread" badge is a read-receipt
+on PrestaShop's side and **is not exposed by the API** — there is no read, status or answered
+field on a conversation, and no author on a message. So this module cannot mirror that number,
+and does not pretend to. It tracks *your* decisions plus genuine new activity, which is why you
+set the starting point yourself.
 
 The Dashboard notice reads only the local copy of your data — it never calls the marketplace, so
 it cannot slow your back office down. It refreshes with everything else.

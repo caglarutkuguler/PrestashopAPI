@@ -20,19 +20,22 @@
 	<div class="alert alert-warning">
 		<i class="icon icon-comments"></i>
 		{if $psapi_unread == 1}
-			<strong>{l s='1 marketplace conversation has new activity' mod='PrestashopAPI'}</strong>
+			<strong>{l s='1 marketplace conversation is waiting for you' mod='PrestashopAPI'}</strong>
 		{else}
-			<strong>{$psapi_unread} {l s='marketplace conversations have new activity' mod='PrestashopAPI'}</strong>
+			<strong>{$psapi_unread} {l s='marketplace conversations are waiting for you' mod='PrestashopAPI'}</strong>
 		{/if}
 		&mdash; {l s='out of' mod='PrestashopAPI'} {$psapi_total} {l s='in total.' mod='PrestashopAPI'}
+		{if $psapi_pinned > 0}
+			<span class="text-muted">({$psapi_pinned} {l s='pinned' mod='PrestashopAPI'})</span>
+		{/if}
 		<a class="btn btn-primary btn-sm" href="{$psapi_messages_url|escape:'html':'UTF-8'}">
-			{l s='Read them' mod='PrestashopAPI'}
+			{l s='Open them' mod='PrestashopAPI'}
 		</a>
 	</div>
 {else}
 	<div class="alert alert-info">
 		<i class="icon icon-check"></i>
-		{l s='No marketplace conversation has new activity.' mod='PrestashopAPI'}
+		{l s='No marketplace conversation is waiting for a reply.' mod='PrestashopAPI'}
 		<span class="text-muted">({$psapi_total} {l s='conversations tracked' mod='PrestashopAPI'})</span>
 		<a class="btn btn-default btn-sm" href="{$psapi_messages_url|escape:'html':'UTF-8'}">
 			{l s='Open Seller Dashboard' mod='PrestashopAPI'}

@@ -67,7 +67,6 @@ function upgrade_module_2_0_0($module)
         'PRESTASHOPAPI_BADGE_MIN' => 10,
         'PRESTASHOPAPI_LINKS' => '{}',
         'PRESTASHOPAPI_BADGE_MAP' => '{}',
-        'PRESTASHOPAPI_SEEN' => '{}',
     );
 
     foreach ($defaults as $key => $value) {
@@ -99,9 +98,14 @@ function upgrade_module_2_0_0($module)
     // it. Its mixed-case name also breaks on MySQL with lower_case_table_names enabled.
     Db::getInstance()->execute('DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'PrestashopAPI`');
 
-    require_once dirname(__FILE__) . '/../classes/SellerApiClient.php';
+    // An early 2.0.0 build kept conversation read-state in a Configuration value. It has its
+    // own table now: ps_configuration.value is TEXT, and 1843 conversations overflow 64KB.
+    Configuration::deleteByName('PRESTASHOPAPI_SEEN');
 
-    if (!SellerApiClient::installCache()) {
+    require_once dirname(__FILE__) . '/../classes/SellerApiClient.php';
+    require_once dirname(__FILE__) . '/../classes/SellerThreadState.php';
+
+    if (!SellerApiClient::installCache() || !SellerThreadState::install()) {
         return false;
     }
 

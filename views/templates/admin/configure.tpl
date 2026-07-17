@@ -458,10 +458,12 @@
 		<div class="panel">
 			<h3>
 				<i class="icon icon-comments"></i> {l s='Buyer messages' mod='PrestashopAPI'}
-				{if $psapi_unread > 0 && !$psapi_thread}
+				{if $psapi_threads_counts.unread > 0 && !$psapi_thread}
 					<span class="panel-heading-action">
-						<a class="btn btn-default btn-sm" href="{$psapi_base|escape:'html':'UTF-8'}readall">
+						<a class="btn btn-default btn-sm" href="{$psapi_base|escape:'html':'UTF-8'}readall"
+							onclick="return confirm('{l s='Mark all conversations as read?' mod='PrestashopAPI' js=1}');">
 							<i class="icon icon-check"></i> {l s='Mark all as read' mod='PrestashopAPI'}
+							({$psapi_threads_counts.unread})
 						</a>
 					</span>
 				{/if}
@@ -518,11 +520,29 @@
 						<i class="icon icon-send"></i> {l s='Send reply' mod='PrestashopAPI'}
 					</button>
 				</form>
-			{elseif $psapi_threads}
-				{if $psapi_threads_total > 300}
+			{elseif $psapi_threads || $psapi_threads_filter != 'all'}
+				{assign var='psapi_fbase' value="`$psapi_config_url`&psapi_filter="}
+
+				<div class="psapi-segments">
+					<a class="psapi-segment {if $psapi_threads_filter == 'all'}psapi-segment--on{/if}"
+						href="{$psapi_fbase|escape:'html':'UTF-8'}all#psapi-messages">
+						{l s='All' mod='PrestashopAPI'} <span>{$psapi_threads_counts.total}</span>
+					</a>
+					<a class="psapi-segment {if $psapi_threads_filter == 'unread'}psapi-segment--on{/if}"
+						href="{$psapi_fbase|escape:'html':'UTF-8'}unread#psapi-messages">
+						{l s='Unread' mod='PrestashopAPI'} <span>{$psapi_threads_counts.unread}</span>
+					</a>
+					<a class="psapi-segment {if $psapi_threads_filter == 'pinned'}psapi-segment--on{/if}"
+						href="{$psapi_fbase|escape:'html':'UTF-8'}pinned#psapi-messages">
+						<i class="icon icon-thumb-tack"></i> {l s='Pinned' mod='PrestashopAPI'}
+						<span>{$psapi_threads_counts.pinned}</span>
+					</a>
+				</div>
+
+				{if $psapi_threads_shown > 300}
 					<div class="alert alert-info">
-						{l s='Showing the 300 most recent of' mod='PrestashopAPI'} {$psapi_threads_total}
-						{l s='conversations.' mod='PrestashopAPI'}
+						{l s='Showing the first 300 of' mod='PrestashopAPI'} {$psapi_threads_shown}
+						{l s='conversations. Narrow it down with the filters or the search box.' mod='PrestashopAPI'}
 					</div>
 				{/if}
 
@@ -533,6 +553,7 @@
 					<table class="table psapi-table" id="psapi-threads-table">
 						<thead>
 							<tr>
+								<th></th>
 								<th>{l s='Subject' mod='PrestashopAPI'}</th>
 								<th>{l s='Product' mod='PrestashopAPI'}</th>
 								<th>{l s='Customer' mod='PrestashopAPI'}</th>
@@ -545,9 +566,20 @@
 						<tbody>
 							{foreach from=$psapi_threads item=thread}
 								<tr data-psapi-search="{$thread.topic|escape:'html':'UTF-8'} {$thread.product|escape:'html':'UTF-8'} {$thread.website|escape:'html':'UTF-8'}"
-									{if $thread.unread}class="psapi-row-unread"{/if}>
+									class="{if $thread.unread}psapi-row-unread {/if}{if $thread.pinned}psapi-row-pinned{/if}">
+									<td class="psapi-flags">
+										<a class="psapi-pin {if $thread.pinned}psapi-pin--on{/if}"
+											title="{if $thread.pinned}{l s='Unpin' mod='PrestashopAPI'}{else}{l s='Pin' mod='PrestashopAPI'}{/if}"
+											href="{$psapi_base|escape:'html':'UTF-8'}{if $thread.pinned}unpin{else}pin{/if}&psapi_id={$thread.id}#psapi-messages">
+											<i class="icon icon-thumb-tack"></i>
+										</a>
+										<a class="psapi-dot {if $thread.unread}psapi-dot--unread{/if}"
+											title="{if $thread.unread}{l s='Mark as read' mod='PrestashopAPI'}{else}{l s='Mark as unread' mod='PrestashopAPI'}{/if}"
+											href="{$psapi_base|escape:'html':'UTF-8'}{if $thread.unread}read{else}unread{/if}&psapi_id={$thread.id}#psapi-messages">
+										</a>
+									</td>
 									<td class="psapi-name">
-										{if $thread.unread}<span class="psapi-new">{l s='New' mod='PrestashopAPI'}</span>{/if}
+										{if $thread.unread}<span class="psapi-new">{l s='Unread' mod='PrestashopAPI'}</span>{/if}
 										{$thread.topic}
 									</td>
 									<td>{$thread.product}</td>
@@ -583,6 +615,18 @@
 											href="{$psapi_config_url|escape:'html':'UTF-8'}&psapi_id_thread={$thread.id}#psapi-messages">
 											{l s='Open' mod='PrestashopAPI'}
 										</a>
+									</td>
+								</tr>
+							{foreachelse}
+								<tr>
+									<td colspan="8" class="psapi-empty">
+										{if $psapi_threads_filter == 'unread'}
+											{l s='Nothing is unread. Every conversation has been dealt with.' mod='PrestashopAPI'}
+										{elseif $psapi_threads_filter == 'pinned'}
+											{l s='No conversation is pinned yet. Use the pin next to any row to keep it here.' mod='PrestashopAPI'}
+										{else}
+											{l s='No conversations.' mod='PrestashopAPI'}
+										{/if}
 									</td>
 								</tr>
 							{/foreach}
