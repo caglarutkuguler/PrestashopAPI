@@ -117,8 +117,8 @@
 			<i class="icon icon-comments"></i> {l s='Messages' mod='PrestashopAPI'}
 			{if $psapi_unread > 0}
 				<span class="psapi-pill psapi-pill--alert">{$psapi_unread}</span>
-			{elseif $psapi_threads.rows}
-				<span class="psapi-pill">{$psapi_threads.rows|count}</span>
+			{elseif $psapi_threads_total}
+				<span class="psapi-pill">{$psapi_threads_total}</span>
 			{/if}
 		</button>
 		<button type="button" class="psapi-tab" data-psapi-tab="payouts" role="tab">
@@ -586,10 +586,22 @@
 						</tbody>
 					</table>
 				</div>
+			{elseif $psapi_threads_error}
+				{* An empty list and a failed request are different things and must not look alike. *}
+				<div class="alert alert-danger">
+					<strong>{l s='Your conversations could not be downloaded.' mod='PrestashopAPI'}</strong><br />
+					{$psapi_threads_error}
+				</div>
+				<p class="psapi-lead">
+					{l s='Your products and sales are loading normally, so your API key works. Use the Help tab to see exactly what the conversations endpoint returned.' mod='PrestashopAPI'}
+					<button type="button" class="psapi-inline-link" data-psapi-goto="help">
+						{l s='Open the Help tab' mod='PrestashopAPI'}
+					</button>
+				</p>
 			{else}
 				<p class="psapi-empty">
 					{if $psapi_has_key}
-						{l s='No conversations returned by the marketplace.' mod='PrestashopAPI'}
+						{l s='The marketplace returned no conversations for this account.' mod='PrestashopAPI'}
 					{else}
 						{l s='Add your API key to see your buyer messages.' mod='PrestashopAPI'}
 					{/if}

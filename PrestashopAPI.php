@@ -851,7 +851,21 @@ class PrestashopAPI extends Module
         $dates = self::resolvePeriod();
         $summary = $stats->getSummary();
 
-        $threads = $has_key ? $this->safeList($client->getThreads()) : array();
+        // Kept apart from the products/sales error. safeList() used to fold a failure into an
+        // empty array, so a broken conversations call rendered as "no conversations" — a
+        // statement about the account when it was really a statement about the request.
+        $threads = array();
+        $threads_error = '';
+
+        if ($has_key) {
+            $threads = $client->getThreads();
+
+            if ($threads === false) {
+                $threads_error = $client->getLastError();
+                $threads = array();
+            }
+        }
+
         $unread = $this->unreadThreads($threads);
 
         $this->context->smarty->assign(array(
@@ -875,6 +889,7 @@ class PrestashopAPI extends Module
             // browser has to parse. The filter box searches what is rendered.
             'psapi_threads' => array_slice($this->buildThreads($threads, $unread), 0, 300),
             'psapi_threads_total' => count($threads),
+            'psapi_threads_error' => $threads_error,
             'psapi_unread' => count($unread),
             'psapi_invoices' => $this->normalizeTable($has_key ? $this->safeList($client->getInvoices()) : array()),
             'psapi_thread' => $this->currentThread($client, $threads),
@@ -887,7 +902,7 @@ class PrestashopAPI extends Module
             'psapi_shop_iso' => $stats->getShopIso(),
             'psapi_local_products' => $this->localProductChoices(),
 
-            'psapi_diag' => $this->diagnostics($client, $threads, $sales, $products),
+            'psapi_diag' => $this->diagnostics($client, $threads, $sales, $products, $threads_error),
             'psapi_config_url' => $this->configUrl(),
             'psapi_action_param' => self::ACTION_PARAM,
             'psapi_cron_url' => $this->cronUrl(),
@@ -1062,7 +1077,7 @@ class PrestashopAPI extends Module
      *
      * @return array|null endpoint => JSON, or null when not requested.
      */
-    private function diagnostics(SellerApiClient $client, array $threads, array $sales, array $products)
+    private function diagnostics(SellerApiClient $client, array $threads, array $sales, array $products, $threads_error = '')
     {
         if (!Tools::getValue('psapi_diag')) {
             return null;
@@ -1074,9 +1089,26 @@ class PrestashopAPI extends Module
             'seller/threads' => isset($threads[0]) ? $threads[0] : null,
         );
 
-        if (isset($threads[0]['id_thread'])) {
-            $messages = $this->safeList($client->getMessages((int) $threads[0]['id_thread']));
-            $samples['seller/threads/{id}/messages'] = isset($messages[0]) ? $messages[0] : null;
+        // When an endpoint yields nothing, the sample row is null and tells us nothing about
+        // why. The envelope and the transport error are what actually diagnose it.
+        if (!isset($threads[0])) {
+            $samples['seller/threads (envelope)'] = $client->getLastRaw('threads');
+            // The captured error, not getLastError(): every later call resets that, and several
+            // have run since the conversations one failed.
+            $samples['seller/threads (error)'] = $threads_error === '' ? '// no error reported' : $threads_error;
+        }
+
+        $id_thread = isset($threads[0]) ? self::threadId($threads[0]) : 0;
+
+        if ($id_thread) {
+            $messages = $client->getMessages($id_thread);
+
+            if ($messages === false) {
+                $samples['seller/threads/{id}/messages (error)'] = $client->getLastError();
+            } else {
+                $samples['seller/threads/{id}/messages'] = isset($messages[0]) ? $messages[0] : null;
+                $samples['seller/threads/{id}/messages (envelope)'] = $client->getLastRaw('messages_' . $id_thread);
+            }
         }
 
         $invoices = $this->safeList($client->getInvoices());
@@ -1097,9 +1129,15 @@ class PrestashopAPI extends Module
         }
 
         foreach ($samples as $endpoint => $row) {
-            $out[$endpoint] = $row === null
-                ? '// no rows returned for this account'
-                : json_encode($row, $flags);
+            if ($row === null) {
+                $out[$endpoint] = '// no rows returned for this account';
+            } elseif (is_string($row)) {
+                // Error text and notes are already human-readable; quoting them as JSON
+                // would only make them harder to read.
+                $out[$endpoint] = $row;
+            } else {
+                $out[$endpoint] = json_encode($row, $flags);
+            }
         }
 
         return $out;

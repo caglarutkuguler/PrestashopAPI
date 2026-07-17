@@ -599,10 +599,15 @@ class SellerApiClient
     {
         $now = date('Y-m-d H:i:s');
 
+        // pSQL()'s second argument is $html_ok. Without it, Db::escape() runs
+        // strip_tags(nl2br($string)) over the value: a JSON payload containing a "<" anywhere
+        // (a buyer writing "price < 10" is enough) is truncated from that character to the end
+        // of the string, so what gets stored will not decode and the cache never hits again.
+        // Escaping is all a serialised blob needs; there is no markup here to sanitise.
         Db::getInstance()->execute(
             'REPLACE INTO `' . _DB_PREFIX_ . self::CACHE_TABLE . '` (`cache_key`, `payload`, `date_add`, `expires`)
              VALUES ("' . pSQL($this->cacheId($key)) . '",
-                     "' . pSQL(json_encode($payload)) . '",
+                     "' . pSQL(json_encode($payload), true) . '",
                      "' . pSQL($now) . '",
                      "' . pSQL(date('Y-m-d H:i:s', time() + $this->ttl)) . '")'
         );
@@ -623,6 +628,43 @@ class SellerApiClient
         }
 
         return Db::getInstance()->execute('DELETE FROM `' . _DB_PREFIX_ . self::CACHE_TABLE . '`' . $where);
+    }
+
+    /**
+     * The top-level shape of whatever is cached under $key: each key, its type, and for a list
+     * how many rows it holds.
+     *
+     * This is the view that matters when an endpoint "returns nothing": it shows the envelope
+     * the rows are wrapped in. Had it existed sooner it would have shown {"total":1843,
+     * "data":"array(1843 rows)"} and saved several rounds of guessing at the wrapper name.
+     * Deliberately not the rows themselves, so it stays free of buyer details.
+     *
+     * @return array|string
+     */
+    public function getLastRaw($key)
+    {
+        $entry = $this->readCache($key);
+
+        if ($entry === false) {
+            return '// nothing is cached for this endpoint: the request failed, or was never made';
+        }
+
+        $shape = array();
+
+        foreach ($entry['payload'] as $field => $value) {
+            if (is_array($value)) {
+                $shape[$field] = 'array(' . count($value) . ' rows)';
+            } elseif ($value === null) {
+                $shape[$field] = null;
+            } else {
+                $shape[$field] = $value;
+            }
+        }
+
+        $shape['__cached_at'] = $entry['date_add'];
+        $shape['__fresh'] = $entry['fresh'];
+
+        return $shape;
     }
 
     /**
