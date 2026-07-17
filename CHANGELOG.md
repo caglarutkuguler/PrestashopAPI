@@ -38,6 +38,21 @@ Complete rewrite. Renamed **Seller Dashboard — Marketplace Sales, Messages & P
   view, per visitor**. Storefront rendering is now fully decoupled from the API: it reads a
   precomputed map from `Configuration`, costing zero queries and zero HTTP calls.
 
+### Fixed — conversations never loaded at all
+
+- The response wrapper was read wrongly. `seller/threads` answers
+  `{"success":true,"threads":{…paginator…,"data":[…rows…]}}` — the paginator is nested *inside*
+  the named wrapper, and the rows are one level below that. The module read `threads` directly
+  and, finding a map, wrapped the paginator itself as a single phantom "conversation" that then
+  failed every downstream check. The Messages tab counted 1 and rendered nothing.
+- The thread id is `id_community_thread`, not `id_thread`; every row was silently skipped.
+- Pagination was ignored, silently truncating any endpoint past 5000 rows.
+- `pSQL()` was used on the cached JSON payload. It runs `strip_tags(nl2br())` internally, which
+  rewrites the *content*: a buyer writing `Works on PS <8 only` truncated the stored JSON so it
+  never decoded again, and the cache could never hit. Fixed with `pSQL($json, true)`.
+- A failed request rendered identically to an empty account ("no conversations returned").
+  Failures, empty results and unrecognised shapes are now three distinct, visible states.
+
 ### Fixed — broken features
 
 - `sendMessage()` signed every request with a `private static $api_key = ''` that was never

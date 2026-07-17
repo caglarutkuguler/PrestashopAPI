@@ -52,13 +52,19 @@ class SellerApiClient
     const MAX_PAGES = 10;
 
     /**
-     * @var array Wrapper keys a collection can arrive under, tried in order.
+     * @var array Wrapper keys tried after an endpoint's own, in order.
      *
-     * The endpoints are not consistent with each other: seller/products answers
-     * {"products":[...]}, seller/orders answers {"sales":[...]}, but seller/threads answers a
-     * Laravel paginator, {"total":1843,"per_page":5000,"last_page":1,"data":[...]}. Rather
-     * than pin each endpoint to one key and break the moment another is migrated to the
-     * paginator, every endpoint accepts its own key or "data".
+     * Confirmed shape of seller/threads (live account, 2026-07-17):
+     *
+     *   {"success":true,
+     *    "threads":{"total":1843,"per_page":5000,"current_page":1,"last_page":1,
+     *               "next_page_url":null,"prev_page_url":null,"from":1,"to":1843,
+     *               "data":[ ...the rows... ]}}
+     *
+     * So the Laravel paginator sits INSIDE the named wrapper, and the rows are one level
+     * below that again under "data". seller/products and seller/orders put their rows
+     * directly under "products" / "sales" with no paginator. Both are handled: find the
+     * wrapper, then take its "data" if it has one, else treat it as the list itself.
      */
     const LIST_KEYS = array('data');
 
@@ -134,9 +140,7 @@ class SellerApiClient
      */
     public function getProducts($force = false)
     {
-        $response = $this->fetch('seller/products', array(), 'products', $force);
-
-        return $response === false ? false : $this->extract($response, 'products');
+        return $this->fetchList('seller/products', array(), 'products', 'products', $force);
     }
 
     /**
@@ -144,9 +148,7 @@ class SellerApiClient
      */
     public function getOrders($force = false)
     {
-        $response = $this->fetch('seller/orders', $this->dateParams(), 'orders', $force);
-
-        return $response === false ? false : $this->extract($response, 'sales');
+        return $this->fetchList('seller/orders', $this->dateParams(), 'orders', 'sales', $force);
     }
 
     /**
@@ -154,9 +156,7 @@ class SellerApiClient
      */
     public function getThreads($force = false)
     {
-        $response = $this->fetch('seller/threads', array(), 'threads', $force);
-
-        return $response === false ? false : $this->extract($response, array('threads', 'thread'));
+        return $this->fetchList('seller/threads', array(), 'threads', array('threads', 'thread'), $force);
     }
 
     /**
@@ -165,9 +165,14 @@ class SellerApiClient
     public function getMessages($id_thread, $force = false)
     {
         $id_thread = (int) $id_thread;
-        $response = $this->fetch('seller/threads/' . $id_thread . '/messages', array(), 'messages_' . $id_thread, $force);
 
-        return $response === false ? false : $this->extract($response, array('messages', 'message'));
+        return $this->fetchList(
+            'seller/threads/' . $id_thread . '/messages',
+            array(),
+            'messages_' . $id_thread,
+            array('messages', 'message'),
+            $force
+        );
     }
 
     /**
@@ -175,9 +180,7 @@ class SellerApiClient
      */
     public function getInvoices($force = false)
     {
-        $response = $this->fetch('seller/invoices', $this->dateParams(), 'invoices', $force);
-
-        return $response === false ? false : $this->extract($response, array('invoices', 'invoice'));
+        return $this->fetchList('seller/invoices', $this->dateParams(), 'invoices', array('invoices', 'invoice'), $force);
     }
 
     /**
@@ -185,9 +188,7 @@ class SellerApiClient
      */
     public function getBank($force = false)
     {
-        $response = $this->fetch('seller/bank', array(), 'bank', $force);
-
-        return $response === false ? false : $this->extract($response, array('bank', 'banks'));
+        return $this->fetchList('seller/bank', array(), 'bank', array('bank', 'banks'), $force);
     }
 
     /**
@@ -293,8 +294,7 @@ class SellerApiClient
             return array('success' => false, 'message' => $this->last_error);
         }
 
-        $products = $this->extract($response, 'products');
-        $count = is_array($products) ? count($products) : 0;
+        $count = count($this->extract($response, 'products'));
 
         return array(
             'success' => true,
@@ -307,25 +307,33 @@ class SellerApiClient
      * ---------------------------------------------------------------- */
 
     /**
-     * Cache-aware wrapper around call().
+     * Returns an endpoint's rows: from cache when fresh, otherwise downloaded, paginated and
+     * cached.
      *
-     * @return array|false Decoded response, or false when nothing usable is available.
+     * Deliberately returns the ROWS rather than the raw response. The wrapper and paginator
+     * are transport details; leaving them for each caller to unpick is what let the module
+     * read the paginator as if it were a conversation.
+     *
+     * @param array|string $keys Wrapper key(s) this endpoint uses.
+     *
+     * @return array|false
      */
-    private function fetch($path, array $params, $cache_key, $force = false)
+    private function fetchList($path, array $params, $cache_key, $keys, $force = false)
     {
         $this->stale = false;
         $entry = $this->readCache($cache_key);
+        $cached = $entry !== false && isset($entry['payload']['rows']) ? $entry['payload']['rows'] : null;
 
-        if (!$force && $entry !== false && $entry['fresh']) {
-            return $entry['payload'];
+        if (!$force && $cached !== null && $entry['fresh']) {
+            return $cached;
         }
 
         if (!$this->allow_refresh) {
             // Front office: serve whatever we have and never call out.
-            if ($entry !== false) {
+            if ($cached !== null) {
                 $this->stale = true;
 
-                return $entry['payload'];
+                return $cached;
             }
 
             $this->last_error = 'No cached data available.';
@@ -333,83 +341,62 @@ class SellerApiClient
             return false;
         }
 
-        $response = $this->callPaged($path, $params);
-
-        if ($response === false) {
-            if ($entry !== false) {
-                // Expired, but better than nothing while the marketplace is unreachable.
-                $this->stale = true;
-
-                return $entry['payload'];
-            }
-
-            return false;
-        }
-
-        $this->writeCache($cache_key, $response);
-
-        return $response;
-    }
-
-    /**
-     * Walks a paginated endpoint and returns one response with every page's rows merged in.
-     *
-     * seller/threads answers a Laravel paginator. Reading only page 1 silently truncates the
-     * result at PAGE_LIMIT rows, which would quietly understate revenue on a busy account
-     * rather than fail in any visible way.
-     *
-     * @return array|false
-     */
-    private function callPaged($path, array $params)
-    {
         $first = $this->call($path, $params, false, 1);
 
         if ($first === false) {
+            if ($cached !== null) {
+                // Expired, but better than nothing while the marketplace is unreachable.
+                $this->stale = true;
+
+                return $cached;
+            }
+
             return false;
         }
 
-        $last = isset($first['last_page']) ? (int) $first['last_page'] : 1;
+        $rows = $this->extract($first, $keys);
+        $pages = min($this->pageCount($first, $keys), self::MAX_PAGES);
 
-        if ($last <= 1) {
-            return $first;
-        }
-
-        $key = $this->listKey($first);
-
-        if ($key === null) {
-            return $first;
-        }
-
-        $last = min($last, self::MAX_PAGES);
-
-        for ($page = 2; $page <= $last; ++$page) {
+        // Reading page 1 only would silently truncate at PAGE_LIMIT rows: not an error, just
+        // quietly wrong totals.
+        for ($page = 2; $page <= $pages; ++$page) {
             $next = $this->call($path, $params, false, $page);
 
-            // A partial result beats no result: keep whatever pages did arrive.
-            if ($next === false || !isset($next[$key]) || !is_array($next[$key])) {
+            if ($next === false) {
                 break;
             }
 
-            $first[$key] = array_merge($first[$key], $next[$key]);
+            $more = $this->extract($next, $keys);
+
+            if (!$more) {
+                break;
+            }
+
+            $rows = array_merge($rows, $more);
         }
 
-        return $first;
+        $this->writeCache($cache_key, array(
+            'rows' => $rows,
+            // Kept for the diagnostics panel, so an unexpected shape can be seen rather than
+            // deduced.
+            'envelope' => $this->describeEnvelope($first),
+        ));
+
+        return $rows;
     }
 
     /**
-     * Name of the key holding the rows, for a paginated response.
-     *
-     * @return string|null
+     * How many pages the endpoint says it has.
      */
-    private function listKey(array $response)
+    private function pageCount(array $response, $keys)
     {
-        foreach ($response as $key => $value) {
-            if (is_array($value) && (isset($value[0]) || $value === array())) {
-                return $key;
-            }
+        $container = $this->container($response, $keys);
+
+        if ($container !== null && isset($container['last_page'])) {
+            return max(1, (int) $container['last_page']);
         }
 
-        return null;
+        return isset($response['last_page']) ? max(1, (int) $response['last_page']) : 1;
     }
 
     /**
@@ -519,27 +506,44 @@ class SellerApiClient
      */
     private function extract(array $response, $keys)
     {
-        // "data" last, so an endpoint with a named wrapper keeps using it.
-        foreach (array_merge((array) $keys, self::LIST_KEYS) as $key) {
-            if (!isset($response[$key])) {
-                continue;
-            }
+        $container = $this->container($response, $keys);
 
-            $value = $response[$key];
-
-            if (!is_array($value)) {
-                return array();
-            }
-
-            // A single row arrives as a map of scalars rather than a list of rows.
-            if ($value !== array() && !isset($value[0]) && !is_array(reset($value))) {
-                return array($value);
-            }
-
-            return array_values($value);
+        if ($container === null) {
+            return array();
         }
 
+        // A paginator: the rows are under "data". This is seller/threads.
+        if (isset($container['data']) && is_array($container['data'])) {
+            return array_values($container['data']);
+        }
+
+        // The wrapper is the list itself. This is seller/products and seller/orders.
+        if ($container === array() || isset($container[0])) {
+            return array_values($container);
+        }
+
+        // A map that is neither. Previously a guess here wrapped it as a single row, which
+        // turned an unrecognised response into one phantom record that then failed silently
+        // downstream. An empty list is honest: the caller reports "N items, none usable".
         return array();
+    }
+
+    /**
+     * The value holding the rows, or the paginator holding them.
+     *
+     * @return array|null
+     */
+    private function container(array $response, $keys)
+    {
+        // The endpoint's own key first, so a named wrapper always wins over a stray "data".
+        foreach (array_merge((array) $keys, self::LIST_KEYS) as $key) {
+            if (isset($response[$key]) && is_array($response[$key])) {
+                return $response[$key];
+            }
+        }
+
+        // An endpoint that paginates at the top level, with no named wrapper at all.
+        return isset($response['data']) && is_array($response['data']) ? $response : null;
     }
 
     private function dateParams()
@@ -648,26 +652,66 @@ class SellerApiClient
     {
         $entry = $this->readCache($key);
 
-        if ($entry === false) {
+        if ($entry === false || !isset($entry['payload']['envelope'])) {
             return '// nothing is cached for this endpoint: the request failed, or was never made';
         }
 
-        $shape = array();
-
-        foreach ($entry['payload'] as $field => $value) {
-            if (is_array($value)) {
-                $shape[$field] = 'array(' . count($value) . ' rows)';
-            } elseif ($value === null) {
-                $shape[$field] = null;
-            } else {
-                $shape[$field] = $value;
-            }
-        }
-
+        $shape = $entry['payload']['envelope'];
+        $shape['__rows_extracted'] = isset($entry['payload']['rows']) ? count($entry['payload']['rows']) : 0;
         $shape['__cached_at'] = $entry['date_add'];
         $shape['__fresh'] = $entry['fresh'];
 
         return $shape;
+    }
+
+    /**
+     * Describes a response's shape without printing the rows themselves.
+     *
+     * The first version of this counted a map's KEYS and labelled them "rows", so a nested
+     * paginator was reported as "threads: array(9 rows)" when it was really one map of nine
+     * fields wrapping 1843 rows. A diagnostic that misreports the thing it exists to reveal is
+     * worse than none, so lists and maps are now named differently, and maps are described one
+     * level deep — which is exactly where the rows were hiding.
+     *
+     * @return array
+     */
+    private function describeEnvelope(array $response)
+    {
+        $shape = array();
+
+        foreach ($response as $key => $value) {
+            $shape[$key] = is_array($value) ? $this->describeValue($value, true) : $value;
+        }
+
+        return $shape;
+    }
+
+    /**
+     * @param bool $descend Whether to describe a map's own members.
+     *
+     * @return string|array
+     */
+    private function describeValue(array $value, $descend)
+    {
+        if ($value === array()) {
+            return 'empty array';
+        }
+
+        if (isset($value[0])) {
+            return 'list of ' . count($value) . ' row(s)';
+        }
+
+        if (!$descend) {
+            return 'map with keys: ' . implode(', ', array_keys($value));
+        }
+
+        $inner = array();
+
+        foreach ($value as $key => $member) {
+            $inner[$key] = is_array($member) ? $this->describeValue($member, false) : $member;
+        }
+
+        return $inner;
     }
 
     /**

@@ -129,6 +129,12 @@ set up the cron URL.
 That was a 1.x symptom on PHP 8 and is fixed — see below. If you still see it, you are running
 1.x; upgrade.
 
+**"The marketplace answered, but in a shape this module does not recognise."**
+The Seller API is only documented for products and sales; the other endpoints are read from
+observed responses. If one of them changes, you get this message with the exact response printed
+underneath it, rather than a silent empty list. Copy that box into a bug report and it can be
+fixed quickly. Your API key is not involved — products and sales keep working.
+
 ## Upgrading from 1.x
 
 Install over the top. The upgrade script migrates your settings, deletes the obsolete 1.x files
