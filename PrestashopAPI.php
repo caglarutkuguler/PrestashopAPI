@@ -85,7 +85,7 @@ class PrestashopAPI extends Module
 
         parent::__construct();
 
-        $this->displayName = $this->l('Seller Dashboard - Marketplace Sales, Messages & Payouts');
+        $this->displayName = $this->l('Seller Dashboard - Marketplace Sales, Messages and Payouts');
         $this->description = $this->l('See how your PrestaShop Addons marketplace products are selling without leaving your own back office. Revenue, units, refunds, buyer countries and monthly trends, combined with the sales of the same products in your own shop, plus your buyer messages and payouts.');
         $this->confirmUninstall = $this->l('Your API key, product links and cached marketplace data will be deleted. Your sales history on the marketplace is not affected. Do you confirm?');
     }
