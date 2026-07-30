@@ -235,6 +235,18 @@ $_MODULE['<{PrestashopAPI}prestashop>2ea64fef73420dac4042c70b2f9a6e79'] = 'Selle
 $_MODULE['<{PrestashopAPI}prestashop>a6a04307fd90d0c2821b45125e6a0a25'] = 'Gedownload';
 $_MODULE['<{PrestashopAPI}prestashop>4feb3d6a9f34a11230a0e6500b89078d'] = 'keer door klanten zoals u';
 
+// --- Backfilled missing keys (auto-sync)
+$_MODULE['<{prestashopapi}prestashop>configure_16360a2d4a190428439b0ce69b794d67'] = '"De marktplaats was niet bereikbaar"';
+$_MODULE['<{prestashopapi}prestashop>configure_4d5e1090345266af0b7adac1acec1d33'] = 'Gegevens worden in de cache opgeslagen gedurende het interval dat is ingesteld in Instellingen. Gebruik \'Nu vernieuwen\' bovenaan deze pagina om een ​​onmiddellijke download te forceren, of stel de cron-URL in.';
+$_MODULE['<{prestashopapi}prestashop>configure_539c99586f185b61cdb7266acbfe7f31'] = 'Ga naar Instellingen, open het tabblad API en klik vervolgens op \'Mijn API-sleutel ophalen\'. Kopieer de sleutel precies zoals weergegeven.';
+$_MODULE['<{prestashopapi}prestashop>configure_bb325e79afc229f8bb80b6d681bacc6d'] = '"Uw API-sleutel ziet er verkeerd uit of is ingetrokken"';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_2eaffaaa74bf0695be81904b6c0cad88'] = 'De "tot"-datum is geen geldige datum. Verwacht formaat: JJJJ-MM-DD.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_4b8cd220859ed65eb0d44d4d1f7f6fa4'] = 'De \'vanaf\'-datum valt later dan de \'tot\'-datum.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_621d9e003918eab990989b4002329683'] = 'Bestanden van het type "%s" kunnen niet worden bijgevoegd. Toegestaan: %s.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_8c28cfbd1f346fe9a0cea314a2b4815b'] = 'Wordt alleen gebruikt als de periode is ingesteld op "Aangepaste datums". Formaat: JJJJ-MM-DD.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_a0ff1a6bdb65e927b5b8835041ce2576'] = 'Verkopersaccount > Instellingen > API > "Mijn API-sleutel ophalen". Plak alleen de sleutel zelf.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_d2eab0464fb5b5e43d64689acd07dc26'] = 'De \'vanaf\'-datum is geen geldige datum. Verwacht formaat: JJJJ-MM-DD.';
+
 // --- Auto-regenerated below: keys include the template-basename source segment
 //     PrestaShop 1.7+ actually looks up (<{module}prestashop>{basename}_{hash}).
 //     The entries above this line use the old (pre-1.7, basename-less) key format

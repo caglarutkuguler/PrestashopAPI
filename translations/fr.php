@@ -235,6 +235,18 @@ $_MODULE['<{PrestashopAPI}prestashop>2ea64fef73420dac4042c70b2f9a6e79'] = 'Ouvri
 $_MODULE['<{PrestashopAPI}prestashop>a6a04307fd90d0c2821b45125e6a0a25'] = 'Téléchargé';
 $_MODULE['<{PrestashopAPI}prestashop>4feb3d6a9f34a11230a0e6500b89078d'] = 'fois par des clients comme vous';
 
+// --- Backfilled missing keys (auto-sync)
+$_MODULE['<{prestashopapi}prestashop>configure_16360a2d4a190428439b0ce69b794d67'] = '"Le marché n\'a pas pu être atteint"';
+$_MODULE['<{prestashopapi}prestashop>configure_4d5e1090345266af0b7adac1acec1d33'] = 'Les données sont mises en cache pendant l\'intervalle défini dans Paramètres. Utilisez « Actualiser maintenant » en haut de cette page pour forcer un téléchargement immédiat ou configurer l\'URL cron.';
+$_MODULE['<{prestashopapi}prestashop>configure_539c99586f185b61cdb7266acbfe7f31'] = 'Allez dans Paramètres, ouvrez l\'onglet API, puis cliquez sur « Obtenir ma clé API ». Copiez la clé exactement comme indiqué.';
+$_MODULE['<{prestashopapi}prestashop>configure_bb325e79afc229f8bb80b6d681bacc6d'] = '"Votre clé API semble erronée ou a été révoquée"';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_2eaffaaa74bf0695be81904b6c0cad88'] = 'La date « à » n\'est pas une date valide. Format attendu : AAAA-MM-JJ.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_4b8cd220859ed65eb0d44d4d1f7f6fa4'] = 'La date « de » est postérieure à la date « à ».';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_621d9e003918eab990989b4002329683'] = 'Les fichiers de type « %s » ne peuvent pas être joints. Autorisé : %s.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_8c28cfbd1f346fe9a0cea314a2b4815b'] = 'Utilisé uniquement lorsque la période est définie sur "Dates personnalisées". Format : AAAA-MM-JJ.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_a0ff1a6bdb65e927b5b8835041ce2576'] = 'Compte vendeur > Paramètres > API > « Obtenir ma clé API ». Collez uniquement la clé elle-même.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_d2eab0464fb5b5e43d64689acd07dc26'] = 'La date « de » n\'est pas une date valide. Format attendu : AAAA-MM-JJ.';
+
 // --- Auto-regenerated below: keys include the template-basename source segment
 //     PrestaShop 1.7+ actually looks up (<{module}prestashop>{basename}_{hash}).
 //     The entries above this line use the old (pre-1.7, basename-less) key format

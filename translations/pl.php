@@ -235,6 +235,18 @@ $_MODULE['<{PrestashopAPI}prestashop>2ea64fef73420dac4042c70b2f9a6e79'] = 'Otwó
 $_MODULE['<{PrestashopAPI}prestashop>a6a04307fd90d0c2821b45125e6a0a25'] = 'Pobrano';
 $_MODULE['<{PrestashopAPI}prestashop>4feb3d6a9f34a11230a0e6500b89078d'] = 'razy przez klientów takich jak Ty';
 
+// --- Backfilled missing keys (auto-sync)
+$_MODULE['<{prestashopapi}prestashop>configure_16360a2d4a190428439b0ce69b794d67'] = '„Nie można było dotrzeć do rynku”';
+$_MODULE['<{prestashopapi}prestashop>configure_4d5e1090345266af0b7adac1acec1d33'] = 'Dane są buforowane przez okres ustawiony w Ustawieniach. Użyj opcji „Odśwież teraz” u góry tej strony, aby wymusić natychmiastowe pobranie lub skonfiguruj adres URL cron.';
+$_MODULE['<{prestashopapi}prestashop>configure_539c99586f185b61cdb7266acbfe7f31'] = 'Przejdź do Ustawień, otwórz zakładkę API, a następnie kliknij „Pobierz mój klucz API”. Skopiuj klucz dokładnie tak, jak pokazano.';
+$_MODULE['<{prestashopapi}prestashop>configure_bb325e79afc229f8bb80b6d681bacc6d'] = '„Twój klucz API wygląda błędnie lub został unieważniony”';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_2eaffaaa74bf0695be81904b6c0cad88'] = 'Data „do” nie jest prawidłową datą. Oczekiwany format: RRRR-MM-DD.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_4b8cd220859ed65eb0d44d4d1f7f6fa4'] = 'Data „od” jest późniejsza niż data „do”.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_621d9e003918eab990989b4002329683'] = 'Nie można załączyć plików typu „%s”. Dozwolone: ​​%s.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_8c28cfbd1f346fe9a0cea314a2b4815b'] = 'Używane tylko wtedy, gdy okres jest ustawiony na „Daty niestandardowe”. Format: RRRR-MM-DD.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_a0ff1a6bdb65e927b5b8835041ce2576'] = 'Konto sprzedawcy > Ustawienia > API > „Pobierz mój klucz API”. Wklej tylko sam klucz.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_d2eab0464fb5b5e43d64689acd07dc26'] = 'Data „od” nie jest prawidłową datą. Oczekiwany format: RRRR-MM-DD.';
+
 // --- Auto-regenerated below: keys include the template-basename source segment
 //     PrestaShop 1.7+ actually looks up (<{module}prestashop>{basename}_{hash}).
 //     The entries above this line use the old (pre-1.7, basename-less) key format

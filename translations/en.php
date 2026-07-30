@@ -253,7 +253,7 @@ $_MODULE['<{prestashopapi}prestashop>configure_12c500ed0b7879105fb46af0f246be87'
 $_MODULE['<{prestashopapi}prestashop>configure_13e9ff0e83817b6b2ffe5e88ce0b2dc5'] = 'Revenue by month';
 $_MODULE['<{prestashopapi}prestashop>configure_1438971d29f373379a0ca6b9e82f04b0'] = 'Marketplace figures are downloaded from the PrestaShop Addons Seller API with your own API key, and stored locally. Your shop figures are read from your own valid orders. Nothing is sent anywhere else.';
 $_MODULE['<{prestashopapi}prestashop>configure_159f404a63b6f3b28bfda77307324731'] = 'Attach a file';
-$_MODULE['<{prestashopapi}prestashop>configure_16360a2d4a190428439b0ce69b794d67'] = '\"The marketplace could not be reached\"';
+$_MODULE['<{prestashopapi}prestashop>configure_16360a2d4a190428439b0ce69b794d67'] = '"The marketplace could not be reached"';
 $_MODULE['<{prestashopapi}prestashop>configure_18ae59b5a60d0870f822f09d1b8df09c'] = 'Mark as unread';
 $_MODULE['<{prestashopapi}prestashop>configure_19c4d60ad5ac061124c671d40b9609bb'] = 'No API key yet. Add one in the Settings tab.';
 $_MODULE['<{prestashopapi}prestashop>configure_1a11b1adc359c03db0ca798a00e2632c'] = 'Opened';
@@ -285,12 +285,12 @@ $_MODULE['<{prestashopapi}prestashop>configure_43762ae6894fd33706622d782c18e8e6'
 $_MODULE['<{prestashopapi}prestashop>configure_44749712dbec183e983dcd78a7736c41'] = 'Date';
 $_MODULE['<{prestashopapi}prestashop>configure_44877c6aa8e93fa5a91c9361211464fb'] = 'Speed';
 $_MODULE['<{prestashopapi}prestashop>configure_4a516e888d64e2d1a23870ed3cd5e1b8'] = 'Open your seller account';
-$_MODULE['<{prestashopapi}prestashop>configure_4d5e1090345266af0b7adac1acec1d33'] = 'Data is cached for the interval set in Settings. Use \"Refresh now\" at the top of this page to force an immediate download, or set up the cron URL.';
+$_MODULE['<{prestashopapi}prestashop>configure_4d5e1090345266af0b7adac1acec1d33'] = 'Data is cached for the interval set in Settings. Use "Refresh now" at the top of this page to force an immediate download, or set up the cron URL.';
 $_MODULE['<{prestashopapi}prestashop>configure_5048b295de30fb1e4fad7a12d227383f'] = 'No image supplied by the marketplace';
 $_MODULE['<{prestashopapi}prestashop>configure_509a3c36d27ab378b9b6b617d3a034ce'] = 'No conversations.';
 $_MODULE['<{prestashopapi}prestashop>configure_52f43d3c708175296e7b891457b8a319'] = 'Marketplace sales';
 $_MODULE['<{prestashopapi}prestashop>configure_53770fd374062f5b825b25dcd60fb498'] = 'Unread';
-$_MODULE['<{prestashopapi}prestashop>configure_539c99586f185b61cdb7266acbfe7f31'] = 'Go to Settings, open the API tab, then click \"Get my API key\". Copy the key exactly as shown.';
+$_MODULE['<{prestashopapi}prestashop>configure_539c99586f185b61cdb7266acbfe7f31'] = 'Go to Settings, open the API tab, then click "Get my API key". Copy the key exactly as shown.';
 $_MODULE['<{prestashopapi}prestashop>configure_53beb26d8bca00f56fbd295fdee83459'] = 'Refunds';
 $_MODULE['<{prestashopapi}prestashop>configure_56103ac9fe649f0f10b538d6ee4d6490'] = 'Marketplace only';
 $_MODULE['<{prestashopapi}prestashop>configure_58111686a382dbe8bd7871a1057eea62'] = 'Mark as read';
@@ -359,7 +359,7 @@ $_MODULE['<{prestashopapi}prestashop>configure_b2f40690858b404ed10e62bdf422c704'
 $_MODULE['<{prestashopapi}prestashop>configure_b480d2aed384082fe8ade47830842742'] = 'Never updated yet';
 $_MODULE['<{prestashopapi}prestashop>configure_b718adec73e04ce3ec720dd11a06a308'] = 'ID';
 $_MODULE['<{prestashopapi}prestashop>configure_b866ae21552c1156b4b0176e7c61408e'] = 'PrestaShop';
-$_MODULE['<{prestashopapi}prestashop>configure_bb325e79afc229f8bb80b6d681bacc6d'] = '\"Your API key looks wrong or has been revoked\"';
+$_MODULE['<{prestashopapi}prestashop>configure_bb325e79afc229f8bb80b6d681bacc6d'] = '"Your API key looks wrong or has been revoked"';
 $_MODULE['<{prestashopapi}prestashop>configure_bb792693e2df302e35ff0a093e2fddf5'] = 'Unpin';
 $_MODULE['<{prestashopapi}prestashop>configure_bea12508fbaab626ade488eeb5e4471b'] = 'Buyer messages';
 $_MODULE['<{prestashopapi}prestashop>configure_c04f1e4841a6af78088d6ccf6f3a8a76'] = 'Export CSV';
@@ -422,12 +422,12 @@ $_MODULE['<{prestashopapi}prestashop>prestashopapi_0754368557b5a10831926336f50ca
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_0e779db8325b45eb76fa447a75c3856b'] = 'The marketplace currency must be a three-letter ISO code, for example EUR.';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_11714fd9c8de36de817385e228ac6090'] = 'Marketplace data is cached for this long. Shorter means fresher figures and more API calls.';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_2557491405dd96ce43f55a3133cfd1fe'] = 'Last 30 days';
-$_MODULE['<{prestashopapi}prestashop>prestashopapi_2eaffaaa74bf0695be81904b6c0cad88'] = 'The \"to\" date is not a valid date. Expected format: YYYY-MM-DD.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_2eaffaaa74bf0695be81904b6c0cad88'] = 'The "to" date is not a valid date. Expected format: YYYY-MM-DD.';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_3f654e69b2537b48aef699fb2757a190'] = 'The currency your marketplace payouts are made in, as a three-letter ISO code. Used to convert marketplace revenue into your shop currency.';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_44749712dbec183e983dcd78a7736c41'] = 'Date';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_48e57d1f965d55e723ea1f6fb206861e'] = 'Seller Dashboard - Marketplace Sales, Messages and Payouts';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_4b794361a1a00242514c4cd54200ac84'] = 'Unit amount';
-$_MODULE['<{prestashopapi}prestashop>prestashopapi_4b8cd220859ed65eb0d44d4d1f7f6fa4'] = 'The \"from\" date is later than the \"to\" date.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_4b8cd220859ed65eb0d44d4d1f7f6fa4'] = 'The "from" date is later than the "to" date.';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_4f8bb38070db479bb06ee761a1ea3dd4'] = 'Custom dates';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_515c681a80f60d42224f8a674674ddd1'] = 'Show a sales badge on product pages';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_53a7095aa36aca98d50c54066e4ceb21'] = 'Last 12 months';
@@ -437,7 +437,7 @@ $_MODULE['<{prestashopapi}prestashop>prestashopapi_5739dad402100b9118221d91d753f
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_59716c97497eb9694541f7c3d37b1a4d'] = 'Country';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_5da618e8e4b89c66fe86e32cdafde142'] = 'From';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_60dd022145dd29fa7be7a5e84f85b0e6'] = 'All time';
-$_MODULE['<{prestashopapi}prestashop>prestashopapi_621d9e003918eab990989b4002329683'] = 'Files of type \"%s\" cannot be attached. Allowed: %s.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_621d9e003918eab990989b4002329683'] = 'Files of type "%s" cannot be attached. Allowed: %s.';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_656a6828d7ef1bb791e42087c4b5ee6e'] = 'API key';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_662c5c247632c2eade9bb7d02ca9139c'] = 'Displays how many times the product has been downloaded, as social proof for visitors of your own shop.';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_6748858905fb52a033301721c93879ec'] = 'How far back to pull marketplace sales. A wider window means a slower refresh.';
@@ -453,7 +453,7 @@ $_MODULE['<{prestashopapi}prestashop>prestashopapi_83e4f322e8319325ef0578dbf2b3b
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_8818a8e692fa5df0941a492bb24e9380'] = 'All conversations marked as read.';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_89532098851e57286a4f33ffa91d3ead'] = 'Leave empty for today. Format: YYYY-MM-DD.';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_89abba6c88ff4f0c17c9fa046f957c81'] = 'That file is larger than this server accepts (%s).';
-$_MODULE['<{prestashopapi}prestashop>prestashopapi_8c28cfbd1f346fe9a0cea314a2b4815b'] = 'Only used when the period is set to \"Custom dates\". Format: YYYY-MM-DD.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_8c28cfbd1f346fe9a0cea314a2b4815b'] = 'Only used when the period is set to "Custom dates". Format: YYYY-MM-DD.';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_93cba07454f06a4a960172bbd6e2a435'] = 'Yes';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_94177cbedab099d902000a412d74b5bb'] = 'The minimum sales figure for the badge must be between 0 and 1000000.';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_97f08a40f22a625d0cbfe03db3349108'] = 'Product ID';
@@ -462,7 +462,7 @@ $_MODULE['<{prestashopapi}prestashop>prestashopapi_989dc887b9b6f8d9d109c38051c79
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_9a7e58ee13cb727cb7c4acc68f4cafe5'] = 'Settings saved.';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_9a919d90da43dd38bb2cf77b6697ea0d'] = 'Reporting period';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_9ed083b1436e5f40ef984b28255eef18'] = 'sales';
-$_MODULE['<{prestashopapi}prestashop>prestashopapi_a0ff1a6bdb65e927b5b8835041ce2576'] = 'Seller account > Settings > API > \"Get my API key\". Paste only the key itself.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_a0ff1a6bdb65e927b5b8835041ce2576'] = 'Seller account > Settings > API > "Get my API key". Paste only the key itself.';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_a103656a631a2c0f57298c0eaca18a24'] = 'Conversation marked as read.';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_a1fa27779242b4902f7ae3bdd5c6d508'] = 'Type';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_a240fa27925a635b08dc28c9e4f9216d'] = 'Order';
@@ -477,7 +477,7 @@ $_MODULE['<{prestashopapi}prestashop>prestashopapi_c35890fced542f7e539ca68fa7f17
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_c9cc8cce247e49bae79f15173ce97354'] = 'Save';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_cc61945cbbf46721a053467c395c666f'] = 'Refunded';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_d22ada154fa9ded2c2dabed3e1bf7ae9'] = 'The PHP cURL extension is not enabled on this server, so this module cannot contact the marketplace. Please ask your hosting provider to enable it.';
-$_MODULE['<{prestashopapi}prestashop>prestashopapi_d2eab0464fb5b5e43d64689acd07dc26'] = 'The \"from\" date is not a valid date. Expected format: YYYY-MM-DD.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_d2eab0464fb5b5e43d64689acd07dc26'] = 'The "from" date is not a valid date. Expected format: YYYY-MM-DD.';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_dc1b367ab5052fd68a2aa6d514f33625'] = 'Refresh data every';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_deb10517653c255364175796ace3553f'] = 'Product';
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_e12167aa0a7698e6ebc92b4ce3909b53'] = 'To';

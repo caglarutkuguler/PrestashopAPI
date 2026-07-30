@@ -235,6 +235,18 @@ $_MODULE['<{PrestashopAPI}prestashop>2ea64fef73420dac4042c70b2f9a6e79'] = 'Selle
 $_MODULE['<{PrestashopAPI}prestashop>a6a04307fd90d0c2821b45125e6a0a25'] = 'Heruntergeladen';
 $_MODULE['<{PrestashopAPI}prestashop>4feb3d6a9f34a11230a0e6500b89078d'] = 'Mal von Kunden wie Ihnen';
 
+// --- Backfilled missing keys (auto-sync)
+$_MODULE['<{prestashopapi}prestashop>configure_16360a2d4a190428439b0ce69b794d67'] = '„Der Marktplatz konnte nicht erreicht werden“';
+$_MODULE['<{prestashopapi}prestashop>configure_4d5e1090345266af0b7adac1acec1d33'] = 'Die Daten werden für das in den Einstellungen festgelegte Intervall zwischengespeichert. Verwenden Sie „Jetzt aktualisieren“ oben auf dieser Seite, um einen sofortigen Download zu erzwingen, oder richten Sie die Cron-URL ein.';
+$_MODULE['<{prestashopapi}prestashop>configure_539c99586f185b61cdb7266acbfe7f31'] = 'Gehen Sie zu Einstellungen, öffnen Sie die Registerkarte API und klicken Sie dann auf „Meinen API-Schlüssel abrufen“. Kopieren Sie den Schlüssel genau wie gezeigt.';
+$_MODULE['<{prestashopapi}prestashop>configure_bb325e79afc229f8bb80b6d681bacc6d'] = '„Ihr API-Schlüssel sieht falsch aus oder wurde widerrufen“';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_2eaffaaa74bf0695be81904b6c0cad88'] = 'Das „Bis“-Datum ist kein gültiges Datum. Erwartetes Format: JJJJ-MM-TT.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_4b8cd220859ed65eb0d44d4d1f7f6fa4'] = 'Das „Von“-Datum liegt nach dem „Bis“-Datum.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_621d9e003918eab990989b4002329683'] = 'Dateien vom Typ „%s“ können nicht angehängt werden. Zulässig: %s.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_8c28cfbd1f346fe9a0cea314a2b4815b'] = 'Wird nur verwendet, wenn der Zeitraum auf „Benutzerdefinierte Daten“ eingestellt ist. Format: JJJJ-MM-TT.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_a0ff1a6bdb65e927b5b8835041ce2576'] = 'Verkäuferkonto > Einstellungen > API > „Meinen API-Schlüssel abrufen“. Fügen Sie nur den Schlüssel selbst ein.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_d2eab0464fb5b5e43d64689acd07dc26'] = 'Das „Von“-Datum ist kein gültiges Datum. Erwartetes Format: JJJJ-MM-TT.';
+
 // --- Auto-regenerated below: keys include the template-basename source segment
 //     PrestaShop 1.7+ actually looks up (<{module}prestashop>{basename}_{hash}).
 //     The entries above this line use the old (pre-1.7, basename-less) key format

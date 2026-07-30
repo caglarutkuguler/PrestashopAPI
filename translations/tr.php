@@ -235,6 +235,18 @@ $_MODULE['<{PrestashopAPI}prestashop>2ea64fef73420dac4042c70b2f9a6e79'] = 'Selle
 $_MODULE['<{PrestashopAPI}prestashop>a6a04307fd90d0c2821b45125e6a0a25'] = 'İndirildi';
 $_MODULE['<{PrestashopAPI}prestashop>4feb3d6a9f34a11230a0e6500b89078d'] = 'kez sizin gibi müşteriler tarafından';
 
+// --- Backfilled missing keys (auto-sync)
+$_MODULE['<{prestashopapi}prestashop>configure_16360a2d4a190428439b0ce69b794d67'] = '"Pazar yerine ulaşılamadı"';
+$_MODULE['<{prestashopapi}prestashop>configure_4d5e1090345266af0b7adac1acec1d33'] = 'Veriler, Ayarlar\'da belirlenen aralık boyunca önbelleğe alınır. Hemen indirmeyi zorlamak için bu sayfanın üst kısmındaki "Şimdi yenile" seçeneğini kullanın veya cron URL\'sini ayarlayın.';
+$_MODULE['<{prestashopapi}prestashop>configure_539c99586f185b61cdb7266acbfe7f31'] = 'Go to Settings, open the API tab, then click "Get my API key". Anahtarı tam olarak gösterildiği gibi kopyalayın.';
+$_MODULE['<{prestashopapi}prestashop>configure_bb325e79afc229f8bb80b6d681bacc6d'] = '"API anahtarınız yanlış görünüyor veya iptal edildi"';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_2eaffaaa74bf0695be81904b6c0cad88'] = '"Son" tarihi geçerli bir tarih değil. Beklenen biçim: YYYY-AA-GG.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_4b8cd220859ed65eb0d44d4d1f7f6fa4'] = '"Başlangıç" tarihi "bitiş" tarihinden sonradır.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_621d9e003918eab990989b4002329683'] = '"%s" türündeki dosyalar eklenemez. İzin veriliyor: %s.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_8c28cfbd1f346fe9a0cea314a2b4815b'] = 'Yalnızca dönem "Özel tarihler" olarak ayarlandığında kullanılır. Biçim: YYYY-AA-GG.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_a0ff1a6bdb65e927b5b8835041ce2576'] = 'Satıcı hesabı > Ayarlar > API > "API anahtarımı al". Yalnızca anahtarın kendisini yapıştırın.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_d2eab0464fb5b5e43d64689acd07dc26'] = '"Başlangıç" tarihi geçerli bir tarih değil. Beklenen biçim: YYYY-AA-GG.';
+
 // --- Auto-regenerated below: keys include the template-basename source segment
 //     PrestaShop 1.7+ actually looks up (<{module}prestashop>{basename}_{hash}).
 //     The entries above this line use the old (pre-1.7, basename-less) key format

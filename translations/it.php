@@ -235,6 +235,18 @@ $_MODULE['<{PrestashopAPI}prestashop>2ea64fef73420dac4042c70b2f9a6e79'] = 'Apri 
 $_MODULE['<{PrestashopAPI}prestashop>a6a04307fd90d0c2821b45125e6a0a25'] = 'Scaricato';
 $_MODULE['<{PrestashopAPI}prestashop>4feb3d6a9f34a11230a0e6500b89078d'] = 'volte da clienti come te';
 
+// --- Backfilled missing keys (auto-sync)
+$_MODULE['<{prestashopapi}prestashop>configure_16360a2d4a190428439b0ce69b794d67'] = '"Impossibile raggiungere il mercato"';
+$_MODULE['<{prestashopapi}prestashop>configure_4d5e1090345266af0b7adac1acec1d33'] = 'I dati vengono memorizzati nella cache per l\'intervallo impostato in Impostazioni. Utilizza "Aggiorna ora" nella parte superiore di questa pagina per forzare un download immediato o imposta l\'URL cron.';
+$_MODULE['<{prestashopapi}prestashop>configure_539c99586f185b61cdb7266acbfe7f31'] = 'Vai su Impostazioni, apri la scheda API, quindi fai clic su "Ottieni la mia chiave API". Copia la chiave esattamente come mostrato.';
+$_MODULE['<{prestashopapi}prestashop>configure_bb325e79afc229f8bb80b6d681bacc6d'] = '"La tua chiave API sembra sbagliata o è stata revocata"';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_2eaffaaa74bf0695be81904b6c0cad88'] = 'La data "a" non è una data valida. Formato previsto: AAAA-MM-GG.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_4b8cd220859ed65eb0d44d4d1f7f6fa4'] = 'La data "da" è successiva alla data "a".';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_621d9e003918eab990989b4002329683'] = 'Non è possibile allegare file di tipo "%s". Consentito: %s.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_8c28cfbd1f346fe9a0cea314a2b4815b'] = 'Utilizzato solo quando il periodo è impostato su "Date personalizzate". Formato: AAAA-MM-GG.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_a0ff1a6bdb65e927b5b8835041ce2576'] = 'Account venditore > Impostazioni > API > "Ottieni la mia chiave API". Incolla solo la chiave stessa.';
+$_MODULE['<{prestashopapi}prestashop>prestashopapi_d2eab0464fb5b5e43d64689acd07dc26'] = 'La data "da" non è una data valida. Formato previsto: AAAA-MM-GG.';
+
 // --- Auto-regenerated below: keys include the template-basename source segment
 //     PrestaShop 1.7+ actually looks up (<{module}prestashop>{basename}_{hash}).
 //     The entries above this line use the old (pre-1.7, basename-less) key format
