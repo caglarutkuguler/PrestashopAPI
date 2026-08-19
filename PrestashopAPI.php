@@ -218,6 +218,7 @@ class PrestashopAPI extends Module
 
     public function getContent()
     {
+        require_once _PS_MODULE_DIR_ . 'PrestashopAPI/classes/MegVentureAdsWidget.php';
         $this->html = '';
         $this->ensureHooks();
         $this->ensureSchema();
@@ -238,7 +239,7 @@ class PrestashopAPI extends Module
             $this->html .= $this->displayError($this->l('The PHP cURL extension is not enabled on this server, so this module cannot contact the marketplace. Please ask your hosting provider to enable it.'));
         }
 
-        return $this->html . $this->renderPage();
+        return $this->html . $this->renderPage() . MegVentureAdsWidget::render('https://megventure.com/index.php?fc=module&module=virtualproductcombination&controller=adswidget');
     }
 
     /**
