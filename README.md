@@ -16,7 +16,7 @@ Built for PrestaShop Addons contributors, by a contributor. Free and open source
 | **Sales** | Every sale line, filterable, exportable to CSV for your accountant. |
 | **Messages** | Your buyer conversations, with replies — and file attachments — sent straight from your back office. New conversations are flagged, and the back-office Dashboard tells you when buyers are waiting. |
 | **Payouts** | Your marketplace invoices. |
-| **Storefront badge** | Optional social-proof badge on your own product pages: "Downloaded 1 234 times". |
+| **Storefront badge** | Optional social-proof badge on your own product pages: "Downloaded 1 234 times". Never shown on free products. |
 
 Everything is read-only against your seller account. The module never publishes, changes or
 removes anything on the marketplace. The only write it performs is a reply you type yourself

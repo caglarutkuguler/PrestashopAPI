@@ -1646,7 +1646,19 @@ class PrestashopAPI extends Module
                 return '';
             }
 
-            $units = $this->badgeUnits($id_product);
+            $product = new Product($id_product);
+
+            if (!Validate::isLoadedObject($product)) {
+                return '';
+            }
+
+            // "Downloaded N times by customers like you" is social proof for a paid product; on
+            // a free giveaway it reads oddly, so the badge is suppressed there.
+            if ($this->productIsFree($product)) {
+                return '';
+            }
+
+            $units = $this->badgeUnits($product);
 
             if ($units < (int) Configuration::get('PRESTASHOPAPI_BADGE_MIN')) {
                 return '';
@@ -1677,17 +1689,26 @@ class PrestashopAPI extends Module
     }
 
     /**
+     * A product is free when the price a customer would actually pay is zero.
+     *
+     * getPriceStatic is used rather than $product->price so that reductions and specific
+     * prices count: a product marked down to zero is free to the buyer even though its base
+     * price is not. If the price cannot be read the badge is suppressed, which errs toward not
+     * showing social proof — the safe direction.
+     */
+    private function productIsFree(Product $product)
+    {
+        $price = Product::getPriceStatic((int) $product->id, true);
+
+        return $price === false || (float) $price <= 0;
+    }
+
+    /**
      * Reads the precomputed badge map. No query, no HTTP call: Configuration is already in
      * memory by the time a hook runs.
      */
-    private function badgeUnits($id_product)
+    private function badgeUnits(Product $product)
     {
-        $product = new Product($id_product);
-
-        if (!Validate::isLoadedObject($product)) {
-            return 0;
-        }
-
         $marketplace_id = $this->marketplaceIdFor($product);
         $units = 0;
 
@@ -1704,7 +1725,7 @@ class PrestashopAPI extends Module
                 'SELECT SUM(od.`product_quantity` - od.`product_quantity_refunded`)
                  FROM `' . _DB_PREFIX_ . 'order_detail` od
                  INNER JOIN `' . _DB_PREFIX_ . 'orders` o ON o.`id_order` = od.`id_order`
-                 WHERE o.`valid` = 1 AND od.`product_id` = ' . (int) $id_product
+                 WHERE o.`valid` = 1 AND od.`product_id` = ' . (int) $product->id
             );
         }
 

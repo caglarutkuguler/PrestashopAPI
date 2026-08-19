@@ -781,7 +781,7 @@
 				</div>
 				<div>
 					<h4>{l s='The storefront badge' mod='PrestashopAPI'}</h4>
-					<p>{l s='Optionally, product pages in your own shop can show how many times a product has been downloaded, as social proof. It is drawn from the local copy of your data, costs no extra page time, and hides itself below the threshold you set.' mod='PrestashopAPI'}</p>
+					<p>{l s='Optionally, product pages in your own shop can show how many times a product has been downloaded, as social proof. It is drawn from the local copy of your data, costs no extra page time, hides itself below the threshold you set, and never appears on free products.' mod='PrestashopAPI'}</p>
 				</div>
 				<div>
 					<h4>{l s='Speed' mod='PrestashopAPI'}</h4>

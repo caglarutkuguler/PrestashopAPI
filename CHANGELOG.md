@@ -101,7 +101,9 @@ Complete rewrite. Renamed **Seller Dashboard — Marketplace Sales, Messages & P
 
 - **Storefront notice**: the jQuery Growl toast that popped at every visitor is now a static
   inline badge on `displayProductAdditionalInfo`. It ships **disabled**, with a 10-sale
-  threshold, and counts marketplace + shop by default.
+  threshold, and counts marketplace + shop by default. It is **never shown on free products** —
+  a "Downloaded N times" line reads oddly on a giveaway. "Free" uses the price the customer
+  actually pays, so a product discounted to zero counts too.
 - Combined totals are **hidden** rather than guessed when the shop has no exchange rate for the
   marketplace currency.
 - Config keys `PRODUCT_PAGE_FRONT_ENABLE`, `API_DATE_FROM`, `API_DATE_TO` are now prefixed
