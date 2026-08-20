@@ -3,14 +3,14 @@
  *
  * NOTICE OF LICENSE
  *
- * This source file is subject to the Academic Free License (AFL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
+ * This source file is subject to the MIT License
+ * that is bundled with this package in the file LICENSE.
  * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/afl-3.0.php
+ * https://opensource.org/licenses/MIT
  *
  *  @author    MEG Venture
- *  @copyright 2019-2026 MEG Venture
- *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  @copyright 2019-2026 MEG Venture & Consulting Ltd.
+ *  @license   https://opensource.org/licenses/MIT MIT License
  *
  * Vanilla on purpose: the back office ships Bootstrap 3, 4 or 5 depending on the PrestaShop
  * version, so data-toggle="tab" behaves differently across the versions this module supports.

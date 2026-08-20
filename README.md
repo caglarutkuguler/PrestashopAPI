@@ -231,5 +231,5 @@ with the key you provide.
 
 ---
 
-[MEG Venture](https://www.megventure.com) · AFL-3.0 · Contributions welcome at
+[MEG Venture & Consulting Ltd.](https://www.megventure.com) · MIT License · Contributions welcome at
 [github.com/caglarutkuguler/PrestashopAPI](https://github.com/caglarutkuguler/PrestashopAPI)
