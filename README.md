@@ -7,6 +7,8 @@ Built for PrestaShop Addons contributors, by a contributor. Free and open source
 
 ---
 
+**Installable zip:** the archive GitHub generates on the releases page is a source snapshot, not an installable module — PrestaShop rejects it because the folder inside carries the version number. Download the ready-to-install zip from [megventure.com](https://megventure.com/en/free-modules/91-prestashop-addons-seller-dashboard-marketplace-sales.html).
+
 ## What it does
 
 | | |
