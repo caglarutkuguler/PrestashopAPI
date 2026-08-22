@@ -28,7 +28,7 @@ require_once dirname(__FILE__) . '/classes/SellerThreadState.php';
 class PrestashopAPI extends Module
 {
     /** @var string Kept in a constant so the API client can send it as a user agent. */
-    const MODULE_VERSION = '2.0.0';
+    const MODULE_VERSION = '2.1.0';
 
     /** @var string Query parameter for config-page actions. "action" is reserved by the admin dispatcher. */
     const ACTION_PARAM = 'psapi_action';
@@ -87,6 +87,8 @@ class PrestashopAPI extends Module
 
     public function install()
     {
+        require_once dirname(__FILE__) . '/classes/MegVentureReviewNudge.php';
+
         if (!parent::install()) {
             return false;
         }
@@ -126,19 +128,24 @@ class PrestashopAPI extends Module
             }
         }
 
-        return true;
+        return MegVentureReviewNudge::onInstall();
     }
 
     public function uninstall()
     {
+        require_once dirname(__FILE__) . '/classes/MegVentureReviewNudge.php';
+        MegVentureReviewNudge::onUninstall();
+
         $keys = array(
             'PRESTASHOPAPI_KEY', 'PRESTASHOPAPI_PERIOD', 'PRESTASHOPAPI_DATE_FROM',
             'PRESTASHOPAPI_DATE_TO', 'PRESTASHOPAPI_CURRENCY', 'PRESTASHOPAPI_CACHE_TTL',
             'PRESTASHOPAPI_BADGE_ENABLED', 'PRESTASHOPAPI_BADGE_MIN', 'PRESTASHOPAPI_BADGE_SCOPE',
             'PRESTASHOPAPI_LINKS', 'PRESTASHOPAPI_BADGE_MAP', 'PRESTASHOPAPI_SEEN',
             'PRESTASHOPAPI_CRON_TOKEN', 'PRESTASHOPAPI_LAST_SYNC', 'PRESTASHOPAPI_LAST_ERROR',
-            // v1 keys, unprefixed and liable to collide with other modules.
-            'PRODUCT_PAGE_FRONT_ENABLE', 'API_DATE_FROM', 'API_DATE_TO',
+            // The unprefixed v1 names (PRODUCT_PAGE_FRONT_ENABLE, API_DATE_FROM,
+            // API_DATE_TO) are deliberately NOT deleted: configuration is
+            // shop-wide and the module cannot prove another module does not own
+            // a row by one of those names. A stale leftover row is harmless.
         );
 
         foreach ($keys as $key) {
@@ -210,6 +217,17 @@ class PrestashopAPI extends Module
     public function getContent()
     {
         require_once _PS_MODULE_DIR_ . 'PrestashopAPI/classes/MegVentureAdsWidget.php';
+        require_once _PS_MODULE_DIR_ . 'PrestashopAPI/classes/MegVentureReviewNudge.php';
+
+        // May redirect (review click) — before anything renders on purpose.
+        // Concatenated configure URL on purpose: getAdminLink()'s $params
+        // argument does not exist on the oldest supported cores.
+        $nudge = MegVentureReviewNudge::handleRequest($this)
+            . MegVentureReviewNudge::render(
+                $this,
+                $this->context->link->getAdminLink('AdminModules', true) . '&configure=' . $this->name
+            );
+
         $this->html = '';
         $this->ensureHooks();
         $this->ensureSchema();
@@ -230,7 +248,7 @@ class PrestashopAPI extends Module
             $this->html .= $this->displayError($this->l('The PHP cURL extension is not enabled on this server, so this module cannot contact the marketplace. Please ask your hosting provider to enable it.'));
         }
 
-        return $this->html . $this->renderPage() . MegVentureAdsWidget::render('https://megventure.com/index.php?fc=module&module=virtualproductcombination&controller=adswidget');
+        return $nudge . $this->html . $this->renderPage() . MegVentureAdsWidget::render('https://megventure.com/index.php?fc=module&module=virtualproductcombination&controller=adswidget');
     }
 
     /**

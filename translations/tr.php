@@ -253,3 +253,7 @@ $_MODULE['<{prestashopapi}prestashop>prestashopapi_f6fa79a6f5ce50dfb6359524ee1a7
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_f84011b11766e36823ffbb2eb2ef4f39'] = 'Rozeti su degerin altinda gizle';
 $_MODULE['<{prestashopapi}prestashop>salesbadge_4feb3d6a9f34a11230a0e6500b89078d'] = 'kez, sizin gibi musteriler tarafindan';
 $_MODULE['<{prestashopapi}prestashop>salesbadge_a6a04307fd90d0c2821b45125e6a0a25'] = 'Su kadar kez indirildi:';
+$_MODULE['<{PrestashopAPI}prestashop>megventurereviewnudge_c980491d2b999421c4aa1ef4449323e1'] = 'Bu modülden memnun musunuz? Kısa bir değerlendirme, diğer mağaza sahiplerinin bu modülü bulmasına yardımcı olur.';
+$_MODULE['<{PrestashopAPI}prestashop>megventurereviewnudge_6ecbf3c5ab7a06f08c526f02bce2b2d6'] = 'Değerlendirme yazın';
+$_MODULE['<{PrestashopAPI}prestashop>megventurereviewnudge_8ad4303b83a62fb6ca3b025bad5bc114'] = 'Hayır, teşekkürler';
+$_MODULE['<{PrestashopAPI}prestashop>megventurereviewnudge_4d170dcb0d03a0efa011c9193219bb68'] = 'Tamam, bir daha sormayacağız.';

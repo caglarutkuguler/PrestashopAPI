@@ -1,5 +1,26 @@
 # Changelog
 
+## 2.1.0
+
+### Added
+
+- A single review-request line on the module's own configuration page. It
+  appears at the earliest 21 days after installing, asks once for a short
+  review on megventure.com, and disappears forever after a click, a
+  "No thanks", or three unanswered views. It makes no outbound request of any
+  kind and stores nothing beyond three prefixed configuration values, which
+  uninstalling removes.
+
+### Fixed
+
+- **Uninstalling the module could delete another module's settings.** The
+  uninstall step still removed the unprefixed v1 configuration names
+  `PRODUCT_PAGE_FRONT_ENABLE`, `API_DATE_FROM` and `API_DATE_TO` as leftover
+  cleanup. Those names carry no module prefix, so if any other module on the
+  shop stored a setting under one of them, uninstalling this module silently
+  wiped it. The old rows are now left alone — a stale leftover row is
+  harmless, deleting another module's setting is not.
+
 ## 2.0.0
 
 Complete rewrite. Renamed **Seller Dashboard — Marketplace Sales, Messages & Payouts**
