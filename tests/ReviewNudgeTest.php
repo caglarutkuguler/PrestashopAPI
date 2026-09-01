@@ -17,7 +17,13 @@
  * merchant to this module's own review form on megventure.com in the
  * back-office language, and uninstall must remove exactly its three keys.
  */
-define('_PS_VERSION_', '8.1.0');
+if (!defined('_PS_VERSION_')) {
+    // Only the CLI harness may run without the shop; a web hit exits here.
+    if (PHP_SAPI !== 'cli') {
+        exit;
+    }
+    define('_PS_VERSION_', '8.1.0');
+}
 
 class Configuration
 {
