@@ -12,6 +12,22 @@
 *  @copyright 2019-2026 MEG Venture & Consulting Ltd.
 *  @license   https://opensource.org/licenses/MIT MIT License
 *}
+<style>
+{literal}
+/* Back-office icons. These used to be FontAwesome 4, which the back office shipped up to
+   PrestaShop 8; PrestaShop 9 replaced it with Material Symbols Outlined. An icon-font class
+   selects a private-use code point, so the moment the font is not there the browser has
+   nothing to fall back to and draws an empty box. These now come from the set the core loads
+   for its own interface, which is ligature-based: the icon name is the element's text.
+   Sized down from the 24px default and set back to inheriting the text colour, so they sit
+   where the FontAwesome ones did. */
+.material-icons.mv-ico{font-size:18px;line-height:1;vertical-align:middle;margin-right:4px;}
+.material-icons.mv-ico,.material-icons.mv-ico:hover{color:inherit;}
+h3 .material-icons.mv-ico,
+.panel-heading .material-icons.mv-ico{font-size:20px;}
+.btn .material-icons.mv-ico{font-size:16px;margin-right:3px;}
+{/literal}
+</style>
 
 {assign var='psapi_base' value="`$psapi_config_url`&`$psapi_action_param`="}
 
@@ -36,7 +52,7 @@
 				<span class="psapi-sync">{l s='Never updated yet' mod='PrestashopAPI'}</span>
 			{/if}
 			<a class="btn btn-default btn-sm" href="{$psapi_base|escape:'html':'UTF-8'}refresh">
-				<i class="icon icon-refresh"></i> {l s='Refresh now' mod='PrestashopAPI'}
+				<i class="material-icons mv-ico">refresh</i> {l s='Refresh now' mod='PrestashopAPI'}
 			</a>
 		</div>
 	</div>
@@ -62,7 +78,7 @@
 	{* ============================================================ *}
 	{if !$psapi_has_key}
 		<div class="panel psapi-onboarding">
-			<h3><i class="icon icon-rocket"></i> {l s='Let us get you connected' mod='PrestashopAPI'}</h3>
+			<h3><i class="material-icons mv-ico">rocket_launch</i> {l s='Let us get you connected' mod='PrestashopAPI'}</h3>
 			<p class="psapi-lead">
 				{l s='This module reads your sales from the PrestaShop Addons marketplace using your seller API key. It only ever reads: nothing is published, changed or removed on your seller account.' mod='PrestashopAPI'}
 			</p>
@@ -73,7 +89,7 @@
 						<strong>{l s='Open your seller account' mod='PrestashopAPI'}</strong>
 						<p>{l s='Sign in at addons.prestashop.com with the account that sells your modules.' mod='PrestashopAPI'}</p>
 						<a class="btn btn-default btn-xs" target="_blank" rel="noopener" href="https://addons.prestashop.com/en/login">
-							{l s='Go to the marketplace' mod='PrestashopAPI'} <i class="icon icon-external-link"></i>
+							{l s='Go to the marketplace' mod='PrestashopAPI'} <i class="material-icons mv-ico">open_in_new</i>
 						</a>
 					</div>
 				</li>
@@ -103,18 +119,18 @@
 	{* ============================================================ *}
 	<div class="psapi-tabs" role="tablist">
 		<button type="button" class="psapi-tab" data-psapi-tab="dashboard" role="tab">
-			<i class="icon icon-dashboard"></i> {l s='Dashboard' mod='PrestashopAPI'}
+			<i class="material-icons mv-ico">dashboard</i> {l s='Dashboard' mod='PrestashopAPI'}
 		</button>
 		<button type="button" class="psapi-tab" data-psapi-tab="products" role="tab">
-			<i class="icon icon-cubes"></i> {l s='Products' mod='PrestashopAPI'}
+			<i class="material-icons mv-ico">widgets</i> {l s='Products' mod='PrestashopAPI'}
 			{if $psapi_products}<span class="psapi-pill">{$psapi_products|count}</span>{/if}
 		</button>
 		<button type="button" class="psapi-tab" data-psapi-tab="sales" role="tab">
-			<i class="icon icon-shopping-cart"></i> {l s='Sales' mod='PrestashopAPI'}
+			<i class="material-icons mv-ico">shopping_cart</i> {l s='Sales' mod='PrestashopAPI'}
 			{if $psapi_sales_total}<span class="psapi-pill">{$psapi_sales_total}</span>{/if}
 		</button>
 		<button type="button" class="psapi-tab" data-psapi-tab="messages" role="tab">
-			<i class="icon icon-comments"></i> {l s='Messages' mod='PrestashopAPI'}
+			<i class="material-icons mv-ico">forum</i> {l s='Messages' mod='PrestashopAPI'}
 			{if $psapi_unread > 0}
 				<span class="psapi-pill psapi-pill--alert">{$psapi_unread}</span>
 			{elseif $psapi_threads_total}
@@ -122,13 +138,13 @@
 			{/if}
 		</button>
 		<button type="button" class="psapi-tab" data-psapi-tab="payouts" role="tab">
-			<i class="icon icon-money"></i> {l s='Payouts' mod='PrestashopAPI'}
+			<i class="material-icons mv-ico">payments</i> {l s='Payouts' mod='PrestashopAPI'}
 		</button>
 		<button type="button" class="psapi-tab" data-psapi-tab="settings" role="tab">
-			<i class="icon icon-cogs"></i> {l s='Settings' mod='PrestashopAPI'}
+			<i class="material-icons mv-ico">settings</i> {l s='Settings' mod='PrestashopAPI'}
 		</button>
 		<button type="button" class="psapi-tab" data-psapi-tab="help" role="tab">
-			<i class="icon icon-life-ring"></i> {l s='Help' mod='PrestashopAPI'}
+			<i class="material-icons mv-ico">support</i> {l s='Help' mod='PrestashopAPI'}
 		</button>
 	</div>
 
@@ -177,7 +193,7 @@
 
 		{* ---------- Health checks ---------- *}
 		<div class="panel">
-			<h3><i class="icon icon-stethoscope"></i> {l s='Status' mod='PrestashopAPI'}</h3>
+			<h3><i class="material-icons mv-ico">stethoscope</i> {l s='Status' mod='PrestashopAPI'}</h3>
 			<ul class="psapi-checks">
 				<li class="{if $psapi_curl}psapi-ok{else}psapi-bad{/if}">
 					<i class="icon {if $psapi_curl}icon-check{else}icon-times{/if}"></i>
@@ -197,7 +213,7 @@
 					{/if}
 				</li>
 				<li class="{if $psapi_link_health.linked == $psapi_link_health.total && $psapi_link_health.total > 0}psapi-ok{elseif $psapi_link_health.linked > 0}psapi-warn{else}psapi-warn{/if}">
-					<i class="icon icon-link"></i>
+					<i class="material-icons mv-ico">link</i>
 					{$psapi_link_health.linked} / {$psapi_link_health.total}
 					{l s='marketplace products are matched to a product in this shop.' mod='PrestashopAPI'}
 					{if $psapi_link_health.linked < $psapi_link_health.total}
@@ -207,7 +223,7 @@
 					{/if}
 				</li>
 				<li class="psapi-ok">
-					<i class="icon icon-bell"></i>
+					<i class="material-icons mv-ico">notifications</i>
 					{if $psapi_unread > 0}
 						{$psapi_unread} {l s='conversation(s) have new activity. The back-office Dashboard is showing a notice.' mod='PrestashopAPI'}
 						<button type="button" class="psapi-inline-link" data-psapi-goto="messages">
@@ -218,7 +234,7 @@
 					{/if}
 				</li>
 				<li class="{if $psapi_currency_mismatch}psapi-warn{else}psapi-ok{/if}">
-					<i class="icon icon-money"></i>
+					<i class="material-icons mv-ico">payments</i>
 					{if $psapi_currency_mismatch}
 						{l s='Your marketplace currency and your shop currency are different, and your shop has no exchange rate for the marketplace currency, so combined totals are hidden.' mod='PrestashopAPI'}
 						({$psapi_marketplace_iso} &ne; {$psapi_shop_iso})
@@ -232,7 +248,7 @@
 
 		{* ---------- Revenue chart ---------- *}
 		<div class="panel">
-			<h3><i class="icon icon-bar-chart"></i> {l s='Revenue by month' mod='PrestashopAPI'}</h3>
+			<h3><i class="material-icons mv-ico">bar_chart</i> {l s='Revenue by month' mod='PrestashopAPI'}</h3>
 			{if $psapi_summary.addons_units > 0}
 				<div class="psapi-chart">
 					{foreach from=$psapi_months item=month}
@@ -254,7 +270,7 @@
 		{* ---------- Countries ---------- *}
 		{if $psapi_countries}
 			<div class="panel">
-				<h3><i class="icon icon-globe"></i> {l s='Where your buyers are' mod='PrestashopAPI'}</h3>
+				<h3><i class="material-icons mv-ico">public</i> {l s='Where your buyers are' mod='PrestashopAPI'}</h3>
 				<table class="table psapi-table">
 					<thead>
 						<tr>
@@ -286,7 +302,7 @@
 	{* ============================================================ *}
 	<section class="psapi-pane" data-psapi-pane="products">
 		<div class="panel">
-			<h3><i class="icon icon-cubes"></i> {l s='Your products' mod='PrestashopAPI'}</h3>
+			<h3><i class="material-icons mv-ico">widgets</i> {l s='Your products' mod='PrestashopAPI'}</h3>
 			<p class="psapi-lead">
 				{l s='A product is matched to this shop when its reference here equals its marketplace product ID. Anything that did not match automatically can be pinned by hand below.' mod='PrestashopAPI'}
 			</p>
@@ -324,7 +340,7 @@
 													referrerpolicy="no-referrer" data-psapi-thumb />
 											{/if}
 											<span class="psapi-thumb-empty" title="{if $product.pico}{$product.pico|escape:'html':'UTF-8'}{else}{l s='No image supplied by the marketplace' mod='PrestashopAPI'}{/if}">
-												<i class="icon icon-picture-o"></i>
+												<i class="material-icons mv-ico">image</i>
 											</span>
 										</td>
 										<td>{$product.id_product}</td>
@@ -369,7 +385,7 @@
 
 					<div class="panel-footer">
 						<button type="submit" name="submitPrestashopAPILinks" class="btn btn-default pull-right">
-							<i class="icon icon-save"></i> {l s='Save matches' mod='PrestashopAPI'}
+							<i class="material-icons mv-ico">save</i> {l s='Save matches' mod='PrestashopAPI'}
 						</button>
 					</div>
 				</form>
@@ -391,10 +407,10 @@
 	<section class="psapi-pane" data-psapi-pane="sales">
 		<div class="panel">
 			<h3>
-				<i class="icon icon-shopping-cart"></i> {l s='Marketplace sales' mod='PrestashopAPI'}
+				<i class="material-icons mv-ico">shopping_cart</i> {l s='Marketplace sales' mod='PrestashopAPI'}
 				<span class="panel-heading-action">
 					<a class="btn btn-default btn-sm" href="{$psapi_base|escape:'html':'UTF-8'}export">
-						<i class="icon icon-download"></i> {l s='Export CSV' mod='PrestashopAPI'}
+						<i class="material-icons mv-ico">download</i> {l s='Export CSV' mod='PrestashopAPI'}
 					</a>
 				</span>
 			</h3>
@@ -457,12 +473,12 @@
 	<section class="psapi-pane" data-psapi-pane="messages">
 		<div class="panel">
 			<h3>
-				<i class="icon icon-comments"></i> {l s='Buyer messages' mod='PrestashopAPI'}
+				<i class="material-icons mv-ico">forum</i> {l s='Buyer messages' mod='PrestashopAPI'}
 				{if $psapi_threads_counts.unread > 0 && !$psapi_thread}
 					<span class="panel-heading-action">
 						<a class="btn btn-default btn-sm" href="{$psapi_base|escape:'html':'UTF-8'}readall"
 							onclick="return confirm('{l s='Mark all conversations as read?' mod='PrestashopAPI' js=1}');">
-							<i class="icon icon-check"></i> {l s='Mark all as read' mod='PrestashopAPI'}
+							<i class="material-icons mv-ico">check</i> {l s='Mark all as read' mod='PrestashopAPI'}
 							({$psapi_threads_counts.unread})
 						</a>
 					</span>
@@ -472,7 +488,7 @@
 			{if $psapi_thread}
 				<p>
 					<a class="btn btn-default btn-xs" href="{$psapi_config_url|escape:'html':'UTF-8'}#psapi-messages">
-						<i class="icon icon-arrow-left"></i> {l s='Back to all conversations' mod='PrestashopAPI'}
+						<i class="material-icons mv-ico">arrow_back</i> {l s='Back to all conversations' mod='PrestashopAPI'}
 					</a>
 				</p>
 
@@ -517,7 +533,7 @@
 					</p>
 
 					<button type="submit" name="submitPrestashopAPIReply" class="btn btn-primary">
-						<i class="icon icon-send"></i> {l s='Send reply' mod='PrestashopAPI'}
+						<i class="material-icons mv-ico">send</i> {l s='Send reply' mod='PrestashopAPI'}
 					</button>
 				</form>
 			{elseif $psapi_threads || $psapi_threads_filter != 'all'}
@@ -534,7 +550,7 @@
 					</a>
 					<a class="psapi-segment {if $psapi_threads_filter == 'pinned'}psapi-segment--on{/if}"
 						href="{$psapi_fbase|escape:'html':'UTF-8'}pinned#psapi-messages">
-						<i class="icon icon-thumb-tack"></i> {l s='Pinned' mod='PrestashopAPI'}
+						<i class="material-icons mv-ico">push_pin</i> {l s='Pinned' mod='PrestashopAPI'}
 						<span>{$psapi_threads_counts.pinned}</span>
 					</a>
 				</div>
@@ -571,7 +587,7 @@
 										<a class="psapi-pin {if $thread.pinned}psapi-pin--on{/if}"
 											title="{if $thread.pinned}{l s='Unpin' mod='PrestashopAPI'}{else}{l s='Pin' mod='PrestashopAPI'}{/if}"
 											href="{$psapi_base|escape:'html':'UTF-8'}{if $thread.pinned}unpin{else}pin{/if}&psapi_id={$thread.id}#psapi-messages">
-											<i class="icon icon-thumb-tack"></i>
+											<i class="material-icons mv-ico">push_pin</i>
 										</a>
 										<a class="psapi-dot {if $thread.unread}psapi-dot--unread{/if}"
 											title="{if $thread.unread}{l s='Mark as read' mod='PrestashopAPI'}{else}{l s='Mark as unread' mod='PrestashopAPI'}{/if}"
@@ -646,7 +662,7 @@
 					<div class="psapi-diag-head">
 						<code>seller/threads</code>
 						<button type="button" class="btn btn-default btn-xs" data-psapi-copy="psapi-threads-debug">
-							<i class="icon icon-copy"></i> {l s='Copy' mod='PrestashopAPI'}
+							<i class="material-icons mv-ico">content_copy</i> {l s='Copy' mod='PrestashopAPI'}
 						</button>
 					</div>
 					<textarea id="psapi-threads-debug" class="psapi-diag-body form-control" rows="14" readonly="readonly">{$psapi_threads_debug}</textarea>
@@ -680,7 +696,7 @@
 	{* ============================================================ *}
 	<section class="psapi-pane" data-psapi-pane="payouts">
 		<div class="panel">
-			<h3><i class="icon icon-money"></i> {l s='Invoices and payouts' mod='PrestashopAPI'}</h3>
+			<h3><i class="material-icons mv-ico">payments</i> {l s='Invoices and payouts' mod='PrestashopAPI'}</h3>
 
 			{if $psapi_invoices.rows}
 				<div class="table-responsive">
@@ -728,14 +744,14 @@
 		{$psapi_settings_form nofilter}
 
 		<div class="panel">
-			<h3><i class="icon icon-clock-o"></i> {l s='Keep the data fresh automatically' mod='PrestashopAPI'}</h3>
+			<h3><i class="material-icons mv-ico">schedule</i> {l s='Keep the data fresh automatically' mod='PrestashopAPI'}</h3>
 			<p>
 				{l s='The storefront badge and the figures above are read from a local copy of your marketplace data, so that no visitor to your shop ever waits for the marketplace. That copy refreshes when you open this page. To refresh it on a schedule instead, call this URL from a cron task, for example once an hour:' mod='PrestashopAPI'}
 			</p>
 			<div class="psapi-copy">
 				<input type="text" class="form-control" readonly="readonly" value="{$psapi_cron_url|escape:'html':'UTF-8'}" id="psapi-cron-url" />
 				<button type="button" class="btn btn-default" data-psapi-copy="psapi-cron-url">
-					<i class="icon icon-copy"></i> {l s='Copy' mod='PrestashopAPI'}
+					<i class="material-icons mv-ico">content_copy</i> {l s='Copy' mod='PrestashopAPI'}
 				</button>
 			</div>
 			<p class="help-block">
@@ -744,13 +760,13 @@
 		</div>
 
 		<div class="panel">
-			<h3><i class="icon icon-trash"></i> {l s='Cached data' mod='PrestashopAPI'}</h3>
+			<h3><i class="material-icons mv-ico">delete</i> {l s='Cached data' mod='PrestashopAPI'}</h3>
 			<p>{l s='If something looks wrong, clear the local copy and download everything again.' mod='PrestashopAPI'}</p>
 			<a class="btn btn-default" href="{$psapi_base|escape:'html':'UTF-8'}clear">
-				<i class="icon icon-eraser"></i> {l s='Clear cached data' mod='PrestashopAPI'}
+				<i class="material-icons mv-ico">ink_eraser</i> {l s='Clear cached data' mod='PrestashopAPI'}
 			</a>
 			<a class="btn btn-default" href="{$psapi_base|escape:'html':'UTF-8'}test">
-				<i class="icon icon-plug"></i> {l s='Test the connection' mod='PrestashopAPI'}
+				<i class="material-icons mv-ico">power</i> {l s='Test the connection' mod='PrestashopAPI'}
 			</a>
 		</div>
 	</section>
@@ -760,7 +776,7 @@
 	{* ============================================================ *}
 	<section class="psapi-pane" data-psapi-pane="help">
 		<div class="panel">
-			<h3><i class="icon icon-life-ring"></i> {l s='How this module works' mod='PrestashopAPI'}</h3>
+			<h3><i class="material-icons mv-ico">support</i> {l s='How this module works' mod='PrestashopAPI'}</h3>
 
 			<div class="psapi-help-grid">
 				<div>
@@ -791,7 +807,7 @@
 		</div>
 
 		<div class="panel">
-			<h3><i class="icon icon-question-circle"></i> {l s='If something does not work' mod='PrestashopAPI'}</h3>
+			<h3><i class="material-icons mv-ico">help</i> {l s='If something does not work' mod='PrestashopAPI'}</h3>
 			<dl class="psapi-faq">
 				<dt>{l s='"The marketplace could not be reached"' mod='PrestashopAPI'}</dt>
 				<dd>{l s='Your server could not open an outgoing HTTPS connection to the marketplace. Shared hosts often block this. The Status list on the Dashboard tab tells you whether cURL itself is available; if it is, ask your host whether outgoing connections to api.addons.prestashop.com are allowed.' mod='PrestashopAPI'}</dd>
@@ -808,7 +824,7 @@
 		</div>
 
 		<div class="panel">
-			<h3><i class="icon icon-code"></i> {l s='What the API returns' mod='PrestashopAPI'}</h3>
+			<h3><i class="material-icons mv-ico">code</i> {l s='What the API returns' mod='PrestashopAPI'}</h3>
 			<p class="psapi-lead">
 				{l s='The marketplace only documents its products and sales data. Everything else, including conversations, invoices and payouts, is read from fields whose names we have had to infer. This shows one real row from each endpoint of your own account, so the module can be matched to what your account actually sends.' mod='PrestashopAPI'}
 			</p>
@@ -823,7 +839,7 @@
 						<div class="psapi-diag-head">
 							<code>{$endpoint}</code>
 							<button type="button" class="btn btn-default btn-xs" data-psapi-copy="psapi-diag-{$endpoint|md5}">
-								<i class="icon icon-copy"></i> {l s='Copy' mod='PrestashopAPI'}
+								<i class="material-icons mv-ico">content_copy</i> {l s='Copy' mod='PrestashopAPI'}
 							</button>
 						</div>
 						<textarea id="psapi-diag-{$endpoint|md5}" class="psapi-diag-body form-control" rows="10" readonly="readonly">{$json}</textarea>
@@ -831,13 +847,13 @@
 				{/foreach}
 			{else}
 				<a class="btn btn-default" href="{$psapi_config_url|escape:'html':'UTF-8'}&psapi_diag=1#psapi-help">
-					<i class="icon icon-search"></i> {l s='Show one sample row from each endpoint' mod='PrestashopAPI'}
+					<i class="material-icons mv-ico">search</i> {l s='Show one sample row from each endpoint' mod='PrestashopAPI'}
 				</a>
 			{/if}
 		</div>
 
 		<div class="panel">
-			<h3><i class="icon icon-info-circle"></i> {l s='About' mod='PrestashopAPI'}</h3>
+			<h3><i class="material-icons mv-ico">info</i> {l s='About' mod='PrestashopAPI'}</h3>
 			<p>
 				{l s='Seller Dashboard by' mod='PrestashopAPI'}
 				<a href="https://www.megventure.com" target="_blank" rel="noopener">MEG Venture</a>

@@ -28,7 +28,7 @@ require_once dirname(__FILE__) . '/classes/SellerThreadState.php';
 class PrestashopAPI extends Module
 {
     /** @var string Kept in a constant so the API client can send it as a user agent. */
-    const MODULE_VERSION = '2.1.0';
+    const MODULE_VERSION = '2.1.1';
 
     /** @var string Query parameter for config-page actions. "action" is reserved by the admin dispatcher. */
     const ACTION_PARAM = 'psapi_action';

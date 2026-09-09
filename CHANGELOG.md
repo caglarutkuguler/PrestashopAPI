@@ -1,5 +1,28 @@
 # Changelog
 
+## 2.1.1
+
+### Fixed
+
+- **The back-office icons turned into empty boxes on PrestaShop 9.** The 42
+  icons the module draws for itself came from FontAwesome 4, which the back
+  office shipped up to PrestaShop 8. PrestaShop 9 replaced it with Material
+  Symbols Outlined, and FontAwesome now reaches the page only through
+  `themes/default/public/theme.css` — a leftover of the old theme rather than
+  anything the new back office asks for.
+
+  An icon-font class does not name a picture; it selects a private-use code
+  point that means nothing without that exact font file. So the moment the
+  font is not there the browser has nothing to fall back to and draws a
+  placeholder box. That makes the failure abrupt rather than gradual, and it
+  shows up first on a page load with a freshly cleared asset cache.
+
+  The icons now come from the set the core loads for its own interface, where
+  the icon name is the element’s text rather than a class. They are sized
+  down from its 24px default and set back to inheriting the surrounding text
+  colour, so they sit exactly where the FontAwesome ones did. Nothing in the
+  interface moves or changes name.
+
 ## 2.1.0
 
 ### Added
