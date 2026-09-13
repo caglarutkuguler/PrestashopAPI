@@ -492,3 +492,7 @@ $_MODULE['<{prestashopapi}prestashop>prestashopapi_f6fa79a6f5ce50dfb6359524ee1a7
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_f84011b11766e36823ffbb2eb2ef4f39'] = 'Badge verbergen onder';
 $_MODULE['<{prestashopapi}prestashop>salesbadge_4feb3d6a9f34a11230a0e6500b89078d'] = 'keer door klanten zoals u';
 $_MODULE['<{prestashopapi}prestashop>salesbadge_a6a04307fd90d0c2821b45125e6a0a25'] = 'Gedownload';
+$_MODULE['<{PrestashopAPI}prestashop>megventurereviewnudge_c980491d2b999421c4aa1ef4449323e1'] = 'Tevreden met deze module? Een korte review helpt andere webshops om hem te vinden.';
+$_MODULE['<{PrestashopAPI}prestashop>megventurereviewnudge_6ecbf3c5ab7a06f08c526f02bce2b2d6'] = 'Een review achterlaten';
+$_MODULE['<{PrestashopAPI}prestashop>megventurereviewnudge_8ad4303b83a62fb6ca3b025bad5bc114'] = 'Nee, bedankt';
+$_MODULE['<{PrestashopAPI}prestashop>megventurereviewnudge_4d170dcb0d03a0efa011c9193219bb68'] = 'Prima, we vragen het niet opnieuw.';

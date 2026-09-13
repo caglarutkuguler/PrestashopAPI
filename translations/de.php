@@ -492,3 +492,7 @@ $_MODULE['<{prestashopapi}prestashop>prestashopapi_f6fa79a6f5ce50dfb6359524ee1a7
 $_MODULE['<{prestashopapi}prestashop>prestashopapi_f84011b11766e36823ffbb2eb2ef4f39'] = 'Badge ausblenden unter';
 $_MODULE['<{prestashopapi}prestashop>salesbadge_4feb3d6a9f34a11230a0e6500b89078d'] = 'Mal von Kunden wie Ihnen';
 $_MODULE['<{prestashopapi}prestashop>salesbadge_a6a04307fd90d0c2821b45125e6a0a25'] = 'Heruntergeladen';
+$_MODULE['<{PrestashopAPI}prestashop>megventurereviewnudge_c980491d2b999421c4aa1ef4449323e1'] = 'Zufrieden mit diesem Modul? Eine kurze Bewertung hilft anderen Händlern, es zu finden.';
+$_MODULE['<{PrestashopAPI}prestashop>megventurereviewnudge_6ecbf3c5ab7a06f08c526f02bce2b2d6'] = 'Bewertung abgeben';
+$_MODULE['<{PrestashopAPI}prestashop>megventurereviewnudge_8ad4303b83a62fb6ca3b025bad5bc114'] = 'Nein, danke';
+$_MODULE['<{PrestashopAPI}prestashop>megventurereviewnudge_4d170dcb0d03a0efa011c9193219bb68'] = 'In Ordnung, wir fragen nicht erneut.';
