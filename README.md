@@ -1,5 +1,7 @@
 # Seller Dashboard — Marketplace Sales, Messages & Payouts
 
+**Version:** 2.1.1
+
 See how your PrestaShop Addons marketplace products are selling without leaving your own back
 office — combined with the sales of the same products in your own shop.
 
