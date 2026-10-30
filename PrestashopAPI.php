@@ -248,7 +248,7 @@ class PrestashopAPI extends Module
             $this->html .= $this->displayError($this->l('The PHP cURL extension is not enabled on this server, so this module cannot contact the marketplace. Please ask your hosting provider to enable it.'));
         }
 
-        return $nudge . $this->html . $this->renderPage() . MegVentureAdsWidget::render('https://megventure.com/index.php?fc=module&module=virtualproductcombination&controller=adswidget');
+        return $nudge . $this->html . $this->renderPage() . MegVentureAdsWidgetV2::render('https://megventure.com/index.php?fc=module&module=virtualproductcombination&controller=adswidget');
     }
 
     /**
