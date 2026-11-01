@@ -34,8 +34,17 @@ _Only customer-relevant changes are listed. Internal refactoring, tests and hous
 - `en` and `tr` translations (188 strings; 1.x shipped none)
 
 ### Improved
-- Complete rewrite. Renamed Seller Dashboard — Marketplace Sales, Messages & Payouts (was Prestashop Addons Seller Store API Module)
+- Storefront notice: the jQuery Growl toast that popped at every visitor is now a static inline badge on `displayProductAdditionalInfo`. It ships disabled, with a 10-sale threshold, and counts marketplace + shop by default. It is never shown on free products — a "Downloaded N times" line reads oddly on a giveaway. "Free" uses the price the customer actually pays, so a product discounted to zero counts too
+- Combined totals are hidden rather than guessed when the shop has no exchange rate for the marketplace currency
+- Config keys `PRODUCT_PAGE_FRONT_ENABLE`, `API_DATE_FROM`, `API_DATE_TO` are now prefixed `PRESTASHOPAPI_*` (migrated automatically)
+- Minimum PrestaShop version raised from 1.6 to 1.7
+- `ps_PrestashopAPI` table — an auto-increment id and nothing else, never read or written; its install script was never called, and its mixed-case name breaks on MySQL with `lower_case_table_names` enabled
+- `sql/`, `views/img/`, `logo.gif`
+- Net: 14 code files → 10 (plus 2 translation files and 2 documents that did not exist before), with substantially more functionality
+
+### Fixed
 - `money_format()`, removed in PHP 8.0, was called on every configuration page load
+- A missing/invalid API key made `json_decode()` return `null`, which was then passed straight to `foreach` — so a fresh install fataled the moment it was opened
 - Local turnover multiplied `total_price_tax_incl` (already a line total) by quantity again; a 3-unit line reported 3× its value
 - Local sales query had no join condition — a cartesian product of `order_detail` × `product`
 - `product_quantity_refunded` was subtracted but never selected, so local refunds were never actually deducted despite the UI claiming otherwise
@@ -49,13 +58,3 @@ _Only customer-relevant changes are listed. Internal refactoring, tests and hous
 - A failed request rendered identically to an empty account ("no conversations returned"). Failures, empty results and unrecognised shapes are now three distinct, visible states
 - `backOfficeHeader` and `displayBackOfficeHeader` were both registered — they are aliases, so all assets loaded twice
 - Date parameters were sent as `Y/m/d` while the documented format is `YYYY-MM-DD`
-- Storefront notice: the jQuery Growl toast that popped at every visitor is now a static inline badge on `displayProductAdditionalInfo`. It ships disabled, with a 10-sale threshold, and counts marketplace + shop by default. It is never shown on free products — a "Downloaded N times" line reads oddly on a giveaway. "Free" uses the price the customer actually pays, so a product discounted to zero counts too
-- Combined totals are hidden rather than guessed when the shop has no exchange rate for the marketplace currency
-- Config keys `PRODUCT_PAGE_FRONT_ENABLE`, `API_DATE_FROM`, `API_DATE_TO` are now prefixed `PRESTASHOPAPI_*` (migrated automatically)
-- Minimum PrestaShop version raised from 1.6 to 1.7
-- `ps_PrestashopAPI` table — an auto-increment id and nothing else, never read or written; its install script was never called, and its mixed-case name breaks on MySQL with `lower_case_table_names` enabled
-- `sql/`, `views/img/`, `logo.gif`
-- 14 code files → 10 (plus 2 translation files and 2 documents that did not exist before), with substantially more functionality
-
-### Fixed
-- A missing/invalid API key made `json_decode()` return `null`, which was then passed straight to `foreach` — so a fresh install fataled the moment it was opened
