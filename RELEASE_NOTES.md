@@ -5,7 +5,7 @@ _Only customer-relevant changes are listed. Internal refactoring, tests and hous
 ## 2.1.1
 
 ### Fixed
-- The back-office icons turned into empty boxes on PrestaShop 9. The 42 icons the module draws for itself came from FontAwesome 4, which the back office shipped up to PrestaShop 8. PrestaShop 9 replaced it with Material Symbols Outlined, and FontAwesome now reaches the page only through `themes/default/public/theme.css` — a leftover of the old theme rather than anything the new back office asks for
+- The back-office icons turned into empty boxes on PrestaShop 9. The 42 icons the module draws for itself came from FontAwesome 4, which the back office shipped up to PrestaShop 8. PrestaShop 9 replaced it with Material Symbols Outlined, and FontAwesome now reaches the page only through a stylesheet left over from the old theme rather than anything the new back office asks for
 
 ## 2.1.0
 
@@ -13,15 +13,15 @@ _Only customer-relevant changes are listed. Internal refactoring, tests and hous
 - A single review-request line on the module's own configuration page. It appears at the earliest 21 days after installing, asks once for a short review on megventure.com, and disappears forever after a click, a "No thanks", or three unanswered views. It makes no outbound request of any kind and stores nothing beyond three prefixed configuration values, which uninstalling removes
 
 ### Fixed
-- Uninstalling the module could delete another module's settings. The uninstall step still removed the unprefixed v1 configuration names `PRODUCT_PAGE_FRONT_ENABLE`, `API_DATE_FROM` and `API_DATE_TO` as leftover cleanup. Those names carry no module prefix, so if any other module on the shop stored a setting under one of them, uninstalling this module silently wiped it. The old rows are now left alone — a stale leftover row is harmless, deleting another module's setting is not
+- Uninstalling the module could delete another module's settings. The uninstall step still removed three unprefixed configuration names left over from v1 as cleanup. Those names carry no module prefix, so if any other module on the shop stored a setting under one of them, uninstalling this module silently wiped it. The old rows are now left alone — a stale leftover row is harmless, deleting another module's setting is not
 
 ## 2.0.0
 
 ### New
 - Dashboard with KPI cards, a 12-month revenue chart (server-rendered, no JS chart library) and a buyer-country breakdown
-- Messages tab: buyer conversations with replies sent from the back office, carrying an optional attachment (8 MB, extension allow-list, `is_uploaded_file` + server-side size and type checks, real MIME read from the file's bytes rather than the browser's declaration)
-- Merchant-owned unread / pinned state in its own table (`prestashopapi_thread`), with All / Unread / Pinned filters, pinned-then-unread-then-newest ordering, and a back-office Dashboard notice. Everything starts unread; the merchant sets the baseline once. A buyer reply moves the conversation's fingerprint, which returns it to unread automatically while keeping its pin. The marketplace exposes no read/status/answered field and no message author, so this tracks the merchant's decisions plus genuine change rather than pretending to mirror the Addons "unread" badge. Not a Configuration value: 1843 conversations need ~83KB and `ps_configuration.value` is TEXT, capped at 64KB
-- The Dashboard widget is cache-only and can never make an admin page wait on the marketplace. It is guarded to `AdminDashboardController` — `displayDashboardTop` fires on other admin pages too, and rendered the block twice on the module's own configuration page
+- Messages tab: buyer conversations with replies sent from the back office, carrying an optional attachment (8 MB, extension allow-list, server-side upload, size and type checks, real file type read from the file's bytes rather than the browser's declaration)
+- Merchant-owned unread / pinned state in its own table, with All / Unread / Pinned filters, pinned-then-unread-then-newest ordering, and a back-office Dashboard notice. Everything starts unread; the merchant sets the baseline once. A buyer reply moves the conversation's fingerprint, which returns it to unread automatically while keeping its pin. The marketplace exposes no read/status/answered field and no message author, so this tracks the merchant's decisions plus genuine change rather than pretending to mirror the Addons "unread" badge. It is not kept in the shop configuration: 1843 conversations need ~83KB and a configuration value is capped at 64KB
+- The Dashboard widget is cache-only and can never make an admin page wait on the marketplace. It now shows only on the Dashboard — its position also exists on other admin pages, and it rendered the block twice on the module's own configuration page
 - Message bodies are decoded and reduced to plain text. They arrive as HTML, sometimes entity-encoded on top, so escaping them printed the markup and rendering them raw would run buyer-supplied script with the merchant's back-office session
 - Payouts tab: marketplace invoices
 - Products tab: manual product matching, replacing the 1.x instruction to rename your references to match marketplace IDs
@@ -31,30 +31,36 @@ _Only customer-relevant changes are listed. Internal refactoring, tests and hous
 - CSV export of sales, with formula-injection neutralisation
 - Three-step onboarding shown until a key is saved
 - Help tab: how it works, plus troubleshooting
-- `en` and `tr` translations (188 strings; 1.x shipped none)
+- English and Turkish translations (188 strings; 1.x shipped none)
 
 ### Improved
-- Storefront notice: the jQuery Growl toast that popped at every visitor is now a static inline badge on `displayProductAdditionalInfo`. It ships disabled, with a 10-sale threshold, and counts marketplace + shop by default. It is never shown on free products — a "Downloaded N times" line reads oddly on a giveaway. "Free" uses the price the customer actually pays, so a product discounted to zero counts too
+- Rebuilt from scratch and renamed to “Seller Dashboard — Marketplace Sales, Messages & Payouts” (was “Prestashop Addons Seller Store API Module”)
+- Storefront notice: the jQuery Growl toast that popped at every visitor is now a static inline badge in the product page's additional-information area. It ships disabled, with a 10-sale threshold, and counts marketplace + shop by default. It is never shown on free products — a "Downloaded N times" line reads oddly on a giveaway. "Free" uses the price the customer actually pays, so a product discounted to zero counts too
 - Combined totals are hidden rather than guessed when the shop has no exchange rate for the marketplace currency
-- Config keys `PRODUCT_PAGE_FRONT_ENABLE`, `API_DATE_FROM`, `API_DATE_TO` are now prefixed `PRESTASHOPAPI_*` (migrated automatically)
+- The module's three settings now carry the module's own prefix (migrated automatically)
 - Minimum PrestaShop version raised from 1.6 to 1.7
-- `ps_PrestashopAPI` table — an auto-increment id and nothing else, never read or written; its install script was never called, and its mixed-case name breaks on MySQL with `lower_case_table_names` enabled
-- `sql/`, `views/img/`, `logo.gif`
+- Every storefront position is guarded, so an error in the module can no longer white-screen a product page
+- An unused database table that was never read or written; its install script was never called, and its mixed-case name breaks on MySQL servers set to lowercase table names
+- Unused SQL and image folders and the old GIF logo
 - Net: 14 code files → 10 (plus 2 translation files and 2 documents that did not exist before), with substantially more functionality
 
 ### Fixed
-- `money_format()`, removed in PHP 8.0, was called on every configuration page load
-- A missing/invalid API key made `json_decode()` return `null`, which was then passed straight to `foreach` — so a fresh install fataled the moment it was opened
-- Local turnover multiplied `total_price_tax_incl` (already a line total) by quantity again; a 3-unit line reported 3× its value
-- Local sales query had no join condition — a cartesian product of `order_detail` × `product`
-- `product_quantity_refunded` was subtracted but never selected, so local refunds were never actually deducted despite the UI claiming otherwise
+- A currency-formatting function that PHP 8.0 removed was called on every configuration page load
+- A missing or invalid API key left the module with an empty response that it then tried to loop over — so a fresh install fataled the moment it was opened
+- Local turnover multiplied the tax-included line total (already a line total) by quantity again; a 3-unit line reported 3× its value
+- The local sales query had no join condition, so every order line was paired with every product
+- Refunded quantities were subtracted but never read from the order, so local refunds were never actually deducted despite the UI claiming otherwise
 - Invalid and abandoned orders were counted as local sales
-- Product matching used `==`; on PHP 5/7 any non-numeric reference matched marketplace ID `0`
+- Product matching used a loose comparison; on PHP 5/7 any non-numeric reference matched marketplace ID 0
 - Marketplace and shop revenue were summed with no currency conversion
-- The storefront made two live API calls with `limit => 10000`, uncached, per product page view, per visitor. Storefront rendering is now fully decoupled from the API: it reads a precomputed map from `Configuration`, costing zero queries and zero HTTP calls
-- The response wrapper was read wrongly. `seller/threads` answers `{"success":true,"threads":{…paginator…,"data":[…rows…]}}` — the paginator is nested inside the named wrapper, and the rows are one level below that. The module read `threads` directly and, finding a map, wrapped the paginator itself as a single phantom "conversation" that then failed every downstream check. The Messages tab counted 1 and rendered nothing
-- The thread id is `id_community_thread`, not `id_thread`; every row was silently skipped
+- The settings switch read its saved value with the wrong arguments, so it always rendered "No" regardless of the saved value
+- SQL injection in the storefront: the product id taken from the page address was put into a query without being cast to a number
+- The storefront made two live API calls fetching up to 10,000 rows each, uncached, per product page view, per visitor. Storefront rendering is now fully decoupled from the API: it reads a precomputed map from the shop configuration, costing zero queries and zero HTTP calls
+- The marketplace's conversation list was read wrongly. The rows sit one level below the paging data, which is itself nested inside a named wrapper. The module read the wrapper directly and, finding a map, wrapped the paging data itself as a single phantom "conversation" that then failed every downstream check. The Messages tab counted 1 and rendered nothing
+- Conversations were looked up by the wrong id field, so every row was silently skipped
 - Pagination was ignored, silently truncating any endpoint past 5000 rows
+- The message cache could never hit: saving it stripped anything that looked like an HTML tag, so a buyer message containing a less-than sign truncated the stored data and it never decoded again
 - A failed request rendered identically to an empty account ("no conversations returned"). Failures, empty results and unrecognised shapes are now three distinct, visible states
-- `backOfficeHeader` and `displayBackOfficeHeader` were both registered — they are aliases, so all assets loaded twice
-- Date parameters were sent as `Y/m/d` while the documented format is `YYYY-MM-DD`
+- Replies could not be sent: every request was signed with an API key that was never set, and the message body was SQL-escaped before it was put in an HTTP request
+- The back-office assets were registered for two names of the same position, so they all loaded twice
+- Dates were sent to the marketplace as year/month/day with slashes, while the documented format is year-month-day with dashes
