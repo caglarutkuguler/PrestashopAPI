@@ -2,6 +2,21 @@
 
 _Only customer-relevant changes are listed. Internal refactoring, tests and housekeeping are omitted._
 
+## 2.2.0
+
+### New
+- An "Awaiting reply" filter on the Messages tab, listing every conversation where the buyer wrote last
+- A counter of conversations awaiting your reply on the Messages tab and in the Status list on the Dashboard tab
+
+### Improved
+- Conversations on the Messages tab are now sorted by their last message, the same order as the marketplace's own inbox. A buyer writing today in a conversation opened two years ago now appears at the top instead of being buried under newer conversations
+- The "Opened" column is now "Last message". The date the conversation was opened is shown underneath in smaller text
+- Pinned conversations still come first. Unread conversations no longer jump ahead of the others; the Unread filter still lists them
+- In a conversation, each message now says whether it was written by the customer or by you
+
+### Fixed
+- Passwords that buyers paste into a conversation (for example "password: …", "parola: …", "mot de passe: …") are now hidden behind dots when the conversation is shown. Only the display changes: the message itself is not altered
+
 ## 2.1.2
 
 ### New
@@ -11,11 +26,3 @@ _Only customer-relevant changes are listed. Internal refactoring, tests and hous
 
 ### Fixed
 - The back-office icons turned into empty boxes on PrestaShop 9. The 42 icons the module draws for itself came from FontAwesome 4, which the back office shipped up to PrestaShop 8. PrestaShop 9 replaced it with Material Symbols Outlined, and FontAwesome now reaches the page only through a stylesheet left over from the old theme rather than anything the new back office asks for
-
-## 2.1.0
-
-### New
-- A single review-request line on the module's own configuration page. It appears at the earliest 21 days after installing, asks once for a short review on megventure.com, and disappears forever after a click, a "No thanks", or three unanswered views. It makes no outbound request of any kind and stores nothing beyond three prefixed configuration values, which uninstalling removes
-
-### Fixed
-- Uninstalling the module could delete another module's settings. The uninstall step still removed three unprefixed configuration names left over from v1 as cleanup. Those names carry no module prefix, so if any other module on the shop stored a setting under one of them, uninstalling this module silently wiped it. The old rows are now left alone — a stale leftover row is harmless, deleting another module's setting is not
