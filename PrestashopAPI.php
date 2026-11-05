@@ -28,7 +28,7 @@ require_once dirname(__FILE__) . '/classes/SellerThreadState.php';
 class PrestashopAPI extends Module
 {
     /** @var string Kept in a constant so the API client can send it as a user agent. */
-    const MODULE_VERSION = '2.1.1';
+    const MODULE_VERSION = '2.1.2';
 
     /** @var string Query parameter for config-page actions. "action" is reserved by the admin dispatcher. */
     const ACTION_PARAM = 'psapi_action';
@@ -214,6 +214,29 @@ class PrestashopAPI extends Module
      * Configuration page
      * ================================================================ */
 
+    /**
+     * One line pointing to the free MEG Venture Updates module, shown on the
+     * configuration page until that module is installed. A static link only:
+     * nothing is requested from megventure.com.
+     */
+    private function renderMvuNotice()
+    {
+        if (Module::isInstalled('megventureupdates')) {
+            return '';
+        }
+        $iso = Tools::strtolower((string) $this->context->language->iso_code);
+        if (!in_array($iso, array('en', 'tr', 'fr', 'es', 'de', 'it', 'nl', 'pl', 'pt'), true)) {
+            $iso = 'en';
+        }
+        $this->context->smarty->assign(array(
+            'mvu_notice_text' => $this->l('Get updates for this module in one click: install the free MEG Venture Updates module.'),
+            'mvu_notice_link' => $this->l('How it works'),
+            'mvu_notice_url' => 'https://megventure.com/' . $iso . '/content/17-module-updates',
+        ));
+
+        return $this->display(__FILE__, 'views/templates/admin/mvu_notice.tpl');
+    }
+
     public function getContent()
     {
         require_once _PS_MODULE_DIR_ . 'PrestashopAPI/classes/MegVentureAdsWidget.php';
@@ -248,7 +271,7 @@ class PrestashopAPI extends Module
             $this->html .= $this->displayError($this->l('The PHP cURL extension is not enabled on this server, so this module cannot contact the marketplace. Please ask your hosting provider to enable it.'));
         }
 
-        return $nudge . $this->html . $this->renderPage() . MegVentureAdsWidgetV2::render('https://megventure.com/index.php?fc=module&module=virtualproductcombination&controller=adswidget');
+        return $nudge . $this->html . $this->renderPage() . $this->renderMvuNotice() . MegVentureAdsWidgetV2::render('https://megventure.com/index.php?fc=module&module=virtualproductcombination&controller=adswidget');
     }
 
     /**
