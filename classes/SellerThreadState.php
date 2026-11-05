@@ -109,6 +109,144 @@ class SellerThreadState
     }
 
     /* ---------------------------------------------------------------- *
+     * Last message, ordering, display
+     * ---------------------------------------------------------------- */
+
+    /**
+     * The latest message of each conversation, from the bulk seller/messages rows.
+     *
+     * A thread row carries only its OPENING date (date_add). The marketplace's own inbox sorts
+     * by last message, so a buyer writing today in a thread opened in 2024 sits at the top
+     * there and was buried two years down here. The messages endpoint has the missing date
+     * and the author (from: "customer" | "seller").
+     *
+     * The endpoint answers newest first, so the first row seen for a conversation is its last
+     * message. A later row only replaces it if it is strictly newer, which keeps the result
+     * right even if the order ever changes.
+     *
+     * @return array id_community_thread => array{date: string, from: string}
+     */
+    public static function lastMessages(array $messages)
+    {
+        $last = array();
+
+        foreach ($messages as $message) {
+            if (!is_array($message) || !isset($message['id_community_thread'])) {
+                continue;
+            }
+
+            $id = (int) $message['id_community_thread'];
+
+            if ($id <= 0) {
+                continue;
+            }
+
+            $date = isset($message['date_add']) ? (string) $message['date_add'] : '';
+
+            if (isset($last[$id]) && strcmp($date, $last[$id]['date']) <= 0) {
+                continue;
+            }
+
+            $last[$id] = array(
+                'date' => $date,
+                'from' => isset($message['from']) ? (string) $message['from'] : '',
+            );
+        }
+
+        return $last;
+    }
+
+    /**
+     * When a conversation last moved: its last message, or its opening date when the
+     * message is not on the page of messages we read.
+     *
+     * @return string
+     */
+    public static function lastDate(array $thread, array $last)
+    {
+        $id = self::threadId($thread);
+        $opened = isset($thread['date_add']) ? (string) $thread['date_add'] : '';
+
+        if ($id && isset($last[$id]['date']) && $last[$id]['date'] !== '' && strcmp($last[$id]['date'], $opened) > 0) {
+            return $last[$id]['date'];
+        }
+
+        return $opened;
+    }
+
+    /**
+     * Whether the buyer wrote last, so the conversation is waiting on the seller.
+     *
+     * @return bool
+     */
+    public static function isAwaiting(array $thread, array $last)
+    {
+        $id = self::threadId($thread);
+
+        return $id && isset($last[$id]['from']) && $last[$id]['from'] === 'customer';
+    }
+
+    /**
+     * Sort key: pinned conversations first, then the most recent last message.
+     *
+     * A string so that a plain strcmp sorts on both keys at once.
+     *
+     * @return string
+     */
+    public static function rank($pinned, $date)
+    {
+        $time = $date !== '' ? strtotime($date) : false;
+
+        if ($time === false || $time < 0) {
+            $time = 0;
+        }
+
+        return ($pinned ? '0' : '1') . str_pad((string) (99999999999 - $time), 11, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * usort() comparator for rows carrying rank and id. Equal ranks fall back to the newer id,
+     * so the order is stable between page loads.
+     *
+     * @return int
+     */
+    public static function compareRank($a, $b)
+    {
+        $order = strcmp($a['rank'], $b['rank']);
+
+        if ($order !== 0) {
+            return $order;
+        }
+
+        return (int) $b['id'] - (int) $a['id'];
+    }
+
+    /**
+     * Hides passwords buyers paste into a conversation, for display only.
+     *
+     * "password: hunter2", "Parola = x", "mot de passe : x" and the like become
+     * "password: ••••••". Line by line: the value is whatever follows on the same line up to
+     * the next space. The cached copy is left as it was; this only changes what is shown.
+     *
+     * @return string
+     */
+    public static function maskSecrets($text)
+    {
+        $text = (string) $text;
+        $dot = str_repeat("\xE2\x80\xA2", 6);
+        $words = "password|parola|mot de passe|passwort|contrase\xC3\xB1a|pwd";
+
+        $masked = @preg_replace('/(' . $words . ')[^\S\r\n]*[:=][^\S\r\n]*\S+/iu', '$1: ' . $dot, $text);
+
+        if ($masked === null) {
+            // Not valid UTF-8: same pattern byte-wise, rather than showing the text unmasked.
+            $masked = preg_replace('/(' . $words . ')[^\S\r\n]*[:=][^\S\r\n]*\S+/i', '$1: ' . $dot, $text);
+        }
+
+        return $masked === null ? $text : $masked;
+    }
+
+    /* ---------------------------------------------------------------- *
      * Sync
      * ---------------------------------------------------------------- */
 

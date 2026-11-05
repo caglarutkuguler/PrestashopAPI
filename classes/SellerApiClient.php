@@ -178,7 +178,61 @@ class SellerApiClient
      */
     public function getAllMessages($force = false)
     {
-        return $this->fetchList('seller/messages', array(), 'allmessages', array('messages', 'message'), $force);
+        // Page 1 only. The endpoint answers newest first, and its first 5000 rows already reach
+        // back about a year; walking every page would download and cache 20,000+ messages to
+        // learn nothing new. A conversation absent from page 1 falls back to its opening date,
+        // which is older than anything on that page anyway.
+        //
+        // The message bodies are dropped before caching: this copy exists only to tell when each
+        // conversation last moved and who wrote last. A conversation's text is read from its own
+        // seller/threads/{id}/messages call, and 5000 HTML bodies in one cache row would risk
+        // the database's packet size limit for no gain.
+        return $this->fetchList(
+            'seller/messages',
+            array(),
+            'allmessages',
+            array('messages', 'message'),
+            $force,
+            1,
+            array('message')
+        );
+    }
+
+    /**
+     * When each conversation last moved, and who wrote last.
+     *
+     * Derived from getAllMessages() and cached under its own key, so the back office does not
+     * rescan 5000 messages on every page view. Refreshed whenever it has expired (or when
+     * forced), in step with the threads it describes.
+     *
+     * @return array id_community_thread => array{date: string, from: string}
+     */
+    public function getLastMessages($force = false)
+    {
+        $entry = $this->readCache('last_by_thread');
+        $cached = $entry !== false && isset($entry['payload']['map']) && is_array($entry['payload']['map'])
+            ? $entry['payload']['map']
+            : null;
+
+        if (!$force && $cached !== null && $entry['fresh']) {
+            return $cached;
+        }
+
+        $messages = $this->getAllMessages($force);
+
+        if (!is_array($messages)) {
+            return $cached !== null ? $cached : array();
+        }
+
+        $map = SellerThreadState::lastMessages($messages);
+
+        // Only an instance allowed to refresh writes. A read-only one (the front office, the
+        // Dashboard widget) may compute from an expired copy but must not stamp it as new.
+        if ($this->allow_refresh) {
+            $this->writeCache('last_by_thread', array('map' => $map));
+        }
+
+        return $map;
     }
 
     /**
@@ -321,10 +375,12 @@ class SellerApiClient
      * read the paginator as if it were a conversation.
      *
      * @param array|string $keys Wrapper key(s) this endpoint uses.
+     * @param int $max_pages Stop after this many pages, never more than MAX_PAGES.
+     * @param string[] $drop Fields removed from every row before it is cached.
      *
      * @return array|false
      */
-    private function fetchList($path, array $params, $cache_key, $keys, $force = false)
+    private function fetchList($path, array $params, $cache_key, $keys, $force = false, $max_pages = self::MAX_PAGES, array $drop = array())
     {
         $this->stale = false;
         $entry = $this->readCache($cache_key);
@@ -361,7 +417,7 @@ class SellerApiClient
         }
 
         $rows = $this->extract($first, $keys);
-        $pages = min($this->pageCount($first, $keys), self::MAX_PAGES);
+        $pages = min($this->pageCount($first, $keys), self::MAX_PAGES, max(1, (int) $max_pages));
 
         // Reading page 1 only would silently truncate at PAGE_LIMIT rows: not an error, just
         // quietly wrong totals.
@@ -379,6 +435,16 @@ class SellerApiClient
             }
 
             $rows = array_merge($rows, $more);
+        }
+
+        if ($drop) {
+            foreach ($rows as $index => $row) {
+                if (is_array($row)) {
+                    foreach ($drop as $field) {
+                        unset($rows[$index][$field]);
+                    }
+                }
+            }
         }
 
         $this->writeCache($cache_key, array(

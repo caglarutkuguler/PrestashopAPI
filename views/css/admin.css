@@ -416,6 +416,36 @@
     color: var(--psapi-bad);
 }
 
+.psapi-badge--await {
+    border-color: #f6d9a8;
+    background: #fff6e6;
+    color: #a86400;
+}
+
+.psapi-pill--await,
+.psapi-tab--active .psapi-pill--await {
+    background: #e69500;
+    color: #fff;
+}
+
+.psapi-pill--await .mv-ico {
+    font-size: 11px;
+    vertical-align: -1px;
+}
+
+.psapi-date small {
+    display: block;
+    font-size: 11px;
+}
+
+.psapi-message--customer {
+    border-inline-start: 3px solid #e69500;
+}
+
+.psapi-message--seller {
+    border-inline-start: 3px solid var(--psapi-ok);
+}
+
 .psapi-badge--active {
     border-color: #c5e8c7;
     background: #f1faf1;

@@ -136,6 +136,11 @@ h3 .material-icons.mv-ico,
 			{elseif $psapi_threads_total}
 				<span class="psapi-pill">{$psapi_threads_total}</span>
 			{/if}
+			{if $psapi_awaiting > 0}
+				<span class="psapi-pill psapi-pill--await" title="{l s='Awaiting your reply' mod='PrestashopAPI'}">
+					<i class="material-icons mv-ico">reply</i>{$psapi_awaiting}
+				</span>
+			{/if}
 		</button>
 		<button type="button" class="psapi-tab" data-psapi-tab="payouts" role="tab">
 			<i class="material-icons mv-ico">payments</i> {l s='Payouts' mod='PrestashopAPI'}
@@ -231,6 +236,15 @@ h3 .material-icons.mv-ico,
 						</button>
 					{else}
 						{l s='No conversations are waiting, so the Dashboard shows no notice. It appears there only when a buyer is waiting.' mod='PrestashopAPI'}
+					{/if}
+				</li>
+				<li class="{if $psapi_awaiting > 0}psapi-warn{else}psapi-ok{/if}">
+					<i class="material-icons mv-ico">reply</i>
+					{$psapi_awaiting} {l s='conversations awaiting your reply' mod='PrestashopAPI'}
+					{if $psapi_awaiting > 0}
+						<a class="psapi-inline-link" href="{$psapi_config_url|escape:'html':'UTF-8'}&psapi_filter=awaiting#psapi-messages">
+							{l s='Show them' mod='PrestashopAPI'}
+						</a>
 					{/if}
 				</li>
 				<li class="{if $psapi_currency_mismatch}psapi-warn{else}psapi-ok{/if}">
@@ -495,7 +509,7 @@ h3 .material-icons.mv-ico,
 				<div class="psapi-thread">
 					{if $psapi_thread.messages}
 						{foreach from=$psapi_thread.messages item=message}
-							<div class="psapi-message">
+							<div class="psapi-message{if $message.from} psapi-message--{$message.from}{/if}">
 								{if $message.meta}
 									<div class="psapi-message-meta">{$message.meta nofilter}</div>
 								{/if}
@@ -553,6 +567,11 @@ h3 .material-icons.mv-ico,
 						<i class="material-icons mv-ico">push_pin</i> {l s='Pinned' mod='PrestashopAPI'}
 						<span>{$psapi_threads_counts.pinned}</span>
 					</a>
+					<a class="psapi-segment {if $psapi_threads_filter == 'awaiting'}psapi-segment--on{/if}"
+						href="{$psapi_fbase|escape:'html':'UTF-8'}awaiting#psapi-messages">
+						<i class="material-icons mv-ico">reply</i> {l s='Awaiting reply' mod='PrestashopAPI'}
+						<span>{$psapi_awaiting}</span>
+					</a>
 				</div>
 
 				{if $psapi_threads_shown > 300}
@@ -574,7 +593,7 @@ h3 .material-icons.mv-ico,
 								<th>{l s='Product' mod='PrestashopAPI'}</th>
 								<th>{l s='Customer' mod='PrestashopAPI'}</th>
 								<th class="text-right">{l s='Messages' mod='PrestashopAPI'}</th>
-								<th>{l s='Opened' mod='PrestashopAPI'}</th>
+								<th>{l s='Last message' mod='PrestashopAPI'}</th>
 								<th>{l s='Support' mod='PrestashopAPI'}</th>
 								<th></th>
 							</tr>
@@ -596,6 +615,7 @@ h3 .material-icons.mv-ico,
 									</td>
 									<td class="psapi-name">
 										{if $thread.unread}<span class="psapi-new">{l s='Unread' mod='PrestashopAPI'}</span>{/if}
+										{if $thread.awaiting}<span class="psapi-badge psapi-badge--await">{l s='Awaiting reply' mod='PrestashopAPI'}</span>{/if}
 										{$thread.topic}
 									</td>
 									<td>{$thread.product}</td>
@@ -613,7 +633,12 @@ h3 .material-icons.mv-ico,
 										{/if}
 									</td>
 									<td class="text-right">{$thread.messages}</td>
-									<td>{$thread.date|truncate:10:''}</td>
+									<td class="psapi-date">
+										{$thread.date|truncate:16:'':true|escape:'html':'UTF-8'}
+										{if $thread.date_opened && $thread.date_opened != $thread.date}
+											<small class="psapi-muted">{l s='Opened' mod='PrestashopAPI'} {$thread.date_opened|truncate:10:''|escape:'html':'UTF-8'}</small>
+										{/if}
+									</td>
 									<td>
 										{* Business Care entitlement: negative days means it has run out. *}
 										{if $thread.support_days === null}
@@ -640,6 +665,8 @@ h3 .material-icons.mv-ico,
 											{l s='Nothing is unread. Every conversation has been dealt with.' mod='PrestashopAPI'}
 										{elseif $psapi_threads_filter == 'pinned'}
 											{l s='No conversation is pinned yet. Use the pin next to any row to keep it here.' mod='PrestashopAPI'}
+										{elseif $psapi_threads_filter == 'awaiting'}
+											{l s='No buyer is waiting for a reply.' mod='PrestashopAPI'}
 										{else}
 											{l s='No conversations.' mod='PrestashopAPI'}
 										{/if}

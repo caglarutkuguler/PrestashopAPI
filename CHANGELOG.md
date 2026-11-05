@@ -1,5 +1,29 @@
 # Changelog
 
+## 2.2.0
+
+### Changed
+
+- Conversations on the Messages tab are now sorted by their last message, the same order as the marketplace's own inbox. A buyer writing today in a conversation opened two years ago now appears at the top instead of being buried under newer conversations.
+- The "Opened" column is now "Last message". The date the conversation was opened is shown underneath in smaller text.
+- Pinned conversations still come first. Unread conversations no longer jump ahead of the others; the Unread filter still lists them.
+- In a conversation, each message now says whether it was written by the customer or by you.
+
+### Added
+
+- An "Awaiting reply" filter on the Messages tab, listing every conversation where the buyer wrote last.
+- A counter of conversations awaiting your reply on the Messages tab and in the Status list on the Dashboard tab.
+
+### Fixed
+
+- Passwords that buyers paste into a conversation (for example "password: …", "parola: …", "mot de passe: …") are now hidden behind dots when the conversation is shown. Only the display changes: the message itself is not altered.
+
+### Notes
+
+- Last-message dates come from page 1 of the seller/messages endpoint (newest first, up to 5000 rows); conversations not on that page fall back to their opening date. Message bodies are not kept in that bulk cache. The per-conversation map is cached under the last_by_thread key and refreshed by the back office and by the cron URL.
+- upgrade-2.2.0.php only empties the threads and allmessages caches and the compiled templates. No table changes.
+- New test: tests/ThreadSortTest.php.
+
 ## 2.1.2
 
 ### Added

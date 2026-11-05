@@ -82,16 +82,28 @@ answer. **Pin** any conversation to keep it at the top of the list; pinning is f
 independent of read state.
 
 From then on the module only tells you what **changed**: when a buyer replies, that conversation
-goes back to unread by itself and rises to the top. It keeps its pin.
+goes back to unread by itself. It keeps its pin.
 
-Filter the list by **All / Unread / Pinned**, and the Messages tab and the back-office Dashboard
-both show the unread count.
+**Order.** Conversations are sorted by their **last message**, newest first, the same order as
+the marketplace's own inbox, with pinned conversations above the rest. The **Last message**
+column shows that date, with the date the conversation was opened underneath. Last-message dates
+come from the most recent page of messages the marketplace returns (roughly the last year);
+an older conversation that is not on it is placed by its opening date.
+
+**Awaiting reply.** A conversation whose last message was written by the buyer is marked
+**Awaiting reply**. Filter the list by **All / Unread / Pinned / Awaiting reply**; the Messages
+tab shows the unread and awaiting counts, the Status list on the Dashboard tab shows how many
+conversations await your reply, and the back-office Dashboard shows the unread count. Inside a
+conversation each message says whether the customer or you wrote it.
+
+**Passwords.** Buyers sometimes paste a back-office or FTP password into a message. Lines such as
+"password: …" are shown with the value hidden behind dots. Only the display changes.
 
 One honest limitation, worth knowing: the marketplace's own "N unread" badge is a read-receipt
 on PrestaShop's side and **is not exposed by the API** — there is no read, status or answered
-field on a conversation, and no author on a message. So this module cannot mirror that number,
-and does not pretend to. It tracks *your* decisions plus genuine new activity, which is why you
-set the starting point yourself.
+field on a conversation. So this module cannot mirror that number, and does not pretend to.
+Unread tracks *your* decisions plus genuine new activity, which is why you set the starting
+point yourself.
 
 The Dashboard notice reads only the local copy of your data — it never calls the marketplace, so
 it cannot slow your back office down. It refreshes with everything else.

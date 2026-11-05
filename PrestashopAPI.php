@@ -28,7 +28,7 @@ require_once dirname(__FILE__) . '/classes/SellerThreadState.php';
 class PrestashopAPI extends Module
 {
     /** @var string Kept in a constant so the API client can send it as a user agent. */
-    const MODULE_VERSION = '2.1.2';
+    const MODULE_VERSION = '2.2.0';
 
     /** @var string Query parameter for config-page actions. "action" is reserved by the admin dispatcher. */
     const ACTION_PARAM = 'psapi_action';
@@ -464,6 +464,8 @@ class PrestashopAPI extends Module
         $client->getProducts(true);
         $sales = $client->getOrders(true);
         $threads = $client->getThreads(true);
+        // Last message per conversation, which the Messages tab sorts by.
+        $client->getLastMessages(true);
         $client->getInvoices(true);
 
         // Reconcile read/pinned state against what just arrived: new conversations appear
@@ -869,6 +871,9 @@ class PrestashopAPI extends Module
         $threads = array();
         $threads_error = '';
 
+        // Read before the threads so isStale() below still describes the threads call.
+        $last = $has_key ? $client->getLastMessages() : array();
+
         if ($has_key) {
             $threads = $client->getThreads();
 
@@ -878,9 +883,16 @@ class PrestashopAPI extends Module
             }
         }
 
-        $built = $this->buildThreads($threads);
+        $built = $this->buildThreads($threads, $last);
         $filtered = $this->filterThreads($built);
         $counts = SellerThreadState::counts();
+        $counts['awaiting'] = 0;
+
+        foreach ($built as $row) {
+            if ($row['awaiting']) {
+                ++$counts['awaiting'];
+            }
+        }
 
         $this->context->smarty->assign(array(
             'psapi_has_key' => $has_key,
@@ -915,6 +927,7 @@ class PrestashopAPI extends Module
             // one click away from the failure is a diagnostic nobody reads.
             'psapi_threads_debug' => $threads && !$built ? $this->threadsDebug($client, $threads) : '',
             'psapi_unread' => $counts['unread'],
+            'psapi_awaiting' => $counts['awaiting'],
             'psapi_invoices' => $this->normalizeTable($has_key ? $this->safeList($client->getInvoices()) : array()),
             'psapi_thread' => $this->currentThread($client, $threads),
             'psapi_attachment_types' => implode(', ', self::ATTACHMENT_TYPES),
@@ -1016,24 +1029,36 @@ class PrestashopAPI extends Module
 
             $meta = array();
 
-            foreach (array('date_add', 'author', 'customer_name', 'employee_name', 'name') as $field) {
-                if (isset($message[$field]) && is_scalar($message[$field]) && (string) $message[$field] !== '') {
-                    // Escaped here because the joined string is printed with nofilter, the
-                    // separator being markup.
-                    $meta[] = htmlspecialchars((string) $message[$field], ENT_QUOTES, 'UTF-8');
-                }
+            if (isset($message['date_add']) && is_scalar($message['date_add']) && (string) $message['date_add'] !== '') {
+                // Escaped here because the joined string is printed with nofilter, the
+                // separator being markup.
+                $meta[] = htmlspecialchars((string) $message['date_add'], ENT_QUOTES, 'UTF-8');
+            }
+
+            // The API names the author with "from" only: "customer" or "seller". There is
+            // no author, customer_name or employee_name field on these rows.
+            $from = isset($message['from']) ? (string) $message['from'] : '';
+
+            if ($from === 'customer') {
+                $meta[] = htmlspecialchars($this->l('Customer'), ENT_QUOTES, 'UTF-8');
+            } elseif ($from === 'seller') {
+                $meta[] = htmlspecialchars($this->l('You'), ENT_QUOTES, 'UTF-8');
+            } else {
+                $from = '';
             }
 
             $body = '';
 
             foreach (array('message', 'content', 'text') as $field) {
                 if (isset($message[$field]) && is_scalar($message[$field])) {
-                    $body = self::messageToText($message[$field]);
+                    // Buyers paste back-office and FTP passwords into conversations. They are
+                    // masked on screen only; the cached copy is not altered.
+                    $body = SellerThreadState::maskSecrets(self::messageToText($message[$field]));
                     break;
                 }
             }
 
-            $messages[] = array('meta' => implode(' &middot; ', $meta), 'body' => $body);
+            $messages[] = array('meta' => implode(' &middot; ', $meta), 'body' => $body, 'from' => $from);
         }
 
         return array('id' => $id_thread, 'messages' => $messages);
@@ -1076,7 +1101,7 @@ class PrestashopAPI extends Module
      *
      * @return array
      */
-    private function buildThreads(array $threads)
+    private function buildThreads(array $threads, array $last = array())
     {
         $state = SellerThreadState::all();
         $rows = array();
@@ -1097,6 +1122,9 @@ class PrestashopAPI extends Module
 
             $zen = isset($thread['zen']) && is_array($thread['zen']) ? $thread['zen'] : array();
             $version = isset($thread['versionps']) ? trim((string) $thread['versionps']) : '';
+            // The thread row only knows when it was opened. When it last moved comes from the
+            // messages endpoint, and that is what the marketplace's own inbox sorts by.
+            $last_date = SellerThreadState::lastDate($thread, $last);
 
             $rows[] = array(
                 'id' => $id,
@@ -1104,7 +1132,8 @@ class PrestashopAPI extends Module
                 'product' => isset($thread['name']) ? (string) $thread['name'] : '',
                 'id_product' => isset($thread['id_product']) ? (int) $thread['id_product'] : 0,
                 'messages' => isset($thread['nb_messages']) ? (int) $thread['nb_messages'] : 0,
-                'date' => isset($thread['date_add']) ? (string) $thread['date_add'] : '',
+                'date' => $last_date,
+                'date_opened' => isset($thread['date_add']) ? (string) $thread['date_add'] : '',
                 // "" | presale | aftersale.
                 'qualification' => isset($thread['qualification']) ? (string) $thread['qualification'] : '',
                 // The API writes "none" when the buyer did not say.
@@ -1117,14 +1146,11 @@ class PrestashopAPI extends Module
                 'support_days' => isset($zen['nb_days_left']) ? (int) $zen['nb_days_left'] : null,
                 'unread' => !$is_read,
                 'pinned' => $is_pinned,
-                // Sort key: pinned first, then unread, then newest. Computed here because
-                // Smarty cannot sort on three keys without a plugin.
-                'rank' => ($is_pinned ? 0 : 1) . ($is_read ? '1' : '0') . str_pad(
-                    (string) (99999999999 - strtotime(isset($thread['date_add']) ? $thread['date_add'] : '1970-01-01')),
-                    11,
-                    '0',
-                    STR_PAD_LEFT
-                ),
+                // The buyer wrote last.
+                'awaiting' => SellerThreadState::isAwaiting($thread, $last),
+                // Sort key: pinned first, then the newest last message, the order the
+                // marketplace inbox uses. Unread no longer jumps the queue; it has its filter.
+                'rank' => SellerThreadState::rank($is_pinned, $last_date),
             );
         }
 
@@ -1135,17 +1161,17 @@ class PrestashopAPI extends Module
 
     public static function sortThreads($a, $b)
     {
-        return strcmp($a['rank'], $b['rank']);
+        return SellerThreadState::compareRank($a, $b);
     }
 
     /**
-     * @return string One of: all, unread, pinned.
+     * @return string One of: all, unread, pinned, awaiting.
      */
     private function threadFilter()
     {
         $filter = (string) Tools::getValue('psapi_filter');
 
-        return in_array($filter, array('all', 'unread', 'pinned'), true) ? $filter : 'all';
+        return in_array($filter, array('all', 'unread', 'pinned', 'awaiting'), true) ? $filter : 'all';
     }
 
     /**
@@ -1162,7 +1188,10 @@ class PrestashopAPI extends Module
         $out = array();
 
         foreach ($rows as $row) {
-            if (($filter === 'unread' && $row['unread']) || ($filter === 'pinned' && $row['pinned'])) {
+            if (($filter === 'unread' && $row['unread'])
+                || ($filter === 'pinned' && $row['pinned'])
+                || ($filter === 'awaiting' && $row['awaiting'])
+            ) {
                 $out[] = $row;
             }
         }
@@ -1228,8 +1257,11 @@ class PrestashopAPI extends Module
         if ($all === false) {
             $samples['seller/messages (error)'] = $client->getLastError();
         } else {
+            // Bodies are not cached for this endpoint (see getAllMessages()), so the sample row
+            // shows every field except "message".
             $samples['seller/messages'] = isset($all[0]) ? $all[0] : null;
             $samples['seller/messages (envelope)'] = $client->getLastRaw('allmessages');
+            $samples['seller/messages (conversations with a last message)'] = count($client->getLastMessages());
         }
 
         $invoices = $this->safeList($client->getInvoices());

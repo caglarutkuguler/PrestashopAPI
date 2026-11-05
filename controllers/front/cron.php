@@ -44,6 +44,8 @@ class PrestashopAPICronModuleFrontController extends ModuleFrontController
         $products = $client->getProducts(true);
         $sales = $client->getOrders(true);
         $client->getThreads(true);
+        // When each conversation last moved and who wrote last: the Messages tab sorts by it.
+        $client->getLastMessages(true);
         $client->getInvoices(true);
 
         if ($sales === false) {
