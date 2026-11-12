@@ -2,6 +2,16 @@
 
 _Only customer-relevant changes are listed. Internal refactoring, tests and housekeeping are omitted._
 
+## 2.3.0
+
+### New
+- Multistore support. With several shops, the marketplace figures behind the product badge and the last-updated date are stored once for the whole installation, because they belong to the seller account: calling the cron URL from any shop now refreshes them for every shop
+- A notice on the configuration page when you are in the All shops or shop group context, explaining that settings saved there are the default for every shop, that one seller account normally serves all shops, and how the badge and the dashboard count orders
+
+### Fixed
+- With several shops, the "Marketplace + this shop" badge counted the orders of every shop. It now counts only the orders of the shop being visited
+- With several shops, a product pinned by hand on the Products tab could show the name of another shop's language row. The name now comes from the current shop
+
 ## 2.2.0
 
 ### New
@@ -21,8 +31,3 @@ _Only customer-relevant changes are listed. Internal refactoring, tests and hous
 
 ### New
 - The configuration page links to the free MEG Venture Updates module, which installs updates for this module in one click. The line is hidden once that module is installed
-
-## 2.1.1
-
-### Fixed
-- The back-office icons turned into empty boxes on PrestaShop 9. The 42 icons the module draws for itself came from FontAwesome 4, which the back office shipped up to PrestaShop 8. PrestaShop 9 replaced it with Material Symbols Outlined, and FontAwesome now reaches the page only through a stylesheet left over from the old theme rather than anything the new back office asks for
