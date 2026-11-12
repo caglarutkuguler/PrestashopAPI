@@ -14,7 +14,7 @@
 
 ### Notes
 
-- A shop that has not been refreshed since the update keeps showing its own previous marketplace figures until the next refresh. upgrade-2.3.0.php also copies an existing per-shop value to the installation-wide setting when none exists yet (default shop first). Nothing is deleted. With a single shop nothing changes and nothing is moved.
+- upgrade-2.3.0.php copies an existing per-shop marketplace value to the installation-wide setting when none exists yet (the default shop first, otherwise the lowest shop id; for the last-updated date the newest). Because the installation-wide value is read first, every shop shows those copied figures straight after the update, not its own previous ones, until the next refresh writes new figures. The per-shop rows are left where they are and nothing is deleted. With a single shop nothing changes and nothing is moved.
 - New test: tests/MultistoreTest.php.
 
 ## 2.2.0
