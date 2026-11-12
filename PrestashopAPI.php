@@ -28,7 +28,7 @@ require_once dirname(__FILE__) . '/classes/SellerThreadState.php';
 class PrestashopAPI extends Module
 {
     /** @var string Kept in a constant so the API client can send it as a user agent. */
-    const MODULE_VERSION = '2.2.0';
+    const MODULE_VERSION = '2.3.0';
 
     /** @var string Query parameter for config-page actions. "action" is reserved by the admin dispatcher. */
     const ACTION_PARAM = 'psapi_action';
@@ -266,6 +266,7 @@ class PrestashopAPI extends Module
         }
 
         $this->html .= $this->renderFlash();
+        $this->html .= $this->renderShopContextNotice();
 
         if (!SellerApiClient::isCurlAvailable()) {
             $this->html .= $this->displayError($this->l('The PHP cURL extension is not enabled on this server, so this module cannot contact the marketplace. Please ask your hosting provider to enable it.'));
@@ -340,7 +341,7 @@ class PrestashopAPI extends Module
 
             case 'clear':
                 SellerApiClient::purgeCache();
-                Configuration::updateValue('PRESTASHOPAPI_BADGE_MAP', '{}');
+                SellerApiClient::setAccountValue('PRESTASHOPAPI_BADGE_MAP', '{}');
                 $this->redirectBack(5);
                 break;
 
@@ -511,7 +512,7 @@ class PrestashopAPI extends Module
             $map[$id] += $qty - $ref;
         }
 
-        Configuration::updateValue('PRESTASHOPAPI_BADGE_MAP', json_encode($map));
+        SellerApiClient::setAccountValue('PRESTASHOPAPI_BADGE_MAP', json_encode($map));
     }
 
     private function saveSettings()
@@ -1777,7 +1778,7 @@ class PrestashopAPI extends Module
         $units = 0;
 
         if ($marketplace_id !== '') {
-            $map = json_decode((string) Configuration::get('PRESTASHOPAPI_BADGE_MAP'), true);
+            $map = json_decode((string) SellerApiClient::getAccountValue('PRESTASHOPAPI_BADGE_MAP'), true);
 
             if (is_array($map) && isset($map[$marketplace_id])) {
                 $units = (int) $map[$marketplace_id];
@@ -1790,10 +1791,39 @@ class PrestashopAPI extends Module
                  FROM `' . _DB_PREFIX_ . 'order_detail` od
                  INNER JOIN `' . _DB_PREFIX_ . 'orders` o ON o.`id_order` = od.`id_order`
                  WHERE o.`valid` = 1 AND od.`product_id` = ' . (int) $product->id
+                . $this->badgeShopCondition()
             );
         }
 
         return $units;
+    }
+
+    /**
+     * With multistore active the "total" badge counts the visiting shop's own orders only
+     * (the marketplace part comes from the one shared seller account). Empty with a single
+     * shop, so that query is unchanged.
+     */
+    private function badgeShopCondition()
+    {
+        if (!Shop::isFeatureActive()) {
+            return '';
+        }
+
+        return ' AND o.`id_shop` = ' . (int) $this->context->shop->id;
+    }
+
+    /**
+     * Back-office warning shown in the All shops / shop group context.
+     */
+    private function renderShopContextNotice()
+    {
+        if (!Shop::isFeatureActive() || Shop::getContext() == Shop::CONTEXT_SHOP) {
+            return '';
+        }
+
+        return '<div class="alert alert-warning">'
+            . $this->l('You are in the All shops or shop group context. Settings saved here become the default for every shop that does not have its own value. One seller account normally serves all of your shops, so the marketplace figures are shared by every shop, and the sales of your own shops shown on the dashboard add up the shops of this context. The product badge counts the orders of the visiting shop only. Choose a single shop to change a setting for that shop alone.')
+            . '</div>';
     }
 
     /**

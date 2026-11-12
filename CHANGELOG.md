@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.3.0
+
+### Added
+
+- Multistore support. With several shops, the marketplace figures behind the product badge and the last-updated date are stored once for the whole installation, because they belong to the seller account: calling the cron URL from any shop now refreshes them for every shop.
+- A notice on the configuration page when you are in the All shops or shop group context, explaining that settings saved there are the default for every shop, that one seller account normally serves all shops, and how the badge and the dashboard count orders.
+
+### Fixed
+
+- With several shops, the "Marketplace + this shop" badge counted the orders of every shop. It now counts only the orders of the shop being visited.
+- With several shops, a product pinned by hand on the Products tab could show the name of another shop's language row. The name now comes from the current shop.
+
+### Notes
+
+- A shop that has not been refreshed since the update keeps showing its own previous marketplace figures until the next refresh. upgrade-2.3.0.php also copies an existing per-shop value to the installation-wide setting when none exists yet (default shop first). Nothing is deleted. With a single shop nothing changes and nothing is moved.
+- New test: tests/MultistoreTest.php.
+
 ## 2.2.0
 
 ### Changed

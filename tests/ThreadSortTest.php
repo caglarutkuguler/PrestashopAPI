@@ -40,6 +40,14 @@ class Configuration
     }
 }
 
+class Shop
+{
+    public static function isFeatureActive()
+    {
+        return false;
+    }
+}
+
 class Tools
 {
     public static function substr($s, $start, $length = null)

@@ -1,6 +1,6 @@
 # Seller Dashboard — Marketplace Sales, Messages & Payouts
 
-**Version:** 2.2.0
+**Version:** 2.3.0
 
 See how your PrestaShop Addons marketplace products are selling without leaving your own back
 office — combined with the sales of the same products in your own shop.
@@ -122,6 +122,20 @@ once an hour:
 ```
 
 Keep that URL private, and note that it changes if you reinstall the module.
+
+## Multistore
+
+One seller account normally serves every shop of an installation, so the API key, period,
+currency and badge settings are ordinary PrestaShop settings: set them in the "All shops"
+context to give every shop the same values, or pick a shop to override them for that shop.
+
+- The marketplace figures behind the product badge (and the last-updated date) belong to the
+  seller account, so they are stored once for the whole installation. Calling the cron URL from
+  any shop refreshes them for all shops.
+- With the "Marketplace + this shop" badge scope, the part counted from your own orders
+  includes only the orders of the shop being visited.
+- The dashboard adds up the orders of the shops of the context you are in.
+- With a single shop nothing changes.
 
 ## Troubleshooting
 

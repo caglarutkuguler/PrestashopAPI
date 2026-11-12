@@ -691,7 +691,82 @@ class SellerApiClient
                      "' . pSQL(date('Y-m-d H:i:s', time() + $this->ttl)) . '")'
         );
 
-        Configuration::updateValue('PRESTASHOPAPI_LAST_SYNC', $now);
+        self::setAccountValue('PRESTASHOPAPI_LAST_SYNC', $now);
+    }
+
+    /**
+     * Reads a value that belongs to the marketplace ACCOUNT rather than to one shop (the
+     * badge map and the last-sync date: both are derived from the one shared cache table).
+     *
+     * With multistore active the installation-wide value is read first; a shop that still
+     * only has its own older value (written before 2.3.0) keeps showing it until the next
+     * refresh writes the installation-wide one. With multistore off this is a plain
+     * Configuration::get(), exactly as before.
+     */
+    public static function getAccountValue($key)
+    {
+        if (Shop::isFeatureActive()) {
+            $global = Configuration::get($key, null, 0, 0);
+
+            if ($global !== false) {
+                return $global;
+            }
+        }
+
+        return Configuration::get($key);
+    }
+
+    /**
+     * Writes an account-level value for the whole installation when multistore is active
+     * (group 0 and shop 0 = the global row), and exactly as before when it is not.
+     */
+    public static function setAccountValue($key, $value)
+    {
+        if (Shop::isFeatureActive()) {
+            return Configuration::updateValue($key, $value, false, 0, 0);
+        }
+
+        return Configuration::updateValue($key, $value);
+    }
+
+    /**
+     * Picks the shop-level value that is promoted to the installation-wide row by the 2.3.0
+     * upgrade. Empty values are ignored; the default shop wins; otherwise the lowest shop id
+     * (or, for dates, the newest) is used.
+     *
+     * @param array $byShop Shop id => stored value.
+     * @param int $default_shop
+     * @param bool $newest True for a date value: take the most recent instead.
+     *
+     * @return string|false False when no shop has a usable value.
+     */
+    public static function choosePromotedValue(array $byShop, $default_shop, $newest = false)
+    {
+        $usable = array();
+
+        foreach ($byShop as $id_shop => $value) {
+            $value = (string) $value;
+
+            if ($value !== '' && $value !== '{}' && $value !== '[]') {
+                $usable[(int) $id_shop] = $value;
+            }
+        }
+
+        if (!$usable) {
+            return false;
+        }
+
+        if ($newest) {
+            return max($usable);
+        }
+
+        if (isset($usable[(int) $default_shop])) {
+            return $usable[(int) $default_shop];
+        }
+
+        ksort($usable);
+
+        return reset($usable);
     }
 
     /**
@@ -791,7 +866,7 @@ class SellerApiClient
      */
     public static function getLastSync()
     {
-        $value = Configuration::get('PRESTASHOPAPI_LAST_SYNC');
+        $value = self::getAccountValue('PRESTASHOPAPI_LAST_SYNC');
 
         return $value ? $value : false;
     }

@@ -89,7 +89,8 @@ class PrestashopAPICronModuleFrontController extends ModuleFrontController
             $map[$id] += $qty - $refunded;
         }
 
-        Configuration::updateValue('PRESTASHOPAPI_BADGE_MAP', json_encode($map));
+        // The marketplace account is one for the whole installation: every shop reads this map.
+        SellerApiClient::setAccountValue('PRESTASHOPAPI_BADGE_MAP', json_encode($map));
     }
 
     private function respond(array $payload)

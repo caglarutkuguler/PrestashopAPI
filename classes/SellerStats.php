@@ -179,7 +179,8 @@ class SellerStats
                  FROM `' . _DB_PREFIX_ . 'product` p
                  LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` pl
                     ON pl.`id_product` = p.`id_product`
-                   AND pl.`id_lang` = ' . (int) Context::getContext()->language->id . '
+                   AND pl.`id_lang` = ' . (int) Context::getContext()->language->id .
+                    Shop::addSqlRestrictionOnLang('pl') . '
                  WHERE p.`id_product` = ' . (int) $id_local
             );
 
