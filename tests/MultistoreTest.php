@@ -167,7 +167,7 @@ check('badge map is never written per shop any more',
     && substr_count($main, "SellerApiClient::setAccountValue('PRESTASHOPAPI_BADGE_MAP'") === 2);
 check('notice only outside the single-shop context', (bool) preg_match('/function renderShopContextNotice\(\)\s*\{\s*if \(!Shop::isFeatureActive\(\) \|\| Shop::getContext\(\) == Shop::CONTEXT_SHOP\) \{\s*return \'\';/', $main));
 check('notice is rendered on the configure page', strpos($main, '$this->html .= $this->renderShopContextNotice();') !== false);
-check('version is 2.3.0', strpos($main, "const MODULE_VERSION = '2.3.0';") !== false);
+check('version is 2.3.0 or later', preg_match("/const MODULE_VERSION = '(\\d+\\.\\d+\\.\\d+)';/", $main, $v) === 1 && version_compare($v[1], '2.3.0', '>='));
 check('upgrade-2.3.0.php ships', is_file($base . '/upgrade/upgrade-2.3.0.php'));
 
 echo $fail ? "\nFAILED: $fail\n" : "\nOK - all passed\n";

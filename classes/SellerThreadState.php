@@ -10,15 +10,21 @@ if (!defined('_PS_VERSION_')) {
 }
 
 /**
- * Read and pinned state for marketplace conversations, owned by the merchant.
+ * Which marketplace conversations are waiting for the merchant, plus their pins.
  *
- * The marketplace exposes no read, answered or status field of its own, and no author on a
- * message, so "who owes a reply" cannot be derived from the API. This does not try. The
- * merchant says what is read; the module only says what has CHANGED since they said it.
+ * A conversation is waiting (stored as is_read = 0) when the buyer wrote the last message
+ * and the seller has not seen it yet. Both facts come from the bulk seller/messages rows:
+ * "from" names the author and "seen" is the marketplace's own read receipt. So answering a
+ * buyer, or simply opening the message on the marketplace, settles the conversation here
+ * too, without the merchant touching this module.
  *
- * A conversation goes back to unread by itself whenever its fingerprint moves, and a new
- * buyer message necessarily moves it because nb_messages is part of the row. That is the one
- * inference here, and it rests on a field that is confirmed present rather than assumed.
+ * The merchant can still override either way (mark as read, mark as unread). An override
+ * holds until the conversation's last message changes.
+ *
+ * Up to 2.3.0 the rule was "anything whose thread row changed goes back to unread". The
+ * seller's own replies change the row (nb_messages), and so does renaming a product, so a
+ * merchant who answered everything on the marketplace still collected hundreds of "waiting"
+ * conversations here. STATE_MODEL marks the one-time rebuild that clears that backlog.
  *
  * Kept in a table rather than a Configuration value: ps_configuration.value is TEXT, capped at
  * 64KB, and this account's 1843 conversations need roughly 83KB. It would have fitted right up
@@ -31,6 +37,18 @@ class SellerThreadState
 
     /** @var int Rows per INSERT. One statement for 1843 rows can exceed max_allowed_packet. */
     const CHUNK = 200;
+
+    /** @var string Configuration key holding the state model the table was built with. */
+    const STATE_KEY = 'PRESTASHOPAPI_STATE_MODEL';
+
+    /** @var int Current state model. 2 = waiting follows the last message's author and read receipt. */
+    const STATE_MODEL = 2;
+
+    /**
+     * @var int A conversation seen for the first time (or during the one-time rebuild) only
+     *          counts as waiting when its last buyer message is at most this many days old.
+     */
+    const FRESH_DAYS = 30;
 
     /* ---------------------------------------------------------------- *
      * Schema
@@ -86,26 +104,60 @@ class SellerThreadState
     }
 
     /**
-     * Stable hash of a conversation's scalar fields.
+     * Hash of the only things that decide whether a conversation is waiting: how many
+     * messages it has, when the last one was written, by whom, and whether it was seen.
      *
-     * Whole-row rather than a chosen field: a new buyer message has to change something, and
-     * nb_messages is the field that always moves. Hashing everything means we do not depend on
-     * having guessed which field that is.
+     * Deliberately NOT the whole thread row, which is what 2.3.0 hashed: a product rename or
+     * any other marketplace-side edit moved that hash and reopened conversations nobody had
+     * written in.
+     *
+     * @param array|null $entry The conversation's lastMessages() entry, when known.
+     *
+     * @return string
      */
-    public static function fingerprint(array $thread)
+    public static function signature(array $thread, $entry = null)
     {
-        $flat = array();
+        return md5(implode('|', array(
+            isset($thread['nb_messages']) ? (int) $thread['nb_messages'] : 0,
+            is_array($entry) && isset($entry['date']) ? (string) $entry['date'] : '',
+            is_array($entry) && isset($entry['from']) ? (string) $entry['from'] : '',
+            is_array($entry) && isset($entry['seen']) ? (int) (bool) $entry['seen'] : '',
+        )));
+    }
 
-        foreach ($thread as $field => $value) {
-            if (is_scalar($value) || $value === null) {
-                $flat[$field] = (string) $value;
-            }
+    /**
+     * Whether a last message leaves the conversation waiting for the seller: the buyer wrote
+     * it and the seller has not seen it on the marketplace.
+     *
+     * A row without a "seen" field counts as not seen, so a change in the API can only make
+     * the module say "waiting" too often, never hide a buyer.
+     *
+     * @param array|null $entry
+     *
+     * @return bool
+     */
+    public static function needsAttention($entry)
+    {
+        return is_array($entry)
+            && isset($entry['from']) && $entry['from'] === 'customer'
+            && empty($entry['seen']);
+    }
+
+    /**
+     * @param array|null $entry
+     * @param int|null $now Unix time, for tests.
+     *
+     * @return bool Whether the last message is at most FRESH_DAYS old.
+     */
+    public static function isFresh($entry, $now = null)
+    {
+        $time = is_array($entry) && !empty($entry['date']) ? strtotime($entry['date']) : false;
+
+        if ($time === false) {
+            return false;
         }
 
-        // Sorted so a reordered response is not mistaken for a changed one.
-        ksort($flat);
-
-        return md5(json_encode($flat));
+        return $time >= ($now === null ? time() : (int) $now) - self::FRESH_DAYS * 86400;
     }
 
     /* ---------------------------------------------------------------- *
@@ -150,6 +202,8 @@ class SellerThreadState
             $last[$id] = array(
                 'date' => $date,
                 'from' => isset($message['from']) ? (string) $message['from'] : '',
+                // The marketplace's read receipt: 1 once the other side has opened it.
+                'seen' => isset($message['seen']) ? (int) (bool) $message['seen'] : null,
             );
         }
 
@@ -251,28 +305,31 @@ class SellerThreadState
      * ---------------------------------------------------------------- */
 
     /**
-     * Reconciles stored state against the conversations the marketplace just returned.
+     * Decides what has to change in the table. Pure, so it can be tested without a database.
      *
-     * Rules, in the merchant's words: everything starts unread; a conversation stays how they
-     * left it until it changes; anything that changes goes back to unread.
+     * - A conversation not stored yet starts waiting only if its last buyer message is unseen
+     *   and recent (FRESH_DAYS); otherwise it starts settled. A first install on an account
+     *   with years of history must not open with hundreds of "waiting" conversations.
+     * - A stored one is touched only when its signature moved: waiting if the buyer wrote
+     *   last and it is unseen, settled otherwise (the seller replied, or read it on the
+     *   marketplace). When the last message is not known the read state is left alone.
+     * - $rebuild re-decides every conversation like a new one, keeping the pins.
      *
-     * @return array{added: int, reopened: int, removed: int}
+     * @param array $threads Thread rows from the API.
+     * @param array $last lastMessages() map.
+     * @param array $existing id => array{fingerprint: string, pinned: bool}
+     * @param bool $rebuild
+     * @param int|null $now
+     *
+     * @return array{insert: array, update: array, present: array}
+     *               insert: id => array{fingerprint, read, pinned}
+     *               update: id => array{fingerprint, read (bool, or null = leave as it is)}
      */
-    public static function sync(array $threads)
+    public static function plan(array $threads, array $last, array $existing, $rebuild = false, $now = null)
     {
-        $existing = array();
-        $rows = Db::getInstance()->executeS('SELECT `id_thread`, `fingerprint` FROM ' . self::table());
-
-        if (is_array($rows)) {
-            foreach ($rows as $row) {
-                $existing[(int) $row['id_thread']] = $row['fingerprint'];
-            }
-        }
-
-        $now = date('Y-m-d H:i:s');
-        $present = array();
         $insert = array();
-        $reopened = 0;
+        $update = array();
+        $present = array();
 
         foreach ($threads as $thread) {
             if (!is_array($thread)) {
@@ -286,42 +343,119 @@ class SellerThreadState
             }
 
             $present[$id] = true;
-            $fingerprint = self::fingerprint($thread);
+            $entry = isset($last[$id]) && is_array($last[$id]) ? $last[$id] : null;
+            $signature = self::signature($thread, $entry);
 
-            if (!isset($existing[$id])) {
-                // Never seen: starts unread, exactly like a new message would.
-                $insert[] = '(' . $id . ', "' . pSQL($fingerprint) . '", 0, 0, "' . pSQL($now) . '")';
-            } elseif ($existing[$id] !== $fingerprint) {
-                // Changed since the merchant last looked. is_pinned is deliberately untouched:
-                // pinning is their filing, not a read state.
-                Db::getInstance()->execute(
-                    'UPDATE ' . self::table() . '
-                     SET `fingerprint` = "' . pSQL($fingerprint) . '", `is_read` = 0, `date_upd` = "' . pSQL($now) . '"
-                     WHERE `id_thread` = ' . $id
+            if ($rebuild || !isset($existing[$id])) {
+                $insert[$id] = array(
+                    'fingerprint' => $signature,
+                    'read' => !(self::needsAttention($entry) && self::isFresh($entry, $now)),
+                    'pinned' => isset($existing[$id]) && !empty($existing[$id]['pinned']),
                 );
-                ++$reopened;
+            } elseif ($existing[$id]['fingerprint'] !== $signature) {
+                $update[$id] = array(
+                    'fingerprint' => $signature,
+                    'read' => $entry === null ? null : !self::needsAttention($entry),
+                );
             }
         }
 
-        foreach (array_chunk($insert, self::CHUNK) as $chunk) {
-            Db::getInstance()->execute(
-                'INSERT IGNORE INTO ' . self::table() . '
+        return array('insert' => $insert, 'update' => $update, 'present' => $present);
+    }
+
+    /**
+     * Reconciles stored state against the conversations and last messages just read.
+     *
+     * Does nothing without last-message data: with no author there is nothing to decide on,
+     * and guessing is what filled the old "unread" count. The first run after an update from
+     * 2.3.0 or older rebuilds every row once (see STATE_MODEL).
+     *
+     * @return array{added: int, changed: int, removed: int, rebuilt: bool, skipped: bool}
+     */
+    public static function sync(array $threads, array $last = array(), $now = null)
+    {
+        $result = array('added' => 0, 'changed' => 0, 'removed' => 0, 'rebuilt' => false, 'skipped' => true);
+
+        if (!$threads || !$last) {
+            return $result;
+        }
+
+        $db = Db::getInstance();
+        $rebuild = !self::isCurrentModel();
+        $existing = array();
+        $rows = $db->executeS('SELECT `id_thread`, `fingerprint`, `is_pinned` FROM ' . self::table());
+
+        if (is_array($rows)) {
+            foreach ($rows as $row) {
+                $existing[(int) $row['id_thread']] = array(
+                    'fingerprint' => $row['fingerprint'],
+                    'pinned' => (bool) $row['is_pinned'],
+                );
+            }
+        }
+
+        $plan = self::plan($threads, $last, $existing, $rebuild, $now);
+
+        if (!$plan['present']) {
+            return $result;
+        }
+
+        $stamp = date('Y-m-d H:i:s');
+        $values = array();
+
+        foreach ($plan['insert'] as $id => $row) {
+            $values[] = '(' . (int) $id . ', "' . pSQL($row['fingerprint']) . '", ' . (int) $row['read']
+                . ', ' . (int) $row['pinned'] . ', "' . pSQL($stamp) . '")';
+        }
+
+        // REPLACE, so the one-time rebuild overwrites the rows it re-decides.
+        foreach (array_chunk($values, self::CHUNK) as $chunk) {
+            $db->execute(
+                'REPLACE INTO ' . self::table() . '
                  (`id_thread`, `fingerprint`, `is_read`, `is_pinned`, `date_upd`)
                  VALUES ' . implode(',', $chunk)
             );
         }
 
-        $removed = 0;
-
-        // Conversations the marketplace stopped returning, so the table cannot grow for ever.
-        if ($present) {
-            Db::getInstance()->execute(
-                'DELETE FROM ' . self::table() . ' WHERE `id_thread` NOT IN (' . implode(',', array_keys($present)) . ')'
+        foreach ($plan['update'] as $id => $row) {
+            // is_pinned is deliberately untouched: pinning is the merchant's filing.
+            $db->execute(
+                'UPDATE ' . self::table() . '
+                 SET `fingerprint` = "' . pSQL($row['fingerprint']) . '"'
+                . ($row['read'] === null ? '' : ', `is_read` = ' . (int) $row['read'])
+                . ', `date_upd` = "' . pSQL($stamp) . '"
+                 WHERE `id_thread` = ' . (int) $id
             );
-            $removed = (int) Db::getInstance()->Affected_Rows();
         }
 
-        return array('added' => count($insert), 'reopened' => $reopened, 'removed' => $removed);
+        // Conversations the marketplace stopped returning, so the table cannot grow for ever.
+        $gone = array_diff(array_keys($existing), array_keys($plan['present']));
+
+        foreach (array_chunk($gone, self::CHUNK) as $chunk) {
+            $db->execute(
+                'DELETE FROM ' . self::table() . ' WHERE `id_thread` IN (' . implode(',', array_map('intval', $chunk)) . ')'
+            );
+        }
+
+        if ($rebuild) {
+            SellerApiClient::setAccountValue(self::STATE_KEY, self::STATE_MODEL);
+        }
+
+        return array(
+            'added' => $rebuild ? 0 : count($plan['insert']),
+            'changed' => count($plan['update']),
+            'removed' => count($gone),
+            'rebuilt' => $rebuild,
+            'skipped' => false,
+        );
+    }
+
+    /**
+     * @return bool Whether the table was already built with the current state model.
+     */
+    public static function isCurrentModel()
+    {
+        return (int) SellerApiClient::getAccountValue(self::STATE_KEY) >= self::STATE_MODEL;
     }
 
     /* ---------------------------------------------------------------- *

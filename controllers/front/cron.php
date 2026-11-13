@@ -43,9 +43,15 @@ class PrestashopAPICronModuleFrontController extends ModuleFrontController
 
         $products = $client->getProducts(true);
         $sales = $client->getOrders(true);
-        $client->getThreads(true);
+        $threads = $client->getThreads(true);
         // When each conversation last moved and who wrote last: the Messages tab sorts by it.
-        $client->getLastMessages(true);
+        $last = $client->getLastMessages(true);
+
+        // Keeps the Dashboard's "waiting for you" count current on a shop where nobody opens
+        // the module: without this the count only moved on a manual Refresh.
+        if (is_array($threads) && SellerThreadState::tableExists()) {
+            SellerThreadState::sync($threads, $last);
+        }
         $client->getInvoices(true);
 
         if ($sales === false) {

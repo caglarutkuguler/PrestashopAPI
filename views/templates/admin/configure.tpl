@@ -616,9 +616,9 @@ h3 .material-icons.mv-ico,
 									<td class="psapi-name">
 										{if $thread.unread}<span class="psapi-new">{l s='Unread' mod='PrestashopAPI'}</span>{/if}
 										{if $thread.awaiting}<span class="psapi-badge psapi-badge--await">{l s='Awaiting reply' mod='PrestashopAPI'}</span>{/if}
-										{$thread.topic}
+										{$thread.topic|escape:'html':'UTF-8'}
 									</td>
-									<td>{$thread.product}</td>
+									<td>{$thread.product|escape:'html':'UTF-8'}</td>
 									<td>
 										{if $thread.is_buyer}
 											<span class="psapi-badge">{l s='Bought' mod='PrestashopAPI'}</span>
@@ -626,10 +626,10 @@ h3 .material-icons.mv-ico,
 											<span class="psapi-badge">{l s='Pre-sales' mod='PrestashopAPI'}</span>
 										{/if}
 										{if $thread.website}
-											<small>{$thread.website}</small>
+											<small>{$thread.website|escape:'html':'UTF-8'}</small>
 										{/if}
 										{if $thread.version}
-											<small>{l s='PrestaShop' mod='PrestashopAPI'} {$thread.version}</small>
+											<small>{l s='PrestaShop' mod='PrestashopAPI'} {$thread.version|escape:'html':'UTF-8'}</small>
 										{/if}
 									</td>
 									<td class="text-right">{$thread.messages}</td>
@@ -698,7 +698,7 @@ h3 .material-icons.mv-ico,
 				{* An empty list and a failed request are different things and must not look alike. *}
 				<div class="alert alert-danger">
 					<strong>{l s='Your conversations could not be downloaded.' mod='PrestashopAPI'}</strong><br />
-					{$psapi_threads_error}
+					{$psapi_threads_error|escape:'html':'UTF-8'}
 				</div>
 				<p class="psapi-lead">
 					{l s='Your products and sales are loading normally, so your API key works. Use the Help tab to see exactly what the conversations endpoint returned.' mod='PrestashopAPI'}

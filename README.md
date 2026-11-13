@@ -1,6 +1,6 @@
 # Seller Dashboard — Marketplace Sales, Messages & Payouts
 
-**Version:** 2.3.0
+**Version:** 2.4.0
 
 See how your PrestaShop Addons marketplace products are selling without leaving your own back
 office — combined with the sales of the same products in your own shop.
@@ -75,14 +75,16 @@ your shop. Replies can carry one attachment (up to 8 MB — jpg, png, gif, webp,
 log, csv, zip, doc, docx, xls, xlsx). Size and type are checked on the server, not just in the
 browser.
 
-**Unread and pinned.** You decide what is read. Every conversation starts **unread**; mark them
-read one at a time, or all at once with **Mark all as read**. Opening a conversation marks it
-read, and **Mark as unread** puts it back — that is how you flag the ones you still owe an
-answer. **Pin** any conversation to keep it at the top of the list; pinning is filing, and is
-independent of read state.
+**Unread = waiting for you.** A conversation is **unread** when the buyer wrote the last message
+and you have not seen it yet. Answer it, or simply open it, here or on the marketplace, and it
+is settled by itself at the next refresh: your own replies never make a conversation unread. You
+can still override either way: **Mark as read** (or **Mark all as read**), and **Mark as
+unread** to flag one you still owe an answer. Your choice holds until a new message arrives in
+that conversation. **Pin** any conversation to keep it at the top of the list; pinning is
+filing, and is independent of read state.
 
-From then on the module only tells you what **changed**: when a buyer replies, that conversation
-goes back to unread by itself. It keeps its pin.
+When the module first sees your account, only unseen buyer messages from the last 30 days start
+as unread, so years of history do not open as a backlog.
 
 **Order.** Conversations are sorted by their **last message**, newest first, the same order as
 the marketplace's own inbox, with pinned conversations above the rest. The **Last message**
@@ -93,17 +95,17 @@ an older conversation that is not on it is placed by its opening date.
 **Awaiting reply.** A conversation whose last message was written by the buyer is marked
 **Awaiting reply**. Filter the list by **All / Unread / Pinned / Awaiting reply**; the Messages
 tab shows the unread and awaiting counts, the Status list on the Dashboard tab shows how many
-conversations await your reply, and the back-office Dashboard shows the unread count. Inside a
-conversation each message says whether the customer or you wrote it.
+conversations await your reply, and the back-office Dashboard shows the unread count together
+with the newest five waiting conversations by name. Inside a conversation each message says
+whether the customer or you wrote it.
 
 **Passwords.** Buyers sometimes paste a back-office or FTP password into a message. Lines such as
 "password: …" are shown with the value hidden behind dots. Only the display changes.
 
-One honest limitation, worth knowing: the marketplace's own "N unread" badge is a read-receipt
-on PrestaShop's side and **is not exposed by the API** — there is no read, status or answered
-field on a conversation. So this module cannot mirror that number, and does not pretend to.
-Unread tracks *your* decisions plus genuine new activity, which is why you set the starting
-point yourself.
+One honest limitation, worth knowing: there is no read, status or answered field on a
+conversation itself. The module works from the last message of each conversation, its author
+and its read receipt, which the marketplace returns for roughly the last year of messages. An
+older conversation is left as you set it until someone writes in it again.
 
 The Dashboard notice reads only the local copy of your data — it never calls the marketplace, so
 it cannot slow your back office down. It refreshes with everything else.

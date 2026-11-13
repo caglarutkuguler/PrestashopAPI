@@ -28,7 +28,7 @@ require_once dirname(__FILE__) . '/classes/SellerThreadState.php';
 class PrestashopAPI extends Module
 {
     /** @var string Kept in a constant so the API client can send it as a user agent. */
-    const MODULE_VERSION = '2.3.0';
+    const MODULE_VERSION = '2.4.0';
 
     /** @var string Query parameter for config-page actions. "action" is reserved by the admin dispatcher. */
     const ACTION_PARAM = 'psapi_action';
@@ -50,6 +50,9 @@ class PrestashopAPI extends Module
         'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp',
         'pdf', 'txt', 'log', 'csv', 'zip', 'doc', 'docx', 'xls', 'xlsx',
     );
+
+    /** @var int Waiting conversations listed by name in the Dashboard notice. */
+    const DASHBOARD_ROWS = 5;
 
     /** @var array Every hook the module needs. Checked on each visit to the config page. */
     const HOOKS = array(
@@ -142,6 +145,7 @@ class PrestashopAPI extends Module
             'PRESTASHOPAPI_BADGE_ENABLED', 'PRESTASHOPAPI_BADGE_MIN', 'PRESTASHOPAPI_BADGE_SCOPE',
             'PRESTASHOPAPI_LINKS', 'PRESTASHOPAPI_BADGE_MAP', 'PRESTASHOPAPI_SEEN',
             'PRESTASHOPAPI_CRON_TOKEN', 'PRESTASHOPAPI_LAST_SYNC', 'PRESTASHOPAPI_LAST_ERROR',
+            'PRESTASHOPAPI_STATE_MODEL',
             // The unprefixed v1 names (PRODUCT_PAGE_FRONT_ENABLE, API_DATE_FROM,
             // API_DATE_TO) are deliberately NOT deleted: configuration is
             // shop-wide and the module cannot prove another module does not own
@@ -316,10 +320,11 @@ class PrestashopAPI extends Module
 
         SellerThreadState::install();
 
-        $threads = $this->client(false)->getThreads();
+        $client = $this->client(false);
+        $threads = $client->getThreads();
 
         if (is_array($threads) && $threads) {
-            SellerThreadState::sync($threads);
+            SellerThreadState::sync($threads, $client->getLastMessages());
         }
     }
 
@@ -465,14 +470,13 @@ class PrestashopAPI extends Module
         $client->getProducts(true);
         $sales = $client->getOrders(true);
         $threads = $client->getThreads(true);
-        // Last message per conversation, which the Messages tab sorts by.
-        $client->getLastMessages(true);
+        // Last message per conversation: the Messages tab sorts by it, and its author and
+        // read receipt decide which conversations are waiting.
+        $last = $client->getLastMessages(true);
         $client->getInvoices(true);
 
-        // Reconcile read/pinned state against what just arrived: new conversations appear
-        // unread, and anything whose fingerprint moved goes back to unread.
         if (is_array($threads)) {
-            SellerThreadState::sync($threads);
+            SellerThreadState::sync($threads, $last);
         }
 
         if ($sales === false) {
@@ -652,6 +656,9 @@ class PrestashopAPI extends Module
 
             return false;
         }
+
+        // Answered, so it is no longer waiting, whatever the next sync finds.
+        SellerThreadState::setRead($id_thread, true);
 
         $this->redirectBack(4, '', 'messages');
 
@@ -884,6 +891,19 @@ class PrestashopAPI extends Module
             }
         }
 
+        // Every page view, not only on Refresh: the cache also renews itself when it expires,
+        // and the waiting count has to follow whatever was just read. Nothing is written
+        // unless a conversation's last message actually changed.
+        if ($threads) {
+            SellerThreadState::sync($threads, $last);
+        }
+
+        // Opening a conversation settles it, as any inbox does. Done before the counts are
+        // read so the figures on this very page already reflect it.
+        if ((int) Tools::getValue('psapi_id_thread') > 0) {
+            SellerThreadState::setRead((int) Tools::getValue('psapi_id_thread'), true);
+        }
+
         $built = $this->buildThreads($threads, $last);
         $filtered = $this->filterThreads($built);
         $counts = SellerThreadState::counts();
@@ -1017,10 +1037,6 @@ class PrestashopAPI extends Module
             return null;
         }
 
-        // Opening a conversation marks it read, as any inbox does. "Mark as unread" puts it
-        // back, which is how the merchant flags the ones they still owe an answer.
-        SellerThreadState::setRead($id_thread, true);
-
         $messages = array();
 
         foreach ($this->safeList($client->getMessages($id_thread)) as $message) {
@@ -1129,8 +1145,10 @@ class PrestashopAPI extends Module
 
             $rows[] = array(
                 'id' => $id,
-                'topic' => isset($thread['topic']) ? (string) $thread['topic'] : '',
-                'product' => isset($thread['name']) ? (string) $thread['name'] : '',
+                // Buyer-typed text. Decoded here and escaped in the template, so an apostrophe
+                // the API sends as an entity is not printed as "&#039;".
+                'topic' => isset($thread['topic']) ? self::plain($thread['topic']) : '',
+                'product' => isset($thread['name']) ? self::plain($thread['name']) : '',
                 'id_product' => isset($thread['id_product']) ? (int) $thread['id_product'] : 0,
                 'messages' => isset($thread['nb_messages']) ? (int) $thread['nb_messages'] : 0,
                 'date' => $last_date,
@@ -1139,7 +1157,7 @@ class PrestashopAPI extends Module
                 'qualification' => isset($thread['qualification']) ? (string) $thread['qualification'] : '',
                 // The API writes "none" when the buyer did not say.
                 'version' => $version === 'none' ? '' : $version,
-                'website' => isset($thread['website']) ? (string) $thread['website'] : '',
+                'website' => isset($thread['website']) ? self::plain($thread['website']) : '',
                 // id_order 0 means the person has not bought: a pre-sales question.
                 'is_buyer' => !empty($thread['id_order']),
                 // zen is the Business Care entitlement. Negative days left means their free
@@ -1158,6 +1176,16 @@ class PrestashopAPI extends Module
         usort($rows, array('PrestashopAPI', 'sortThreads'));
 
         return $rows;
+    }
+
+    /**
+     * One line of API text with its entities decoded and any markup removed.
+     *
+     * @return string
+     */
+    private static function plain($value)
+    {
+        return trim(strip_tags(html_entity_decode((string) $value, ENT_QUOTES, 'UTF-8')));
     }
 
     public static function sortThreads($a, $b)
@@ -1638,11 +1666,35 @@ class PrestashopAPI extends Module
                 return '';
             }
 
+            $last = $client->getLastMessages();
+
+            // Only until the one-time rebuild has run (first Dashboard view after an update
+            // that nobody followed with a visit to the module or a cron call). After that the
+            // table is kept current by the configuration page and the cron URL.
+            if (!SellerThreadState::isCurrentModel()) {
+                SellerThreadState::sync($threads, $last);
+            }
+
             // Rendered even at zero. The block previously hid itself whenever nothing was
             // waiting, which is indistinguishable from the module being broken.
             $counts = SellerThreadState::counts();
+            $waiting = array();
+
+            if ($counts['unread'] > 0) {
+                foreach ($this->buildThreads($threads, $last) as $row) {
+                    if ($row['unread']) {
+                        $row['url'] = $this->configUrl() . '&psapi_id_thread=' . (int) $row['id'] . '#psapi-messages';
+                        $waiting[] = $row;
+
+                        if (count($waiting) >= self::DASHBOARD_ROWS) {
+                            break;
+                        }
+                    }
+                }
+            }
 
             $this->context->smarty->assign(array(
+                'psapi_waiting' => $waiting,
                 'psapi_unread' => $counts['unread'],
                 'psapi_pinned' => $counts['pinned'],
                 'psapi_total' => $counts['total'] ? $counts['total'] : count($threads),

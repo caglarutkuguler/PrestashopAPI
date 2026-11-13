@@ -214,6 +214,16 @@ class SellerApiClient
             ? $entry['payload']['map']
             : null;
 
+        // A map written before 2.4.0 has no "seen" flag, and every buyer message in it would
+        // read as unseen. Rebuilt from the cached messages instead, which do carry the field.
+        if ($cached) {
+            $first = reset($cached);
+
+            if (!is_array($first) || !array_key_exists('seen', $first)) {
+                $cached = null;
+            }
+        }
+
         if (!$force && $cached !== null && $entry['fresh']) {
             return $cached;
         }
@@ -293,6 +303,10 @@ class SellerApiClient
         // The reply is now part of the thread, so the cached copy is wrong.
         self::purgeCache('messages_' . (int) $id_thread);
         self::purgeCache('threads');
+        // Who wrote last has changed too. Left cached, the conversation would still read as
+        // "the buyer wrote last" and come straight back as waiting.
+        self::purgeCache('allmessages');
+        self::purgeCache('last_by_thread');
 
         return true;
     }

@@ -47,6 +47,18 @@ h3 .material-icons.mv-ico,
 		<a class="btn btn-primary btn-sm" href="{$psapi_messages_url|escape:'html':'UTF-8'}">
 			{l s='Open them' mod='PrestashopAPI'}
 		</a>
+		{* The newest few by name, so the notice says who is waiting, not only how many. *}
+		{if $psapi_waiting}
+			<ul class="list-unstyled" style="margin:8px 0 0 26px;">
+				{foreach from=$psapi_waiting item=row}
+					<li>
+						<a href="{$row.url|escape:'html':'UTF-8'}">{$row.topic|escape:'html':'UTF-8'}</a>
+						{if $row.product}<span class="text-muted">&middot; {$row.product|escape:'html':'UTF-8'}</span>{/if}
+						<span class="text-muted">&middot; {$row.date|truncate:16:'':true|escape:'html':'UTF-8'}</span>
+					</li>
+				{/foreach}
+			</ul>
+		{/if}
 	</div>
 {else}
 	<div class="alert alert-info">
