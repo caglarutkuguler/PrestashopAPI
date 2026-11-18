@@ -36,14 +36,14 @@ $_MODULE['<{prestashopapi}prestashop>configure_2b567533f379fab2c398929de7c99c2e'
 $_MODULE['<{prestashopapi}prestashop>configure_2b690c734d0bc1b52dd86fd82ff5d88f'] = 'No sales in the selected period.';
 $_MODULE['<{prestashopapi}prestashop>configure_2c30faee637394cd4945040a39939927'] = 'MB.';
 $_MODULE['<{prestashopapi}prestashop>configure_2d6eb75e6913e44b2f57690206d18f0d'] = 'Let us get you connected';
-$_MODULE['<{prestashopapi}prestashop>configure_3585339aed30ba73e0e738d458cff45e'] = 'The module needs to know which product in your catalogue is the same as which product on the marketplace. It matches them when the reference of your product equals the marketplace product ID. If you use different references, pin them by hand on the Products tab.';
+$_MODULE['<{prestashopapi}prestashop>configure_4a428f1e06b81adc6de3dceb68725194'] = 'The module needs to know which product in your catalogue is the same as which product on the marketplace. Enter the marketplace product ID in the MPN field of your product (Details tab), so your reference stays free for your own SKUs. Products with an empty MPN are still matched by reference, as in earlier versions. Anything else can be pinned by hand on the Products tab.';
 $_MODULE['<{prestashopapi}prestashop>configure_3601146c4e948c32b6424d2c0a7f0118'] = 'Price';
 $_MODULE['<{prestashopapi}prestashop>configure_385e36f3b4be0cf04d83eb4dbfba3b8c'] = 'Sign in at addons.prestashop.com with the account that sells your modules.';
 $_MODULE['<{prestashopapi}prestashop>configure_3b488ade6f134eacce53039c0d3b7908'] = 'How this module works';
 $_MODULE['<{prestashopapi}prestashop>configure_3c5e891bff07947cbae2fda89162df9f'] = 'Pinned';
 $_MODULE['<{prestashopapi}prestashop>configure_4127ece03a98e9a4ef85c632087aa425'] = 'Not matched';
 $_MODULE['<{prestashopapi}prestashop>configure_41de6d6cfb8953c021bbe4ba0701c8a1'] = 'Messages';
-$_MODULE['<{prestashopapi}prestashop>configure_42e9d9a762e41c9d24331ecc77cd7bfe'] = 'A product is matched to this shop when its reference here equals its marketplace product ID. Anything that did not match automatically can be pinned by hand below.';
+$_MODULE['<{prestashopapi}prestashop>configure_e8effccaa048a3b980d27fe1854ea8fc'] = 'A product is matched to this shop when its MPN here equals its marketplace product ID. A product with an empty MPN is matched by its reference instead. Anything that did not match automatically can be pinned by hand below.';
 $_MODULE['<{prestashopapi}prestashop>configure_43762ae6894fd33706622d782c18e8e6'] = 'Payouts';
 $_MODULE['<{prestashopapi}prestashop>configure_44749712dbec183e983dcd78a7736c41'] = 'Date';
 $_MODULE['<{prestashopapi}prestashop>configure_44877c6aa8e93fa5a91c9361211464fb'] = 'Speed';

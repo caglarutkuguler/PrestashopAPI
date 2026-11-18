@@ -51,14 +51,14 @@ $_MODULE['<{prestashopapi}prestashop>configure_2b567533f379fab2c398929de7c99c2e'
 $_MODULE['<{prestashopapi}prestashop>configure_2b690c734d0bc1b52dd86fd82ff5d88f'] = 'No hay ventas en el período seleccionado.';
 $_MODULE['<{prestashopapi}prestashop>configure_2c30faee637394cd4945040a39939927'] = 'MB.';
 $_MODULE['<{prestashopapi}prestashop>configure_2d6eb75e6913e44b2f57690206d18f0d'] = 'Conectémonos';
-$_MODULE['<{prestashopapi}prestashop>configure_3585339aed30ba73e0e738d458cff45e'] = 'El módulo debe saber qué producto de su catálogo es el mismo que cuál en el marketplace. Los vincula cuando la referencia de su producto coincide con el ID de producto del marketplace. Si usa referencias diferentes, fíjelos manualmente en la pestaña Productos.';
+$_MODULE['<{prestashopapi}prestashop>configure_4a428f1e06b81adc6de3dceb68725194'] = 'El módulo necesita saber qué producto de su catálogo es el mismo que cuál en el marketplace. Introduzca el ID de producto del marketplace en el campo MPN de su producto (pestaña Detalles), para que su referencia quede libre para sus propios SKU. Los productos con MPN vacío se siguen vinculando por referencia, como en versiones anteriores. Lo demás puede fijarse manualmente en la pestaña Productos.';
 $_MODULE['<{prestashopapi}prestashop>configure_3601146c4e948c32b6424d2c0a7f0118'] = 'Precio';
 $_MODULE['<{prestashopapi}prestashop>configure_385e36f3b4be0cf04d83eb4dbfba3b8c'] = 'Inicie sesión en addons.prestashop.com con la cuenta que vende sus módulos.';
 $_MODULE['<{prestashopapi}prestashop>configure_3b488ade6f134eacce53039c0d3b7908'] = 'Cómo funciona este módulo';
 $_MODULE['<{prestashopapi}prestashop>configure_3c5e891bff07947cbae2fda89162df9f'] = 'Fijados';
 $_MODULE['<{prestashopapi}prestashop>configure_4127ece03a98e9a4ef85c632087aa425'] = 'No vinculado';
 $_MODULE['<{prestashopapi}prestashop>configure_41de6d6cfb8953c021bbe4ba0701c8a1'] = 'Mensajes';
-$_MODULE['<{prestashopapi}prestashop>configure_42e9d9a762e41c9d24331ecc77cd7bfe'] = 'Un producto se vincula a esta tienda cuando su referencia aquí coincide con el ID de producto del marketplace. Lo que no se vinculó automáticamente puede fijarse manualmente abajo.';
+$_MODULE['<{prestashopapi}prestashop>configure_e8effccaa048a3b980d27fe1854ea8fc'] = 'Un producto se vincula a esta tienda cuando su MPN aquí coincide con su ID de producto del marketplace. Un producto con MPN vacío se vincula en cambio por su referencia. Lo que no se vinculó automáticamente puede fijarse manualmente abajo.';
 $_MODULE['<{prestashopapi}prestashop>configure_43762ae6894fd33706622d782c18e8e6'] = 'Pagos';
 $_MODULE['<{prestashopapi}prestashop>configure_44749712dbec183e983dcd78a7736c41'] = 'Fecha';
 $_MODULE['<{prestashopapi}prestashop>configure_44877c6aa8e93fa5a91c9361211464fb'] = 'Velocidad';

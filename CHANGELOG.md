@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.5.0
+
+### Changed
+
+- Marketplace products are now matched by the MPN field of your product (Catalog > Products > Details > References). Your reference is free again for your own SKU scheme.
+- A product with an empty MPN is still matched by its reference, so shops set up with earlier versions keep working without changes.
+- The product lists on the Products tab show the MPN next to the product name, or the reference when there is no MPN.
+
+### Notes
+
+- Match order: pinned by hand on the Products tab, then MPN, then reference. When the MPN of one product and the reference of another both equal the same marketplace ID, the MPN wins.
+- The MPN field exists from PrestaShop 1.7.7. On 1.7.0–1.7.6 matching stays by reference only.
+- No table changes, no upgrade script.
+
 ## 2.4.0
 
 ### Fixed

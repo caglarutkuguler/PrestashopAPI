@@ -51,14 +51,14 @@ $_MODULE['<{prestashopapi}prestashop>configure_2b567533f379fab2c398929de7c99c2e'
 $_MODULE['<{prestashopapi}prestashop>configure_2b690c734d0bc1b52dd86fd82ff5d88f'] = 'Keine Verkäufe im ausgewählten Zeitraum.';
 $_MODULE['<{prestashopapi}prestashop>configure_2c30faee637394cd4945040a39939927'] = 'MB.';
 $_MODULE['<{prestashopapi}prestashop>configure_2d6eb75e6913e44b2f57690206d18f0d'] = 'Lassen Sie uns Sie verbinden';
-$_MODULE['<{prestashopapi}prestashop>configure_3585339aed30ba73e0e738d458cff45e'] = 'Das Modul muss wissen, welches Produkt in Ihrem Katalog dasselbe ist wie welches auf dem Marktplatz. Es verknüpft sie, wenn die Referenz Ihres Produkts der Marktplatz-Produkt-ID entspricht. Bei unterschiedlichen Referenzen heften Sie sie manuell im Reiter Produkte an.';
+$_MODULE['<{prestashopapi}prestashop>configure_4a428f1e06b81adc6de3dceb68725194'] = 'Das Modul muss wissen, welches Produkt in Ihrem Katalog dem Marktplatz-Produkt entspricht. Tragen Sie die Marktplatz-Produkt-ID im Feld MPN Ihres Produkts (Reiter Details) ein, damit Ihre Referenz für Ihre eigenen SKUs frei bleibt. Produkte mit leerem MPN werden weiterhin über die Referenz zugeordnet, wie in früheren Versionen. Alles Weitere kann im Reiter Produkte manuell angeheftet werden.';
 $_MODULE['<{prestashopapi}prestashop>configure_3601146c4e948c32b6424d2c0a7f0118'] = 'Preis';
 $_MODULE['<{prestashopapi}prestashop>configure_385e36f3b4be0cf04d83eb4dbfba3b8c'] = 'Melden Sie sich bei addons.prestashop.com mit dem Konto an, das Ihre Module verkauft.';
 $_MODULE['<{prestashopapi}prestashop>configure_3b488ade6f134eacce53039c0d3b7908'] = 'Wie dieses Modul funktioniert';
 $_MODULE['<{prestashopapi}prestashop>configure_3c5e891bff07947cbae2fda89162df9f'] = 'Angeheftet';
 $_MODULE['<{prestashopapi}prestashop>configure_4127ece03a98e9a4ef85c632087aa425'] = 'Nicht verknüpft';
 $_MODULE['<{prestashopapi}prestashop>configure_41de6d6cfb8953c021bbe4ba0701c8a1'] = 'Nachrichten';
-$_MODULE['<{prestashopapi}prestashop>configure_42e9d9a762e41c9d24331ecc77cd7bfe'] = 'Ein Produkt ist mit diesem Shop verknüpft, wenn seine Referenz hier der Marktplatz-Produkt-ID entspricht. Alles, was nicht automatisch verknüpft wurde, kann unten manuell angeheftet werden.';
+$_MODULE['<{prestashopapi}prestashop>configure_e8effccaa048a3b980d27fe1854ea8fc'] = 'Ein Produkt wird diesem Shop zugeordnet, wenn seine MPN hier der Marktplatz-Produkt-ID entspricht. Ein Produkt mit leerem MPN wird stattdessen über seine Referenz zugeordnet. Alles, was nicht automatisch zugeordnet wurde, kann unten manuell angeheftet werden.';
 $_MODULE['<{prestashopapi}prestashop>configure_43762ae6894fd33706622d782c18e8e6'] = 'Auszahlungen';
 $_MODULE['<{prestashopapi}prestashop>configure_44749712dbec183e983dcd78a7736c41'] = 'Datum';
 $_MODULE['<{prestashopapi}prestashop>configure_44877c6aa8e93fa5a91c9361211464fb'] = 'Geschwindigkeit';

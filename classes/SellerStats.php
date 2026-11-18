@@ -128,6 +128,10 @@ class SellerStats
      * v1 required the merchant to set every local product's reference to the marketplace
      * product id, and said so in a blue info box. That is an instruction, not a control, so
      * a typo produced silently wrong totals. Now the match is reported and can be overridden.
+     *
+     * 2.5.0: the marketplace id is looked up in the MPN field first, so the reference is free
+     * for the shop's own SKU scheme. A product whose MPN is empty or not a marketplace id
+     * still matches by reference, as before. Order: pinned link, MPN, reference.
      * ---------------------------------------------------------------- */
 
     private function linkProducts()
@@ -155,27 +159,38 @@ class SellerStats
             $escaped[] = '"' . pSQL($id) . '"';
         }
 
-        $rows = Db::getInstance()->executeS(
-            'SELECT p.`id_product`, p.`reference`, pl.`name`
-             FROM `' . _DB_PREFIX_ . 'product` p
-             LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` pl
-                ON pl.`id_product` = p.`id_product`
-               AND pl.`id_lang` = ' . (int) Context::getContext()->language->id .
-                Shop::addSqlRestrictionOnLang('pl') . '
-             WHERE p.`reference` IN (' . implode(',', $escaped) . ')'
-        );
+        $fields = self::hasMpnColumn() ? array('mpn', 'reference') : array('reference');
 
-        if (is_array($rows)) {
+        foreach ($fields as $field) {
+            $rows = Db::getInstance()->executeS(
+                'SELECT p.`id_product`, p.`reference`, ' . self::mpnSelect() . ', pl.`name`
+                 FROM `' . _DB_PREFIX_ . 'product` p
+                 LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` pl
+                    ON pl.`id_product` = p.`id_product`
+                   AND pl.`id_lang` = ' . (int) Context::getContext()->language->id .
+                    Shop::addSqlRestrictionOnLang('pl') . '
+                 WHERE p.`' . $field . '` IN (' . implode(',', $escaped) . ')'
+            );
+
+            if (!is_array($rows)) {
+                continue;
+            }
+
             foreach ($rows as $row) {
                 // Match on the exact string. v1 used ==, which on PHP 5/7 made every
                 // non-numeric reference equal to marketplace id 0.
-                $this->links[(string) $row['reference']] = $row;
+                $key = trim((string) $row[$field]);
+
+                // An MPN match wins over a reference match for the same marketplace id.
+                if ($key !== '' && !isset($this->links[$key])) {
+                    $this->links[$key] = $row;
+                }
             }
         }
 
         foreach ($overrides as $marketplace_id => $id_local) {
             $row = Db::getInstance()->getRow(
-                'SELECT p.`id_product`, p.`reference`, pl.`name`
+                'SELECT p.`id_product`, p.`reference`, ' . self::mpnSelect() . ', pl.`name`
                  FROM `' . _DB_PREFIX_ . 'product` p
                  LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` pl
                     ON pl.`id_product` = p.`id_product`
@@ -188,6 +203,33 @@ class SellerStats
                 $this->links[(string) $marketplace_id] = $row;
             }
         }
+    }
+
+    /**
+     * The product MPN column arrived in PrestaShop 1.7.7. On older shops matching falls back
+     * to the reference alone.
+     *
+     * @return bool
+     */
+    public static function hasMpnColumn()
+    {
+        static $has = null;
+
+        if ($has === null) {
+            $has = (bool) Db::getInstance()->executeS(
+                'SHOW COLUMNS FROM `' . _DB_PREFIX_ . 'product` LIKE "mpn"'
+            );
+        }
+
+        return $has;
+    }
+
+    /**
+     * @return string Select expression that always yields an "mpn" column.
+     */
+    public static function mpnSelect()
+    {
+        return self::hasMpnColumn() ? 'p.`mpn`' : '"" AS `mpn`';
     }
 
     /**

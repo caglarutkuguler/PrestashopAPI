@@ -51,14 +51,14 @@ $_MODULE['<{prestashopapi}prestashop>configure_2b567533f379fab2c398929de7c99c2e'
 $_MODULE['<{prestashopapi}prestashop>configure_2b690c734d0bc1b52dd86fd82ff5d88f'] = 'Brak sprzedaży w wybranym okresie.';
 $_MODULE['<{prestashopapi}prestashop>configure_2c30faee637394cd4945040a39939927'] = 'MB.';
 $_MODULE['<{prestashopapi}prestashop>configure_2d6eb75e6913e44b2f57690206d18f0d'] = 'Połączmy Cię';
-$_MODULE['<{prestashopapi}prestashop>configure_3585339aed30ba73e0e738d458cff45e'] = 'Moduł musi wiedzieć, który produkt w katalogu odpowiada któremu na marketplace. Łączy je, gdy referencja produktu odpowiada ID produktu na marketplace. Jeśli używasz innych referencji, przypnij je ręcznie w zakładce Produkty.';
+$_MODULE['<{prestashopapi}prestashop>configure_4a428f1e06b81adc6de3dceb68725194'] = 'Moduł musi wiedzieć, który produkt w katalogu odpowiada któremu na marketplace. Wpisz ID produktu z marketplace w polu MPN swojego produktu (zakładka Szczegóły), aby referencja pozostała wolna dla własnych SKU. Produkty z pustym MPN są nadal dopasowywane po referencji, jak w poprzednich wersjach. Wszystko inne można przypiąć ręcznie w zakładce Produkty.';
 $_MODULE['<{prestashopapi}prestashop>configure_3601146c4e948c32b6424d2c0a7f0118'] = 'Cena';
 $_MODULE['<{prestashopapi}prestashop>configure_385e36f3b4be0cf04d83eb4dbfba3b8c'] = 'Zaloguj się na addons.prestashop.com kontem, które sprzedaje Twoje moduły.';
 $_MODULE['<{prestashopapi}prestashop>configure_3b488ade6f134eacce53039c0d3b7908'] = 'Jak działa ten moduł';
 $_MODULE['<{prestashopapi}prestashop>configure_3c5e891bff07947cbae2fda89162df9f'] = 'Przypięte';
 $_MODULE['<{prestashopapi}prestashop>configure_4127ece03a98e9a4ef85c632087aa425'] = 'Nie powiązano';
 $_MODULE['<{prestashopapi}prestashop>configure_41de6d6cfb8953c021bbe4ba0701c8a1'] = 'Wiadomości';
-$_MODULE['<{prestashopapi}prestashop>configure_42e9d9a762e41c9d24331ecc77cd7bfe'] = 'Produkt jest powiązany z tym sklepem, gdy jego referencja tutaj odpowiada ID produktu na marketplace. To, co nie zostało powiązane automatycznie, można przypiąć ręcznie poniżej.';
+$_MODULE['<{prestashopapi}prestashop>configure_e8effccaa048a3b980d27fe1854ea8fc'] = 'Produkt jest dopasowany do tego sklepu, gdy jego MPN tutaj jest równy ID produktu na marketplace. Produkt z pustym MPN jest dopasowywany po swojej referencji. To, co nie zostało dopasowane automatycznie, można przypiąć ręcznie poniżej.';
 $_MODULE['<{prestashopapi}prestashop>configure_43762ae6894fd33706622d782c18e8e6'] = 'Wypłaty';
 $_MODULE['<{prestashopapi}prestashop>configure_44749712dbec183e983dcd78a7736c41'] = 'Data';
 $_MODULE['<{prestashopapi}prestashop>configure_44877c6aa8e93fa5a91c9361211464fb'] = 'Szybkość';

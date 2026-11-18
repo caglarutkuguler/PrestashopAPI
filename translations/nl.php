@@ -51,14 +51,14 @@ $_MODULE['<{prestashopapi}prestashop>configure_2b567533f379fab2c398929de7c99c2e'
 $_MODULE['<{prestashopapi}prestashop>configure_2b690c734d0bc1b52dd86fd82ff5d88f'] = 'Geen verkopen in de geselecteerde periode.';
 $_MODULE['<{prestashopapi}prestashop>configure_2c30faee637394cd4945040a39939927'] = 'MB.';
 $_MODULE['<{prestashopapi}prestashop>configure_2d6eb75e6913e44b2f57690206d18f0d'] = 'Laten we u verbinden';
-$_MODULE['<{prestashopapi}prestashop>configure_3585339aed30ba73e0e738d458cff45e'] = 'De module moet weten welk product in uw catalogus hetzelfde is als welk product op de marktplaats. Het koppelt ze wanneer de referentie van uw product gelijk is aan het marktplaatsproduct-ID. Gebruikt u andere referenties, zet ze dan handmatig vast op het tabblad Producten.';
+$_MODULE['<{prestashopapi}prestashop>configure_4a428f1e06b81adc6de3dceb68725194'] = 'De module moet weten welk product in uw catalogus hetzelfde is als welk product op de marktplaats. Vul het marktplaatsproduct-ID in het veld MPN van uw product in (tabblad Details), zodat uw referentie vrij blijft voor uw eigen SKU\'s. Producten met een leeg MPN worden nog steeds gekoppeld op referentie, zoals in eerdere versies. Al het overige kan handmatig worden vastgezet op het tabblad Producten.';
 $_MODULE['<{prestashopapi}prestashop>configure_3601146c4e948c32b6424d2c0a7f0118'] = 'Prijs';
 $_MODULE['<{prestashopapi}prestashop>configure_385e36f3b4be0cf04d83eb4dbfba3b8c'] = 'Meld u aan op addons.prestashop.com met het account dat uw modules verkoopt.';
 $_MODULE['<{prestashopapi}prestashop>configure_3b488ade6f134eacce53039c0d3b7908'] = 'Hoe deze module werkt';
 $_MODULE['<{prestashopapi}prestashop>configure_3c5e891bff07947cbae2fda89162df9f'] = 'Vastgezet';
 $_MODULE['<{prestashopapi}prestashop>configure_4127ece03a98e9a4ef85c632087aa425'] = 'Niet gekoppeld';
 $_MODULE['<{prestashopapi}prestashop>configure_41de6d6cfb8953c021bbe4ba0701c8a1'] = 'Berichten';
-$_MODULE['<{prestashopapi}prestashop>configure_42e9d9a762e41c9d24331ecc77cd7bfe'] = 'Een product is gekoppeld aan deze winkel wanneer de referentie hier gelijk is aan het marktplaatsproduct-ID. Wat niet automatisch is gekoppeld, kan hieronder handmatig worden vastgezet.';
+$_MODULE['<{prestashopapi}prestashop>configure_e8effccaa048a3b980d27fe1854ea8fc'] = 'Een product is gekoppeld aan deze winkel wanneer de MPN hier gelijk is aan het marktplaatsproduct-ID. Een product met een leeg MPN wordt in plaats daarvan gekoppeld op zijn referentie. Wat niet automatisch is gekoppeld, kan hieronder handmatig worden vastgezet.';
 $_MODULE['<{prestashopapi}prestashop>configure_43762ae6894fd33706622d782c18e8e6'] = 'Uitbetalingen';
 $_MODULE['<{prestashopapi}prestashop>configure_44749712dbec183e983dcd78a7736c41'] = 'Datum';
 $_MODULE['<{prestashopapi}prestashop>configure_44877c6aa8e93fa5a91c9361211464fb'] = 'Snelheid';

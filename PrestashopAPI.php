@@ -28,7 +28,7 @@ require_once dirname(__FILE__) . '/classes/SellerThreadState.php';
 class PrestashopAPI extends Module
 {
     /** @var string Kept in a constant so the API client can send it as a user agent. */
-    const MODULE_VERSION = '2.4.0';
+    const MODULE_VERSION = '2.5.0';
 
     /** @var string Query parameter for config-page actions. "action" is reserved by the admin dispatcher. */
     const ACTION_PARAM = 'psapi_action';
@@ -1409,12 +1409,12 @@ class PrestashopAPI extends Module
     }
 
     /**
-     * @return array id_product => "reference - name", for the manual link dropdowns.
+     * @return array id_product => "name (MPN or reference)", for the manual link dropdowns.
      */
     private function localProductChoices()
     {
         $rows = Db::getInstance()->executeS(
-            'SELECT p.`id_product`, p.`reference`, pl.`name`
+            'SELECT p.`id_product`, p.`reference`, ' . SellerStats::mpnSelect() . ', pl.`name`
              FROM `' . _DB_PREFIX_ . 'product` p
              LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` pl
                 ON pl.`id_product` = p.`id_product`
@@ -1430,8 +1430,10 @@ class PrestashopAPI extends Module
             foreach ($rows as $row) {
                 $label = $row['name'] !== null && $row['name'] !== '' ? $row['name'] : ('#' . $row['id_product']);
 
-                if ($row['reference'] !== '') {
-                    $label .= ' (' . $row['reference'] . ')';
+                $code = trim((string) $row['mpn']) !== '' ? trim((string) $row['mpn']) : trim((string) $row['reference']);
+
+                if ($code !== '') {
+                    $label .= ' (' . $code . ')';
                 }
 
                 $choices[(int) $row['id_product']] = $label;
@@ -1879,8 +1881,8 @@ class PrestashopAPI extends Module
     }
 
     /**
-     * A product is matched to the marketplace by its reference, unless the merchant has
-     * pinned it explicitly on the Products tab.
+     * A product is matched to the marketplace by its MPN, or by its reference when the MPN
+     * is empty, unless the merchant has pinned it explicitly on the Products tab.
      */
     private function marketplaceIdFor(Product $product)
     {
@@ -1890,6 +1892,8 @@ class PrestashopAPI extends Module
             }
         }
 
-        return trim((string) $product->reference);
+        $mpn = property_exists($product, 'mpn') ? trim((string) $product->mpn) : '';
+
+        return $mpn !== '' ? $mpn : trim((string) $product->reference);
     }
 }

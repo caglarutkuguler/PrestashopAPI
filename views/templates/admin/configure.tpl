@@ -318,7 +318,7 @@ h3 .material-icons.mv-ico,
 		<div class="panel">
 			<h3><i class="material-icons mv-ico">widgets</i> {l s='Your products' mod='PrestashopAPI'}</h3>
 			<p class="psapi-lead">
-				{l s='A product is matched to this shop when its reference here equals its marketplace product ID. Anything that did not match automatically can be pinned by hand below.' mod='PrestashopAPI'}
+				{l s='A product is matched to this shop when its MPN here equals its marketplace product ID. A product with an empty MPN is matched by its reference instead. Anything that did not match automatically can be pinned by hand below.' mod='PrestashopAPI'}
 			</p>
 
 			{if $psapi_products}
@@ -812,7 +812,7 @@ h3 .material-icons.mv-ico,
 				</div>
 				<div>
 					<h4>{l s='Why some products show no shop sales' mod='PrestashopAPI'}</h4>
-					<p>{l s='The module needs to know which product in your catalogue is the same as which product on the marketplace. It matches them when the reference of your product equals the marketplace product ID. If you use different references, pin them by hand on the Products tab.' mod='PrestashopAPI'}</p>
+					<p>{l s='The module needs to know which product in your catalogue is the same as which product on the marketplace. Enter the marketplace product ID in the MPN field of your product (Details tab), so your reference stays free for your own SKUs. Products with an empty MPN are still matched by reference, as in earlier versions. Anything else can be pinned by hand on the Products tab.' mod='PrestashopAPI'}</p>
 				</div>
 				<div>
 					<h4>{l s='Refunds' mod='PrestashopAPI'}</h4>
