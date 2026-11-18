@@ -2,6 +2,13 @@
 
 _Only customer-relevant changes are listed. Internal refactoring, tests and housekeeping are omitted._
 
+## 2.5.0
+
+### Improved
+- Marketplace products are now matched by the MPN field of your product (Catalog > Products > Details > References). Your reference is free again for your own SKU scheme
+- A product with an empty MPN is still matched by its reference, so shops set up with earlier versions keep working without changes
+- The product lists on the Products tab show the MPN next to the product name, or the reference when there is no MPN
+
 ## 2.4.0
 
 ### New
@@ -26,18 +33,3 @@ _Only customer-relevant changes are listed. Internal refactoring, tests and hous
 ### Fixed
 - With several shops, the "Marketplace + this shop" badge counted the orders of every shop. It now counts only the orders of the shop being visited
 - With several shops, a product pinned by hand on the Products tab could show the name of another shop's language row. The name now comes from the current shop
-
-## 2.2.0
-
-### New
-- An "Awaiting reply" filter on the Messages tab, listing every conversation where the buyer wrote last
-- A counter of conversations awaiting your reply on the Messages tab and in the Status list on the Dashboard tab
-
-### Improved
-- Conversations on the Messages tab are now sorted by their last message, the same order as the marketplace's own inbox. A buyer writing today in a conversation opened two years ago now appears at the top instead of being buried under newer conversations
-- The "Opened" column is now "Last message". The date the conversation was opened is shown underneath in smaller text
-- Pinned conversations still come first. Unread conversations no longer jump ahead of the others; the Unread filter still lists them
-- In a conversation, each message now says whether it was written by the customer or by you
-
-### Fixed
-- Passwords that buyers paste into a conversation (for example "password: …", "parola: …", "mot de passe: …") are now hidden behind dots when the conversation is shown. Only the display changes: the message itself is not altered
